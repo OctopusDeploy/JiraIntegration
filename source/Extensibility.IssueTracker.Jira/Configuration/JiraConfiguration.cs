@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
@@ -11,5 +9,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         {
             Id = JiraConfigurationStore.SingletonId;
         }
+
+        public string BaseUrl { get; set; }
     }
 }

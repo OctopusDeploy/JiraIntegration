@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>net451</TargetFramework>
     <RootNamespace>Octopus.Server.Extensibility.IssueTracker.Jira</RootNamespace>
     <AssemblyName>Octopus.Server.Extensibility.IssueTracker.Jira</AssemblyName>
     <Description>Implements the Jira issue tracker.</Description>
@@ -14,8 +14,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Octopus.Diagnostics" Version="1.2.2" />
     <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.2" />
-    <PackageReference Include="Octopus.Server.Extensibility.IssueTracker" Version="0.1.0-ci0000" />
+    <PackageReference Include="Octopus.Server.Extensibility.IssueTracker" Version="0.1.0-ci0001" />
   </ItemGroup>
 
 </Project>
