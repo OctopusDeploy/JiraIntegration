@@ -15,7 +15,7 @@
 
   <ItemGroup>
     <PackageReference Include="Octopus.Diagnostics" Version="1.2.2" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.2" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.3-enh-workitems0003" />
     <PackageReference Include="Octopus.Server.Extensibility.IssueTracker" Version="0.1.0-ci0001" />
   </ItemGroup>
 

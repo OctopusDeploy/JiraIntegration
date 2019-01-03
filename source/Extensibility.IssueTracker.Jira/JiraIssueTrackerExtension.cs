@@ -4,7 +4,9 @@ using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Mappings;
+using Octopus.Server.Extensibility.Extensions.Model;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Model.Projects;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
@@ -15,20 +17,24 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
         {
             builder.RegisterType<JiraConfigurationMapping>()
                 .As<IConfigurationDocumentMapper>()
-                .InstancePerDependency();
+                .InstancePerLifetimeScope();
 
-            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerDependency();
+            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConfigurationStore>()
                 .As<IJiraConfigurationStore>()
-                .InstancePerDependency();
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConfigurationSettings>()
                 .As<IJiraConfigurationSettings>()
                 .As<IHasConfigurationSettings>()
                 .As<IHasConfigurationSettingsResource>()
                 .As<IContributeMappings>()
-                .InstancePerDependency();
+                .InstancePerLifetimeScope();
+
+            builder.RegisterType<ProjectSettings>()
+                .As<IContributeProjectSettingsMetadata>()
+                .InstancePerLifetimeScope();
         }
     }
 }

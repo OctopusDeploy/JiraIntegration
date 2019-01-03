@@ -6,6 +6,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
     public class JiraIssueTracker : IIssueTracker
     {
+        internal static string Name = "Jira";
+
         readonly IJiraConfigurationStore configurationStore;
 
         public JiraIssueTracker(IJiraConfigurationStore configurationStore)
@@ -13,7 +15,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
             this.configurationStore = configurationStore;
         }
 
-        public string IssueTrackerName => "Jira";
+        public string IssueTrackerName => Name;
         public bool IsEnabled => configurationStore.GetIsEnabled();
     }
 }
