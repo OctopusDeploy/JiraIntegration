@@ -12,5 +12,10 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         [Description(JiraBaseUrlDescription)]
         [Writeable]
         public string BaseUrl { get; set; }
+
+        [DisplayName("Octopus Installation Id")]
+        [Description("Use this Id when configuring the Jira connect application")]
+        [ReadOnly(true)]
+        public string OctopusInstallationId { get; set; }
     }
 }
