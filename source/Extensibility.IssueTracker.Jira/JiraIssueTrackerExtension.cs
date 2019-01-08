@@ -8,7 +8,6 @@ using Octopus.Server.Extensibility.Extensions.Model.Projects;
 using Octopus.Server.Extensibility.IssueTracker.Extensions;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Model.Projects;
-using IContributeWorkItemsToReleases = Octopus.Server.Extensibility.Extensions.Model.Projects.IContributeWorkItemsToReleases;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {

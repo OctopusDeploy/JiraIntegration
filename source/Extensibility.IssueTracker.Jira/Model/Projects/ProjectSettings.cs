@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using Octopus.Server.Extensibility.Extensions.Model.Projects;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
+using Octopus.Server.Extensibility.IssueTracker.Extensions;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.Metadata;
 using Octopus.Server.Extensibility.Resources;
