@@ -11,5 +11,6 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         }
 
         public string BaseUrl { get; set; }
+        public string ConnectAppUrl { get; set; }
     }
 }

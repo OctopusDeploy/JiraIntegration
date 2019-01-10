@@ -24,5 +24,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
             SetProperty(doc => doc.BaseUrl = baseUrl);
         }
 
+        public string GetConnectAppUrl()
+        {
+            return GetProperty(doc => doc.ConnectAppUrl);
+        }
+
+        public void SetConnectAppUrl(string url)
+        {
+            SetProperty(doc => doc.ConnectAppUrl = url);
+        }
     }
 }

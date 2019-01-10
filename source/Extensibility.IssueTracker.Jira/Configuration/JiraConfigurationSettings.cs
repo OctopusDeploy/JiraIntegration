@@ -26,6 +26,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 
             yield return new ConfigurationValue("Octopus.WebPortal.JiraIssueTracker", isEnabled.ToString(), isEnabled, "Is Enabled");
             yield return new ConfigurationValue("Octopus.WebPortal.JiraBaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
+            yield return new ConfigurationValue("Octopus.WebPortal.JiraConnectAppPassword", ConfigurationDocumentStore.GetPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetPassword()), "Jira Connect App Password");
         }
 
         public override void BuildMappings(IResourceMappingsBuilder builder)

@@ -7,5 +7,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
     {
         string GetBaseUrl();
         void SetBaseUrl(string baseUrl);
+        string GetConnectAppUrl();
+        void SetConnectAppUrl(string url);
     }
 }
