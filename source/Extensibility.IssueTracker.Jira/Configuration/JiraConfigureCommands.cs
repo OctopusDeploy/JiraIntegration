@@ -32,6 +32,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
                 jiraConfiguration.Value.SetBaseUrl(v);
                 log.Info($"Jira Issue Tracker integration base Url set to: {v}");
             });
+            yield return new ConfigureCommandOption("jiraConnectAppUrl=", "Set the URL for the Jira Connect App", v =>
+            {
+                jiraConfiguration.Value.SetConnectAppUrl(v);
+                log.Info($"Jira Issue Tracker integration ConnectAppUrl set to: {v}");
+            });
         }
     }
 }
