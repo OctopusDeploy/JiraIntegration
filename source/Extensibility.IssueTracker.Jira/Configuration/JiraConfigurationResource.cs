@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel;
+using Octopus.Data.Resources;
 using Octopus.Data.Resources.Attributes;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
@@ -12,6 +13,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         [Description(JiraBaseUrlDescription)]
         [Writeable]
         public string BaseUrl { get; set; }
+        
+        [DisplayName("Jira Connect App Password")]
+        [Description("Set the password for authenticating with the Jira Connect App")]
+        [Writeable]
+        public SensitiveValue Password { get; set; }
 
         [DisplayName("Octopus Installation Id")]
         [Description("Use this Id when configuring the Jira connect application")]
