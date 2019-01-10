@@ -7,6 +7,7 @@ using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Projects;
 using Octopus.Server.Extensibility.IssueTracker.Extensions;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Model.Projects;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
@@ -41,6 +42,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
             builder.RegisterType<JiraIssueTracker>()
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
+
+            builder.RegisterType<DeploymentObserver>().AsSelf().InstancePerDependency();
         }
     }
 }
