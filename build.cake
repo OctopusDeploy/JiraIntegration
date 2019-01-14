@@ -21,6 +21,7 @@ var localPackagesDir = "../LocalPackages";
 var artifactsDir = "./artifacts";
 
 var extensionName = "Octopus.Server.Extensibility.IssueTracker.Jira";
+var extensionClientName = "Octopus.Client.Extensibility.IssueTracker.Jira";
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
     OutputType = GitVersionOutput.Json
@@ -110,6 +111,11 @@ Task("__Publish")
         ApiKey = EnvironmentVariable("FeedzIoApiKey")
     });
 
+    NuGetPush($"{artifactsDir}/{extensionClientName}.{nugetVersion}.nupkg", new NuGetPushSettings {
+        Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
+        ApiKey = EnvironmentVariable("FeedzIoApiKey")
+    });
+
     if (gitVersionInfo.PreReleaseLabel == "")
     {
     }
@@ -124,6 +130,7 @@ Task("__CopyToLocalPackages")
 {
     CreateDirectory(localPackagesDir);
     CopyFileToDirectory(Path.Combine(artifactsDir, $"{extensionName}.{nugetVersion}.nupkg"), localPackagesDir);
+    CopyFileToDirectory(Path.Combine(artifactsDir, $"{extensionClientName}.{nugetVersion}.nupkg"), localPackagesDir);
 });
 
 //////////////////////////////////////////////////////////////////////
