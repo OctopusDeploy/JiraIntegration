@@ -26,7 +26,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Model.Projects
 
         public List<PropertyMetadata> Properties => configurationStore.GetIsEnabled() ? new MetadataGenerator().GetMetadata<JiraProjectSettings>().Types.First().Properties : null;
 
-        public class JiraProjectSettings
+        internal class JiraProjectSettings
         {
             [DisplayName("Work Item Package")]
             [Description("Include the work items from an included package")]
