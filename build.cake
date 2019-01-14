@@ -20,8 +20,7 @@ var publishDir = "./publish";
 var localPackagesDir = "../LocalPackages";
 var artifactsDir = "./artifacts";
 
-var extensionName = "Octopus.Server.Extensibility.IssueTracker.Jira";
-var extensionClientName = "Octopus.Client.Extensibility.IssueTracker.Jira";
+var extensionName = "IssueTracker.Jira";
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
     OutputType = GitVersionOutput.Json
@@ -79,6 +78,7 @@ Task("__Build")
     DotNetCoreBuild("./source", new DotNetCoreBuildSettings
     {
         Configuration = configuration,
+        NoRestore = true,
         ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
     });
 });
@@ -92,12 +92,24 @@ Task("__Test")
 
 Task("__Pack")
     .Does(() => {
-        DotNetCorePack("source", new DotNetCorePackSettings
+        DotNetCorePack(Path.Combine("source", "Client"), new DotNetCorePackSettings
         {
             Configuration = configuration,
             OutputDirectory = artifactsDir,
             NoBuild = true,
+            NoRestore = true,
             ArgumentCustomization = args => args.Append($"/p:Version={nugetVersion}")
+        });
+
+        var extPublishDir = Path.Combine(publishDir, "Server");
+        CreateDirectory(extPublishDir);
+        CopyFileToDirectory(Path.Combine("BuildAssets", "Server.nuspec"), extPublishDir);
+
+		CopyFiles(Path.Combine("source", "Server", "bin", "Release", "net451", $"*.{extensionName}.dll"), extPublishDir);
+
+        NuGetPack(Path.Combine(extPublishDir, "Server.nuspec"), new NuGetPackSettings {
+            Version = nugetVersion,
+            OutputDirectory = artifactsDir
         });
 });
 
@@ -106,19 +118,10 @@ Task("__Publish")
     .WithCriteria(BuildSystem.IsRunningOnTeamCity)
     .Does(() =>
 {
-    NuGetPush($"{artifactsDir}/{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
+    NuGetPush($"{artifactsDir}/*.{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
         Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
         ApiKey = EnvironmentVariable("FeedzIoApiKey")
     });
-
-    NuGetPush($"{artifactsDir}/{extensionClientName}.{nugetVersion}.nupkg", new NuGetPushSettings {
-        Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
-        ApiKey = EnvironmentVariable("FeedzIoApiKey")
-    });
-
-    if (gitVersionInfo.PreReleaseLabel == "")
-    {
-    }
 });
 
 
@@ -129,8 +132,7 @@ Task("__CopyToLocalPackages")
     .Does(() =>
 {
     CreateDirectory(localPackagesDir);
-    CopyFileToDirectory(Path.Combine(artifactsDir, $"{extensionName}.{nugetVersion}.nupkg"), localPackagesDir);
-    CopyFileToDirectory(Path.Combine(artifactsDir, $"{extensionClientName}.{nugetVersion}.nupkg"), localPackagesDir);
+    CopyFiles(Path.Combine(artifactsDir, $"*.{extensionName}.{nugetVersion}.nupkg"), localPackagesDir);
 });
 
 //////////////////////////////////////////////////////////////////////

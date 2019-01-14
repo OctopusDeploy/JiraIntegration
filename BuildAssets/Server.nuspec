@@ -14,12 +14,12 @@
     <language>en-US</language>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <licenseUrl>https://octopus.com/</licenseUrl>
-    <projectUrl>https://octopus.com/</projectUrl>
+    <projectUrl>https://github.com/octopusdeploy/jiraissuetracker</projectUrl>
     <iconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
     <tags>automation deployment</tags>
     <developmentDependency>true</developmentDependency>
 	<dependencies>
-      <dependency id="Octopus.Server.Extensibility.IssueTracker" version="1.0" />
+      <dependency id="Octopus.Server.Extensibility.IssueTracker" />
 	</dependencies>
   </metadata>
   <files>
