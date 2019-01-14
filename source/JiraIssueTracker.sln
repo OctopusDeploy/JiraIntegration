@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.106
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Extensibility.IssueTracker.Jira", "Extensibility.IssueTracker.Jira\Extensibility.IssueTracker.Jira.csproj", "{80A4D3E9-21E9-41BF-B52D-43002CD9AAD0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Server", "Server\Server.csproj", "{80A4D3E9-21E9-41BF-B52D-43002CD9AAD0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{80260C62-5575-47F1-8A48-D2FB81B4CE48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{80A4D3E9-21E9-41BF-B52D-43002CD9AAD0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80A4D3E9-21E9-41BF-B52D-43002CD9AAD0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80A4D3E9-21E9-41BF-B52D-43002CD9AAD0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{80260C62-5575-47F1-8A48-D2FB81B4CE48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{80260C62-5575-47F1-8A48-D2FB81B4CE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{80260C62-5575-47F1-8A48-D2FB81B4CE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{80260C62-5575-47F1-8A48-D2FB81B4CE48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

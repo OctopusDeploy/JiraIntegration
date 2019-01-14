@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <RootNamespace>Octopus.Client.Extensibility.IssueTracker.Jira</RootNamespace>
+    <AssemblyName>Octopus.Client.Extensibility.IssueTracker.Jira</AssemblyName>
+    <NeutralLanguage>en-US</NeutralLanguage>
+    <Authors>Octopus Deploy</Authors>
+    <Company>Octopus Deploy Pty. Ltd.</Company>
+    <Product>Octopus Deploy Client Extensibility - Jira</Product>
+    <Description>Octopus Deploy Client Extensibility for the Jira issue tracker</Description>
+    <PackageId>Octopus.Client.Extensibility.IssueTracker.Jira</PackageId>
+    <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIssueTracker/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIssueTracker</PackageProjectUrl>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Octopus.Client" Version="4.45.1-enh-workitems5" />
+  </ItemGroup>
+
+</Project>
