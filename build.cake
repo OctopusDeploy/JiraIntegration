@@ -118,7 +118,11 @@ Task("__Publish")
     .WithCriteria(BuildSystem.IsRunningOnTeamCity)
     .Does(() =>
 {
-    NuGetPush($"{artifactsDir}/*.{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
+    NuGetPush($"{artifactsDir}/Octopus.Client.Extensibility.{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
+        Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
+        ApiKey = EnvironmentVariable("FeedzIoApiKey")
+    });
+    NuGetPush($"{artifactsDir}/Octopus.Server.Extensibility.{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
         Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
         ApiKey = EnvironmentVariable("FeedzIoApiKey")
     });
