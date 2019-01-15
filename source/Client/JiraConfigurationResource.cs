@@ -9,6 +9,11 @@ namespace Octopus.Client.Extensibility.IssueTracker.Jira
     {
         public const string JiraBaseUrlDescription = "Set the base url for the Jira instance.";
 
+        public JiraConfigurationResource()
+        {
+            Id = "issuetracker-jira";
+        }
+
         [DisplayName("Jira Base Url")]
         [Description(JiraBaseUrlDescription)]
         [Writeable]
