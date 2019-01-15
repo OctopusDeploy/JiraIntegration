@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Domain;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
@@ -16,14 +17,17 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 {
     public class DeploymentObserver : IObserveDomainEventAsync<DeploymentEvent>
     {
+        private readonly ILog log;
         private readonly IJiraConfigurationStore store;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IClock clock;
 
-        public DeploymentObserver(IJiraConfigurationStore store,
+        public DeploymentObserver(ILog log,
+            IJiraConfigurationStore store,
             IInstallationIdProvider installationIdProvider,
             IClock clock)
         {
+            this.log = log;
             this.store = store;
             this.installationIdProvider = installationIdProvider;
             this.clock = clock;
@@ -33,6 +37,12 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         {
             if (!store.GetIsEnabled())
                 return;
+
+            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) || string.IsNullOrWhiteSpace(store.GetPassword()))
+            {
+                log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
+                return;
+            }
 
             // get token from connect App
             var token = await GetAuthTokenFromConnectApp();
