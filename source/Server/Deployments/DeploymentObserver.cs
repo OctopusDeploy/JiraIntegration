@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Domain;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
