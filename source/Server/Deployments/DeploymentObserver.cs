@@ -9,8 +9,10 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Domain;
 using Octopus.Server.Extensibility.HostServices.Licensing;
+using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
 using Octopus.Shared;
 using Octopus.Time;
 
@@ -22,16 +24,19 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         private readonly IJiraConfigurationStore store;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IClock clock;
+        private readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
 
         public DeploymentObserver(ILog log,
             IJiraConfigurationStore store,
             IInstallationIdProvider installationIdProvider,
-            IClock clock)
+            IClock clock,
+            IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider)
         {
             this.log = log;
             this.store = store;
             this.installationIdProvider = installationIdProvider;
             this.clock = clock;
+            this.deploymentEnvironmentSettingsProvider = deploymentEnvironmentSettingsProvider;
         }
 
         public async Task HandleAsync(DeploymentEvent domainEvent)
@@ -81,6 +86,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         async Task PublishToJira(string token, DeploymentEventType eventType, IDeployment deployment)
         {
+            var envSettings = deploymentEnvironmentSettingsProvider.GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(JiraConfigurationStore.SingletonId, deployment.ProjectId);
+
             var data = new OctopusJiraPayloadData
             {
                 InstallationId = installationIdProvider.GetInstallationId().ToString(),
@@ -109,7 +116,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                                 {
                                     Id = deployment.EnvironmentId,
                                     DisplayName = "Dev",
-                                    Type = "DEVELOPMENT"
+                                    Type = envSettings.JiraEnvironmentType.ToString()
                                 },
                                 SchemeVersion = "1.0"
                             }

@@ -4,9 +4,11 @@ using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Mappings;
+using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.IssueTracker.Extensions;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
@@ -37,6 +39,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<DeploymentObserver>().AsSelf().InstancePerDependency();
+
+            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>().As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
 
             builder.RegisterType<JiraConfigureCommands>()
                 .As<IContributeToConfigureCommand>()
