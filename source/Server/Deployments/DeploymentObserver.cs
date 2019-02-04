@@ -8,6 +8,9 @@ using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Domain;
+using Octopus.Server.Extensibility.HostServices.Configuration;
+using Octopus.Server.Extensibility.HostServices.Domain.Environments;
+using Octopus.Server.Extensibility.HostServices.Domain.Projects;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
@@ -25,18 +28,30 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IClock clock;
         private readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
+        private readonly IServerConfigurationStore serverConfigurationStore;
+        private readonly IProjectStore projectStore;
+        private readonly IDeploymentEnvironmentStore deploymentEnvironmentStore;
+        private readonly IReleaseStore releaseStore;
 
         public DeploymentObserver(ILog log,
             IJiraConfigurationStore store,
             IInstallationIdProvider installationIdProvider,
             IClock clock,
-            IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider)
+            IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider,
+            IServerConfigurationStore serverConfigurationStore,
+            IProjectStore projectStore,
+            IDeploymentEnvironmentStore deploymentEnvironmentStore,
+            IReleaseStore releaseStore)
         {
             this.log = log;
             this.store = store;
             this.installationIdProvider = installationIdProvider;
             this.clock = clock;
             this.deploymentEnvironmentSettingsProvider = deploymentEnvironmentSettingsProvider;
+            this.serverConfigurationStore = serverConfigurationStore;
+            this.projectStore = projectStore;
+            this.deploymentEnvironmentStore = deploymentEnvironmentStore;
+            this.releaseStore = releaseStore;
         }
 
         public async Task HandleAsync(DeploymentEvent domainEvent)
@@ -87,6 +102,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         async Task PublishToJira(string token, DeploymentEventType eventType, IDeployment deployment)
         {
             var envSettings = deploymentEnvironmentSettingsProvider.GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(JiraConfigurationStore.SingletonId, deployment.ProjectId);
+            var serverUri = serverConfigurationStore.GetServerUri()?.TrimEnd('/');
+
+            if (string.IsNullOrWhiteSpace(serverUri))
+                throw new ControlledFailureException("To use Jira integration you must have the Octopus server's external url configured (see the Configuration/Nodes page)");
+
+            var project = projectStore.Get(deployment.ProjectId);
+            var deploymentEnvironment = deploymentEnvironmentStore.Get(deployment.EnvironmentId);
+            var release = releaseStore.Get(deployment.ReleaseId);
 
             var data = new OctopusJiraPayloadData
             {
@@ -102,20 +125,20 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                                 UpdateSequenceNumber = 1,
                                 DisplayName = deployment.Name,
                                 IssueKeys = deployment.WorkItems.Where(wi => wi.IssueTrackerId == JiraConfigurationStore.SingletonId).Select(wi => wi.Id).ToArray(),
-                                Url = "https://thisOctopusServerUrl/deployments",
+                                Url = serverUri + $"/app#/{project.SpaceId}/projects/{project.Slug}/releases/{release.Version}/deployments/{deployment.Id}",
                                 Description = deployment.Name,
                                 LastUpdated = clock.GetUtcTime(),
                                 State = StateFromEventType(eventType),
                                 Pipeline = new JiraPayloadData.JiraDeploymentPipeline
                                 {
                                     Id = deployment.ProjectId,
-                                    DisplayName = "Project's name goes here",
-                                    Url = "https://projectUrl"
+                                    DisplayName = project.Name,
+                                    Url = serverUri + $"/app#/{project.SpaceId}/projects/{project.Slug}"
                                 },
                                 Environment = new JiraPayloadData.JiraDeploymentEnvironment
                                 {
                                     Id = deployment.EnvironmentId,
-                                    DisplayName = "Dev",
+                                    DisplayName = deploymentEnvironment.Name,
                                     Type = envSettings.JiraEnvironmentType.ToString()
                                 },
                                 SchemeVersion = "1.0"
