@@ -8,6 +8,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         public JiraConfiguration() : base("Jira", "Octopus Deploy", "1.0")
         {
             Id = JiraConfigurationStore.SingletonId;
+            ConnectAppUrl = "https://jiraconnectapp.octopus.com";
         }
 
         public string BaseUrl { get; set; }

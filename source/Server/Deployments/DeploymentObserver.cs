@@ -101,7 +101,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         async Task PublishToJira(string token, DeploymentEventType eventType, IDeployment deployment)
         {
-            var envSettings = deploymentEnvironmentSettingsProvider.GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(JiraConfigurationStore.SingletonId, deployment.ProjectId);
+            var envSettings = deploymentEnvironmentSettingsProvider.GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(JiraConfigurationStore.SingletonId, deployment.EnvironmentId);
             var serverUri = serverConfigurationStore.GetServerUri()?.TrimEnd('/');
 
             if (string.IsNullOrWhiteSpace(serverUri))
@@ -121,11 +121,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                         {
                             new JiraPayloadData.JiraDeploymentData
                             {
-                                DeploymentSequenceNumber = 1,
-                                UpdateSequenceNumber = 1,
+                                DeploymentSequenceNumber = int.Parse(deployment.Id.Split('-')[1]),
+                                UpdateSequenceNumber = DateTime.UtcNow.Ticks,
                                 DisplayName = deployment.Name,
                                 IssueKeys = deployment.WorkItems.Where(wi => wi.IssueTrackerId == JiraConfigurationStore.SingletonId).Select(wi => wi.Id).ToArray(),
-                                Url = serverUri + $"/app#/{project.SpaceId}/projects/{project.Slug}/releases/{release.Version}/deployments/{deployment.Id}",
+                                Url = $"{serverUri}/app#/{project.SpaceId}/projects/{project.Slug}/releases/{release.Version}/deployments/{deployment.Id}",
                                 Description = deployment.Name,
                                 LastUpdated = clock.GetUtcTime(),
                                 State = StateFromEventType(eventType),
@@ -133,7 +133,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                                 {
                                     Id = deployment.ProjectId,
                                     DisplayName = project.Name,
-                                    Url = serverUri + $"/app#/{project.SpaceId}/projects/{project.Slug}"
+                                    Url = $"{serverUri}/app#/{project.SpaceId}/projects/{project.Slug}"
                                 },
                                 Environment = new JiraPayloadData.JiraDeploymentEnvironment
                                 {
@@ -146,6 +146,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                         }
                     }
             };
+
+            log.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment.Name}({envSettings.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].IssueKeys)}");
 
             var json = JsonConvert.SerializeObject(data);
 
@@ -167,13 +169,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             switch (eventType)
             {
                 case DeploymentEventType.DeploymentStarted:
-                    return "IN_PROGRESS";
+                    return "in_progress";
                 case DeploymentEventType.DeploymentFailed:
-                    return "FAILED";
+                    return "failed";
                 case DeploymentEventType.DeploymentSucceeded:
-                    return "SUCCESSFUL";
+                    return "successful";
                 default:
-                    return "UNKNOWN";
+                    return "unknown";
             }
         }
     }

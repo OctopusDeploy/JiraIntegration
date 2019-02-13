@@ -13,7 +13,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             [JsonProperty("deploymentSequenceNumber")]
             public int DeploymentSequenceNumber { get; set; }
             [JsonProperty("updateSequenceNumber")]
-            public int UpdateSequenceNumber { get; set; }
+            public long UpdateSequenceNumber { get; set; }
             [JsonProperty("displayName")]
             public string DisplayName { get; set; }
             [JsonProperty("issueKeys")]
