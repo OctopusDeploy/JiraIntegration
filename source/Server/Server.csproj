@@ -14,10 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Octopus.Diagnostics" Version="1.2.2" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.3-enh-workitems0029" />
+    <PackageReference Include="Octopus.Diagnostics" Version="1.2.3-enh-workitems0004" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.3-enh-workitems0031" />
     <PackageReference Include="Octopus.Server.Extensibility.IssueTracker" Version="0.1.0-ci0010" />
-    <PackageReference Include="Octopus.Shared" Version="4.7.1" />
+    <PackageReference Include="Octopus.Shared" Version="4.8.3-enh-workitems1" />
   </ItemGroup>
 
 </Project>
