@@ -175,7 +175,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                 var result = client.PostAsync($"{store.GetConnectAppUrl()}/relay/bulk", httpContent).GetAwaiter().GetResult();
 
                 if (!result.IsSuccessStatusCode)
-                    log.ErrorFormat("Unable to publish data to Jira. Response code: {0}", result.StatusCode);
+                    log.ErrorFormat("Unable to publish data to Jira. Response code: {0}, Message: {1}", result.StatusCode, result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
             }
         }
 
