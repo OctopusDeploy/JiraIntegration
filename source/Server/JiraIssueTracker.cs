@@ -1,5 +1,5 @@
 ﻿using System;
-using Octopus.Server.Extensibility.IssueTracker.Extensions;
+using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira

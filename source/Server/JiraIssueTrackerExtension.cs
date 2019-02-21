@@ -5,7 +5,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
-using Octopus.Server.Extensibility.IssueTracker.Extensions;
+using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
