@@ -10,6 +10,7 @@ using Octopus.Server.Extensibility.Extensions.Domain;
 using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Domain.Environments;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
+using Octopus.Server.Extensibility.HostServices.Domain.ServerTasks;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
@@ -30,6 +31,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         private readonly IProjectStore projectStore;
         private readonly IDeploymentEnvironmentStore deploymentEnvironmentStore;
         private readonly IReleaseStore releaseStore;
+        private readonly IServerTaskStore serverTaskStore;
 
         public DeploymentObserver(ILogWithContext log,
             IJiraConfigurationStore store,
@@ -39,7 +41,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             IServerConfigurationStore serverConfigurationStore,
             IProjectStore projectStore,
             IDeploymentEnvironmentStore deploymentEnvironmentStore,
-            IReleaseStore releaseStore)
+            IReleaseStore releaseStore,
+            IServerTaskStore serverTaskStore)
         {
             this.log = log;
             this.store = store;
@@ -50,6 +53,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             this.projectStore = projectStore;
             this.deploymentEnvironmentStore = deploymentEnvironmentStore;
             this.releaseStore = releaseStore;
+            this.serverTaskStore = serverTaskStore;
         }
 
         public void Handle(DeploymentEvent domainEvent)
@@ -122,6 +126,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             var project = projectStore.Get(deployment.ProjectId);
             var deploymentEnvironment = deploymentEnvironmentStore.Get(deployment.EnvironmentId);
             var release = releaseStore.Get(deployment.ReleaseId);
+            var serverTask = serverTaskStore.Get(deployment.TaskId);
 
             var data = new OctopusJiraPayloadData
             {
@@ -135,13 +140,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                         {
                             DeploymentSequenceNumber = int.Parse(deployment.Id.Split('-')[1]),
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
-                            DisplayName = deployment.Name,
+                            DisplayName = serverTask.Description,
                             IssueKeys = deployment.WorkItems
                                 .Where(wi => wi.IssueTrackerId == JiraConfigurationStore.SingletonId)
                                 .Select(wi => wi.Id).ToArray(),
                             Url =
                                 $"{serverUri}/app#/{project.SpaceId}/projects/{project.Slug}/releases/{release.Version}/deployments/{deployment.Id}",
-                            Description = deployment.Name,
+                            Description = serverTask.Description,
                             LastUpdated = clock.GetUtcTime(),
                             State = StateFromEventType(eventType),
                             Pipeline = new JiraPayloadData.JiraDeploymentPipeline
@@ -152,7 +157,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                             },
                             Environment = new JiraPayloadData.JiraDeploymentEnvironment
                             {
-                                Id = deployment.EnvironmentId,
+                                Id = $"{deployment.EnvironmentId}{(string.IsNullOrWhiteSpace(deployment.TenantId) ? "" : $"-{deployment.TenantId}")}",
                                 DisplayName = deploymentEnvironment.Name,
                                 Type = envSettings.JiraEnvironmentType.ToString()
                             },
