@@ -58,7 +58,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
-            if (!store.GetIsEnabled())
+            if (!store.GetIsEnabled() || domainEvent.Deployment.WorkItems.All(wi => wi.IssueTrackerId != JiraConfigurationStore.SingletonId))
                 return;
 
             using (log.OpenBlock($"Sending Jira state update - {StateFromEventType(domainEvent.EventType)}"))
