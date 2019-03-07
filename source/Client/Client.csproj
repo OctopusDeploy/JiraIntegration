@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <RootNamespace>Octopus.Client.Extensibility.IssueTracker.Jira</RootNamespace>
@@ -14,9 +13,7 @@
     <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIssueTracker/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIssueTracker</PackageProjectUrl>
   </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Octopus.Client" Version="5.2.7-enh-workitems20" />
+    <PackageReference Include="Octopus.Client" Version="6.0.3-enh-workitems29" />
   </ItemGroup>
-
 </Project>

@@ -9,6 +9,7 @@ using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
+using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
@@ -45,6 +46,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
             builder.RegisterType<JiraConfigureCommands>()
                 .As<IContributeToConfigureCommand>()
                 .InstancePerDependency();
+
+            builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
         }
     }
 }
