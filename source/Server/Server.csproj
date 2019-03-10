@@ -13,7 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Octopus.Diagnostics" Version="1.2.3-enh-workitems0004" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.3-enh-workitems0040" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="6.0.3-enh-workitems0041" />
     <PackageReference Include="Octopus.Shared" Version="4.8.3-enh-workitems1" />
   </ItemGroup>
 </Project>

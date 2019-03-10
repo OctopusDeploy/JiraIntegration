@@ -58,7 +58,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
-            if (!store.GetIsEnabled() || domainEvent.Deployment.PackageMetadata.All(pm => pm.IssueTrackerId != JiraConfigurationStore.SingletonId))
+            if (!store.GetIsEnabled() || domainEvent.Deployment.PackageMetadata.All(pm => pm.OctopusPackageMetadata.IssueTrackerId != JiraConfigurationStore.SingletonId))
                 return;
 
             using (log.OpenBlock($"Sending Jira state update - {StateFromEventType(domainEvent.EventType)}"))
@@ -142,8 +142,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
                             DisplayName = serverTask.Description,
                             IssueKeys = deployment.PackageMetadata
-                                .Where(pm => pm.IssueTrackerId == JiraConfigurationStore.SingletonId)
-                                .SelectMany(pm => pm.WorkItems)
+                                .Where(pm => pm.OctopusPackageMetadata.IssueTrackerId == JiraConfigurationStore.SingletonId)
+                                .SelectMany(pm => pm.OctopusPackageMetadata.WorkItems)
                                 .Select(wi => wi.Id)
                                 .Distinct().ToArray(),
                             Url =
