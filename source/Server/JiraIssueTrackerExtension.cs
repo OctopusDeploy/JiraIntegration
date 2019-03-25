@@ -47,6 +47,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 .As<IContributeToConfigureCommand>()
                 .InstancePerDependency();
 
+            builder.RegisterType<CommentParser>().AsSelf().InstancePerDependency();
+
             builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
         }
     }

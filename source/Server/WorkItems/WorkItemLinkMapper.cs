@@ -9,18 +9,21 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
     public class WorkItemLinkMapper : IWorkItemLinkMapper
     {
         private readonly IJiraConfigurationStore store;
+        private readonly CommentParser commentParser;
 
-        public WorkItemLinkMapper(IJiraConfigurationStore store)
+        public WorkItemLinkMapper(IJiraConfigurationStore store,
+            CommentParser commentParser)
         {
             this.store = store;
+            this.commentParser = commentParser;
         }
 
-        public string IssueTrackerId => JiraConfigurationStore.SingletonId;
+        public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
         public WorkItemLink[] Map(OctopusPackageMetadata packageMetadata)
         {
-            if (packageMetadata.IssueTrackerId != IssueTrackerId)
+            if (packageMetadata.CommentParser != CommentParser)
                 return null;
 
             var baseUrl = store.GetBaseUrl();
@@ -29,11 +32,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 
             var isEnabled = store.GetIsEnabled();
 
-            return packageMetadata.WorkItems.Select(wi => new WorkItemLink
+            var workItemIds = commentParser.ParseWorkItemIds(packageMetadata);
+
+            return workItemIds.Select(workItemId => new WorkItemLink
                 {
-                    Id = wi.Id,
-                    LinkText = wi.LinkText,
-                    LinkUrl = isEnabled ? baseUrl + "/browse/" + wi.LinkData : null
+                    Id = workItemId,
+                    Description = workItemId,
+                    LinkUrl = isEnabled ? baseUrl + "/browse/" + workItemId : null
                 })
                 .ToArray();
         }

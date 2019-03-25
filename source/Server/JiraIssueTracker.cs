@@ -15,7 +15,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
             this.configurationStore = configurationStore;
         }
 
-        public string IssueTrackerId => JiraConfigurationStore.SingletonId;
+        public string CommentParser => JiraConfigurationStore.CommentParser;
         public string IssueTrackerName => Name;
 
         public bool IsEnabled => configurationStore.GetIsEnabled();

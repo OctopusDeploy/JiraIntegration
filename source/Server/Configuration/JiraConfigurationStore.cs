@@ -6,6 +6,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
     public class JiraConfigurationStore : ExtensionConfigurationStore<JiraConfiguration>, IJiraConfigurationStore
     {
+        public static string CommentParser = "Jira";
         public static string SingletonId = "issuetracker-jira";
         
         public JiraConfigurationStore(IConfigurationStore configurationStore) : base(configurationStore)
