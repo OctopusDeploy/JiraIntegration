@@ -5,6 +5,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
+    [Description("Configure the Jira Issue Tracker. [Learn more](https://g.octopushq.com/JiraIssueTracker).")]
     public class JiraConfigurationResource : ExtensionConfigurationResource
     {
         public const string JiraBaseUrlDescription = "Enter the base url of your Jira instance.";
