@@ -32,7 +32,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 
             var isEnabled = store.GetIsEnabled();
 
-            var workItemIds = commentParser.ParseWorkItemIds(packageMetadata);
+            var workItemIds = commentParser.ParseWorkItemIds(packageMetadata).Distinct();
 
             return workItemIds.Select(workItemId => new WorkItemLink
                 {
