@@ -23,6 +23,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         [DisplayName("Octopus Installation Id")]
         [Description("Copy and paste this Id when configuring the Jira Connect application")]
         [ReadOnly(true)]
+        [AllowCopyToClipboard]
         public string OctopusInstallationId { get; set; }
     }
 }

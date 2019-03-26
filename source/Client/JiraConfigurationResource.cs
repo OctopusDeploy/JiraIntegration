@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
-using Octopus.Client.Extensibility.Attributes;
 using Octopus.Client.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Client.Model;
+using Octopus.Data.Resources.Attributes;
 
 namespace Octopus.Client.Extensibility.IssueTracker.Jira
 {
@@ -27,6 +27,7 @@ namespace Octopus.Client.Extensibility.IssueTracker.Jira
         [DisplayName("Octopus Installation Id")]
         [Description("Use this Id when configuring the Jira connect application")]
         [ReadOnly(true)]
+        [AllowCopyToClipboard]
         public string OctopusInstallationId { get; set; }
     }
 }
