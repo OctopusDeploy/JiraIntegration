@@ -114,7 +114,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             var envSettings =
                 deploymentEnvironmentSettingsProvider
                     .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
-                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId);
+                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
             var serverUri = serverConfigurationStore.GetServerUri()?.TrimEnd('/');
 
             if (string.IsNullOrWhiteSpace(serverUri))
