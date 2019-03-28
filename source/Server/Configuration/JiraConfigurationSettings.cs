@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Mapping;
 
@@ -8,10 +9,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
     public class JiraConfigurationSettings : ExtensionConfigurationSettings<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
     {
         private readonly IInstallationIdProvider installationIdProvider;
+        private readonly IServerConfigurationStore serverConfigurationStore;
 
-        public JiraConfigurationSettings(IJiraConfigurationStore configurationDocumentStore, IInstallationIdProvider installationIdProvider) : base(configurationDocumentStore)
+        public JiraConfigurationSettings(IJiraConfigurationStore configurationDocumentStore, 
+            IInstallationIdProvider installationIdProvider,
+            IServerConfigurationStore serverConfigurationStore) : base(configurationDocumentStore)
         {
             this.installationIdProvider = installationIdProvider;
+            this.serverConfigurationStore = serverConfigurationStore;
         }
 
         public override string Id => JiraConfigurationStore.SingletonId;
@@ -32,7 +37,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         public override void BuildMappings(IResourceMappingsBuilder builder)
         {
             builder.Map<JiraConfigurationResource, JiraConfiguration>()
-                .EnrichResource((model, resource) => resource.OctopusInstallationId = installationIdProvider.GetInstallationId().ToString());
+                .EnrichResource((model, resource) =>
+                {
+                    resource.OctopusInstallationId = installationIdProvider.GetInstallationId().ToString();
+                    resource.OctopusServerUrl = serverConfigurationStore.GetServerUri();
+                });
         }
     }
 }
