@@ -36,7 +36,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
             {
                 jiraConfiguration.Value.SetConnectAppUrl(v);
                 log.Info($"Jira Issue Tracker integration ConnectAppUrl set to: {v}");
-            });
+            }, hide: true);
         }
     }
 }
