@@ -25,13 +25,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 
         public override string Description => "Jira Issue Tracker settings";
 
-        public override IEnumerable<ConfigurationValue> GetConfigurationValues()
+        public override IEnumerable<IConfigurationValue> GetConfigurationValues()
         {
             var isEnabled = ConfigurationDocumentStore.GetIsEnabled();
 
-            yield return new ConfigurationValue("Octopus.IssueTracker.JiraIssueTracker", isEnabled.ToString(), isEnabled, "Is Enabled");
-            yield return new ConfigurationValue("Octopus.IssueTracker.JiraBaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
-            yield return new ConfigurationValue("Octopus.IssueTracker.JiraConnectAppPassword", ConfigurationDocumentStore.GetPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetPassword()), "Jira Connect App Password");
+            yield return new ConfigurationValue<bool>("Octopus.IssueTracker.JiraIssueTracker", isEnabled, isEnabled, "Is Enabled");
+            yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraBaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
+            yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraConnectAppPassword", ConfigurationDocumentStore.GetPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetPassword()), "Jira Connect App Password");
         }
 
         public override void BuildMappings(IResourceMappingsBuilder builder)
