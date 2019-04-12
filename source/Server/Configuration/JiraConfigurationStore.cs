@@ -25,12 +25,12 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
             SetProperty(doc => doc.BaseUrl = baseUrl?.Trim('/'));
         }
 
-        public string GetPassword()
+        public string GetConnectAppPassword()
         {
             return GetProperty(doc => doc.Password);
         }
 
-        public void SetPassword(string password)
+        public void SetConnectAppPassword(string password)
         {
             SetProperty(doc => doc.Password = password);
         }
@@ -43,6 +43,36 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         public void SetConnectAppUrl(string url)
         {
             SetProperty(doc => doc.ConnectAppUrl = url?.Trim('/'));
+        }
+
+        public string GetJiraUsername()
+        {
+            return GetProperty(doc => doc.ReleaseNoteOptions.Username);
+        }
+
+        public void SetJiraUsername(string username)
+        {
+            SetProperty(doc => doc.ReleaseNoteOptions.Username = username);
+        }
+
+        public string GetJiraPassword()
+        {
+            return GetProperty(doc => doc.ReleaseNoteOptions.Password);
+        }
+
+        public void SetJiraPassword(string password)
+        {
+            SetProperty(doc => doc.ReleaseNoteOptions.Password = password);
+        }
+
+        public string GetReleaseNotePrefix()
+        {
+            return GetProperty(doc => doc.ReleaseNoteOptions.ReleaseNotePrefix);
+        }
+
+        public void SetReleaseNotePrefix(string releaseNotePrefix)
+        {
+            SetProperty(doc => doc.ReleaseNoteOptions.ReleaseNotePrefix = releaseNotePrefix);
         }
     }
 }

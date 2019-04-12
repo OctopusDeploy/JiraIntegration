@@ -30,5 +30,29 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         [Description("This Url is required in order to push deployment data to Jira. If it is blank please set it in [Configuration/Nodes](/configuration/nodes)")]
         [ReadOnly(true)]
         public string OctopusServerUrl { get; set; }
+        [DisplayName("Release Note Options")] 
+        public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
+    }
+
+    public class ReleaseNoteOptionsResource
+    {
+        public const string UsernameDescription = "Set the username to authenticate with against your Jira instance.";
+        public const string PasswordDescription = "Set the password to authenticate with against your Jira instance.";
+        public const string ReleaseNotePrefixDescription = "Set the prefix to look for when finding release notes for Jira issues. For example `Release note:`.";
+
+        [DisplayName("Jira Username")]
+        [Description(UsernameDescription)]
+        [Writeable]
+        public string Username { get; set; }
+        
+        [DisplayName("Jira Password")]
+        [Description(PasswordDescription)]
+        [Writeable]
+        public SensitiveValue Password { get; set; }
+
+        [DisplayName("Release Note Prefix")]
+        [Description(ReleaseNotePrefixDescription)]
+        [Writeable]
+        public string ReleaseNotePrefix { get; set; }
     }
 }

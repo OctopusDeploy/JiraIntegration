@@ -7,9 +7,15 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
     {
         string GetBaseUrl();
         void SetBaseUrl(string baseUrl);
-        string GetPassword();
-        void SetPassword(string password);
+        string GetConnectAppPassword();
+        void SetConnectAppPassword(string password);
         string GetConnectAppUrl();
         void SetConnectAppUrl(string url);
+        string GetJiraUsername();
+        void SetJiraUsername(string username);
+        string GetJiraPassword();
+        void SetJiraPassword(string password);
+        string GetReleaseNotePrefix();
+        void SetReleaseNotePrefix(string releaseNotePrefix);
     }
 }

@@ -64,7 +64,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             using (log.OpenBlock($"Sending Jira state update - {StateFromEventType(domainEvent.EventType)}"))
             {
                 if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
-                    string.IsNullOrWhiteSpace(store.GetPassword()))
+                    string.IsNullOrWhiteSpace(store.GetConnectAppPassword()))
                 {
                     log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                     log.Finish();
@@ -86,7 +86,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             using (var client = new HttpClient())
             {
                 var username = installationIdProvider.GetInstallationId();
-                var password = store.GetPassword();
+                var password = store.GetConnectAppPassword();
                 var encodedAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
 
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
