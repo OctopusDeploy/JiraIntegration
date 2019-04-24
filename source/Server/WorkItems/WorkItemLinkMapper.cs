@@ -50,7 +50,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
                 .ToArray();
         }
 
-        string GetReleaseNote(string workItemId, string releaseNotePrefix)
+        public string GetReleaseNote(string workItemId, string releaseNotePrefix)
         {
             var issue = jira.GetIssue(workItemId).Result;
             if (issue is null) return workItemId;
@@ -63,7 +63,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 
             var releaseNote = issueComments?.Comments.LastOrDefault(c => releaseNoteRegex.IsMatch(c.Body))?.Body;
             return !string.IsNullOrWhiteSpace(releaseNote)
-                ? releaseNoteRegex.Replace(releaseNote, "")
+                ? releaseNoteRegex.Replace(releaseNote, "")?.Trim()
                 : issue.Fields.Summary ?? workItemId;
         }
     }
