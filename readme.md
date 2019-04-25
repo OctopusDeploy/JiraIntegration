@@ -7,4 +7,4 @@ This repository contains the [Octopus Deploy][1] Jira issue tracker extension.
 Please see [Contributing](CONTRIBUTING.md)
 
 [1]: https://octopus.com
-[2]: http://g.octopushq.com/JiraIssueTrackerExtension
+[2]: http://g.octopushq.com/JiraIssueTracker
