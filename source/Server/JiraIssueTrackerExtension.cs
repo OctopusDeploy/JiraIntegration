@@ -9,6 +9,7 @@ using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
@@ -21,7 +22,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
             builder.RegisterType<JiraConfigurationMapping>()
                 .As<IConfigurationDocumentMapper>()
                 .InstancePerLifetimeScope();
-
+            
             builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConfigurationStore>()
@@ -48,8 +49,20 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 .InstancePerDependency();
 
             builder.RegisterType<CommentParser>().AsSelf().InstancePerDependency();
-
             builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
+
+            builder.Register(c =>
+            {
+                var store = c.Resolve<IJiraConfigurationStore>();
+                if (!store.GetIsEnabled())
+                    return null;
+                
+                var baseUrl = store.GetBaseUrl();
+                var username = store.GetJiraUsername();
+                var password = store.GetJiraPassword();
+                return new JiraRestClient(baseUrl, username, password);
+            }).As<IJiraRestClient>()
+            .InstancePerDependency();
         }
     }
 }
