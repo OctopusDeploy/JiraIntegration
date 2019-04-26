@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
@@ -13,11 +13,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
     {
         private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;
-        private readonly IJiraRestClient jira;
+        private readonly Lazy<IJiraRestClient> jira;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
             CommentParser commentParser,
-            IJiraRestClient jira)
+            Lazy<IJiraRestClient> jira)
         {
             this.store = store;
             this.commentParser = commentParser;
@@ -52,14 +52,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 
         public string GetReleaseNote(string workItemId, string releaseNotePrefix)
         {
-            var issue = jira.GetIssue(workItemId).Result;
+            var issue = jira.Value.GetIssue(workItemId).Result;
             if (issue is null) return workItemId;
             
             if (issue.Fields.Comments.Total == 0 || string.IsNullOrWhiteSpace(releaseNotePrefix))
                 return issue.Fields.Summary;
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var issueComments = jira.GetIssueComments(workItemId).Result;
+            var issueComments = jira.Value.GetIssueComments(workItemId).Result;
 
             var releaseNote = issueComments?.Comments.LastOrDefault(c => releaseNoteRegex.IsMatch(c.Body))?.Body;
             return !string.IsNullOrWhiteSpace(releaseNote)

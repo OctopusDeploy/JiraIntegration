@@ -1,4 +1,5 @@
-﻿using NSubstitute;
+﻿using System;
+using NSubstitute;
 using NUnit.Framework;
 using Octopus.Server.Extensibility.HostServices.Model.PackageMetadata;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
@@ -27,6 +28,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
+            var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
             jiraClient.GetIssue(Arg.Is(linkData)).Returns(new JiraIssue
             {
                 Fields = new JiraIssueFields
@@ -43,7 +45,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
                 Comments = new [] {new JiraIssueComment { Body = releaseNote }}
             });
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClient).GetReleaseNote(linkData, releaseNotePrefix);
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy).GetReleaseNote(linkData, releaseNotePrefix);
         }
 
         [Test]
@@ -51,6 +53,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
+            var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
             store.GetBaseUrl().Returns("https://github.com");
             store.GetIsEnabled().Returns(true);
             jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
@@ -58,7 +61,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
             
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClient);
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
 
             var workItems = mapper.Map(new OctopusPackageMetadata
             {
