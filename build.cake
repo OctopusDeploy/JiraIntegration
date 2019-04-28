@@ -51,6 +51,7 @@ Task("__Default")
     .IsDependentOn("__Clean")
     .IsDependentOn("__Restore")
     .IsDependentOn("__Build")
+    .IsDependentOn("__Test")
     .IsDependentOn("__Pack")
     .IsDependentOn("__Publish")
     .IsDependentOn("__CopyToLocalPackages");
@@ -85,10 +86,19 @@ Task("__Build")
 
 Task("__Test")
     .IsDependentOn("__Build")
-    .Does(() =>
-{
-    Information("Tests goes here");
-});
+    .Does(() => {
+		var projects = GetFiles("./source/**/*Tests.csproj");
+		foreach(var project in projects)
+			DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
+			{
+				Configuration = configuration,
+				NoBuild = true,
+				ArgumentCustomization = args => {
+					return args.Append("--logger:trx")
+                        .Append($"--verbosity normal");
+				}
+			});
+    });
 
 Task("__Pack")
     .Does(() => {
