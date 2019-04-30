@@ -6,7 +6,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 {
     public class CommentParser
     {
-        private static readonly Regex Expression = new Regex("[A-Z]+-\\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex Expression = new Regex("[A-Z0-9]+-\\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         
         public string[] ParseWorkItemIds(OctopusPackageMetadata packageMetadata)
         {
