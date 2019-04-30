@@ -18,6 +18,16 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var reference = workItemReferences.First();
             Assert.AreEqual("JRE-1234", reference);
         }
+        
+        [Test]
+        public void StandardIssueNumberWithAlphaNumericProjectIdentifierReferenceGetsParsedCorrectly()
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes BT2-1234"));
+            Assert.IsNotEmpty(workItemReferences);
+            
+            var reference = workItemReferences.First();
+            Assert.AreEqual("BT2-1234", reference);
+        }
 
         [Test]
         public void MultipleIssueNumberReferencesGetsParsedCorrectly()
@@ -30,6 +40,19 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             Assert.AreEqual("JRE-1234", reference);
             reference = workItemReferences.Last();
             Assert.AreEqual("JRE-2345", reference);
+        }
+
+        [Test]
+        public void MultipleIssueNumberWithAlphaNumericProjectIdentifierReferencesGetsParsedCorrectly()
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes BT2-1234,BT2-2345"));
+            Assert.IsNotEmpty(workItemReferences);
+            Assert.AreEqual(2, workItemReferences.Length);
+            
+            var reference = workItemReferences.First();
+            Assert.AreEqual("BT2-1234", reference);
+            reference = workItemReferences.Last();
+            Assert.AreEqual("BT2-2345", reference);
         }
 
         [Test]
