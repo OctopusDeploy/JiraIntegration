@@ -6,7 +6,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 {
     public class CommentParser
     {
-        private static readonly Regex Expression = new Regex("[A-Z0-9]+-\\d+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        // Expression based on example found here https://confluence.atlassian.com/stashkb/integrating-with-custom-jira-issue-key-313460921.html?_ga=2.163394108.1696841245.1556699049-1954949426.1532303954
+        private static readonly Regex Expression = new Regex("((?<!([A-Z0-9.]{1,10})-?)[A-Z0-9]+-\\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         
         public string[] ParseWorkItemIds(OctopusPackageMetadata packageMetadata)
         {
