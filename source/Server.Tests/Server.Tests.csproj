@@ -11,6 +11,7 @@
     <PackageReference Include="NUnit" Version="3.11.0" />
     <PackageReference Include="NUnit3TestAdapter" Version="3.13.0" />
     <PackageReference Include="Octokit" Version="0.32.0" />
+    <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.15" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Octopus.Server.Extensibility" Version="6.2.0" />
