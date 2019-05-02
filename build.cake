@@ -92,11 +92,7 @@ Task("__Test")
 			DotNetCoreTest(project.FullPath, new DotNetCoreTestSettings
 			{
 				Configuration = configuration,
-				NoBuild = true,
-				ArgumentCustomization = args => {
-					return args.Append("--logger:trx")
-                        .Append($"--verbosity normal");
-				}
+				NoBuild = true
 			});
     });
 
