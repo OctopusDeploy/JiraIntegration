@@ -74,6 +74,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
         [TestCase("Some text test-foo-2")]
         [TestCase("Some text test-foo-2-bar")]
         [TestCase("Some text test-foo-")]
+        [TestCase("Merge branch 'master' of http://tst-01.com")]
+        [TestCase("Something $foo-1")]
         public void CommentsWithStringThatLookCloseToReferencesGetParsedCorrectly(string comment)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
