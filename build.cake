@@ -53,7 +53,6 @@ Task("__Default")
     .IsDependentOn("__Build")
     .IsDependentOn("__Test")
     .IsDependentOn("__Pack")
-    .IsDependentOn("__Publish")
     .IsDependentOn("__CopyToLocalPackages");
 
 Task("__Clean")
@@ -118,22 +117,6 @@ Task("__Pack")
             OutputDirectory = artifactsDir
         });
 });
-
-
-Task("__Publish")
-    .WithCriteria(BuildSystem.IsRunningOnTeamCity)
-    .Does(() =>
-{
-    NuGetPush($"{artifactsDir}/Octopus.Client.Extensibility.{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
-        Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
-        ApiKey = EnvironmentVariable("FeedzIoApiKey")
-    });
-    NuGetPush($"{artifactsDir}/Octopus.Server.Extensibility.{extensionName}.{nugetVersion}.nupkg", new NuGetPushSettings {
-        Source = "https://f.feedz.io/octopus-deploy/dependencies/nuget",
-        ApiKey = EnvironmentVariable("FeedzIoApiKey")
-    });
-});
-
 
 
 Task("__CopyToLocalPackages")
