@@ -14,7 +14,7 @@
     <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.15" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Server.Extensibility" Version="6.2.0" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="6.3.0" />
     <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
 
