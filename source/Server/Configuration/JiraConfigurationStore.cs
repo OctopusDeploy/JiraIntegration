@@ -15,6 +15,16 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 
         public override string Id => SingletonId;
 
+        public JiraInstanceType GetJiraInstanceType()
+        {
+            return GetProperty(doc => doc.JiraInstanceType);
+        }
+
+        public void SetJiraInstanceType(JiraInstanceType jiraInstanceType)
+        {
+            SetProperty(doc => doc.JiraInstanceType = jiraInstanceType);
+        }
+
         public string GetBaseUrl()
         {
             return GetProperty(doc => doc.BaseUrl?.Trim('/'));

@@ -58,7 +58,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
-            if (!store.GetIsEnabled() || domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.CommentParser != JiraConfigurationStore.CommentParser)))
+            if (!store.GetIsEnabled() || store.GetJiraInstanceType() == JiraInstanceType.Server || domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.CommentParser != JiraConfigurationStore.CommentParser)))
                 return;
 
             using (log.OpenBlock($"Sending Jira state update - {StateFromEventType(domainEvent.EventType)}"))
