@@ -16,6 +16,7 @@ using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
+using Octopus.Shared.Util;
 using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
@@ -61,7 +62,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             if (!store.GetIsEnabled() || 
 				store.GetJiraInstanceType() == JiraInstanceType.Server ||
                 domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.CommentParser != JiraConfigurationStore.CommentParser)) ||
-                domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => !pm.WorkItems.Any())))
+                domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.WorkItems.None())))
                 return;
 
             using (log.OpenBlock($"Sending Jira state update - {StateFromEventType(domainEvent.EventType)}"))
