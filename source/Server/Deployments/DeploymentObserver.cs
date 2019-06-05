@@ -59,8 +59,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
-            if (!store.GetIsEnabled() || 
-				store.GetJiraInstanceType() == JiraInstanceType.Server ||
+            if (!store.GetIsEnabled() ||
+                store.GetJiraInstanceType() == JiraInstanceType.Server ||
                 domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.CommentParser != JiraConfigurationStore.CommentParser)) ||
                 domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.WorkItems.None())))
                 return;
