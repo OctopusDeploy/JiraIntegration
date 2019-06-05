@@ -76,6 +76,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
                 // get token from connect App
                 var token = GetAuthTokenFromConnectApp();
+                if (token is null)
+                {
+                    log.Finish();
+                    return;
+                }
 
                 // Push data to Jira
                 PublishToJira(token, domainEvent.EventType, domainEvent.Deployment);
