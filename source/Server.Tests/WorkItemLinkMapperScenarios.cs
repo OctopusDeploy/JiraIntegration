@@ -1,7 +1,6 @@
 ﻿using System;
 using NSubstitute;
 using NUnit.Framework;
-using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Model.PackageMetadata;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
@@ -30,7 +29,6 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
-            var log = Substitute.For<ILog>();
             jiraClient.GetIssue(Arg.Is(linkData)).Returns(new JiraIssue
             {
                 Fields = new JiraIssueFields
@@ -56,7 +54,6 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
-            var log = Substitute.For<ILog>();
             store.GetBaseUrl().Returns("https://github.com");
             store.GetIsEnabled().Returns(true);
             jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
