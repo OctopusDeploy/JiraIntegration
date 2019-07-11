@@ -1,5 +1,6 @@
 ﻿using System;
 using Autofac;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
@@ -60,7 +61,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 var baseUrl = store.GetBaseUrl();
                 var username = store.GetJiraUsername();
                 var password = store.GetJiraPassword();
-                return new JiraRestClient(baseUrl, username, password);
+                var log = c.Resolve<ILog>();
+                return new JiraRestClient(baseUrl, username, password, log);
             }).As<IJiraRestClient>()
             .InstancePerDependency();
         }
