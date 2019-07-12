@@ -28,7 +28,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public ExtResult<WorkItemLink[]> Map(OctopusPackageMetadata packageMetadata)
+        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusPackageMetadata packageMetadata)
         {
             if (packageMetadata.CommentParser != CommentParser)
                 return null;
