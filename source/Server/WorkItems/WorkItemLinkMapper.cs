@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Model.PackageMetadata;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
@@ -27,7 +28,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public WorkItemLink[] Map(OctopusPackageMetadata packageMetadata)
+        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusPackageMetadata packageMetadata)
         {
             if (packageMetadata.CommentParser != CommentParser)
                 return null;
