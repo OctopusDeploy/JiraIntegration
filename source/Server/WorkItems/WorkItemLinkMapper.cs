@@ -40,25 +40,27 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
             if (string.IsNullOrWhiteSpace(baseUrl))
                 return null;
 
-            var isEnabled = store.GetIsEnabled();
-
             var releaseNotePrefix = store.GetReleaseNotePrefix();
             var workItemIds = commentParser.ParseWorkItemIds(packageMetadata).Distinct();
 
-            return workItemIds.Select(workItemId => new WorkItemLink
+            return workItemIds.Select(workItemId =>
+            {
+                var issue = jira.Value.GetIssue(workItemId).Result;
+                if (issue is null) return null;
+                
+                return new WorkItemLink
                 {
                     Id = workItemId,
-                    Description = isEnabled ? GetReleaseNote(workItemId, releaseNotePrefix) : workItemId,
-                    LinkUrl = isEnabled ? baseUrl + "/browse/" + workItemId : null
-                })
-                .ToArray();
+                    Description = GetReleaseNote(issue, workItemId, releaseNotePrefix),
+                    LinkUrl = baseUrl + "/browse/" + workItemId
+                };
+            })
+            .Where(i => i != null)
+            .ToArray();
         }
 
-        public string GetReleaseNote(string workItemId, string releaseNotePrefix)
+        public string GetReleaseNote(JiraIssue issue, string workItemId, string releaseNotePrefix)
         {
-            var issue = jira.Value.GetIssue(workItemId).Result;
-            if (issue is null) return workItemId;
-            
             if (issue.Fields.Comments.Total == 0 || string.IsNullOrWhiteSpace(releaseNotePrefix))
                 return issue.Fields.Summary;
 
