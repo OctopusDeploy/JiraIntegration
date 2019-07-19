@@ -29,7 +29,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
-            jiraClient.GetIssue(Arg.Is(linkData)).Returns(new JiraIssue
+            var jiraIssue = new JiraIssue
             {
                 Fields = new JiraIssueFields
                 {
@@ -39,13 +39,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
                         Total = 1
                     }
                 }
-            });
+            };
+            jiraClient.GetIssue(Arg.Is(linkData)).Returns(jiraIssue);
             jiraClient.GetIssueComments(Arg.Is(linkData)).Returns(new JiraIssueComments
             {
                 Comments = new [] {new JiraIssueComment { Body = releaseNote }}
             });
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy).GetReleaseNote(linkData, releaseNotePrefix);
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy).GetReleaseNote(jiraIssue,linkData, releaseNotePrefix);
         }
 
         [Test]
@@ -56,6 +57,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
             store.GetBaseUrl().Returns("https://github.com");
             store.GetIsEnabled().Returns(true);
+            store.GetJiraUsername().Returns("user");
+            store.GetJiraPassword().Returns("password");
+            jiraClient.GetIssue(Arg.Is("JRE-1234")).Returns(new JiraIssue());
             jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
             {
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
