@@ -18,6 +18,30 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var reference = workItemReferences.First();
             Assert.AreEqual("JRE-1234", reference);
         }
+
+        [TestCase("Merge branch 'feature/JRE-1234-Product_Feature", "JRE-1234")]
+        public void JiraIssueInBranchNameGetsParsedCorrectly(string comment, string expectedReference)
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
+            Assert.IsNotEmpty(workItemReferences);
+
+            var reference = workItemReferences.First();
+            Assert.AreEqual(expectedReference, reference);
+
+        }
+
+        [TestCase("Fixes [JRE-1234]", "JRE-1234")]
+        [TestCase("Fixes (JRE-1234)", "JRE-1234")]
+        [TestCase("Fixes (JRE-1234]", "JRE-1234")]
+        [TestCase("Fixes [JRE-1234)", "JRE-1234")]
+        public void StandardIssueNumberReferenceEnclosedInBracketsGetsParsedCorrectly(string comment, string expectedReference)
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
+            Assert.IsNotEmpty(workItemReferences);
+            
+            var reference = workItemReferences.First();
+            Assert.AreEqual(expectedReference, reference);
+        }
         
         [Test]
         public void StandardIssueNumberWithAlphaNumericProjectIdentifierReferenceGetsParsedCorrectly()
@@ -27,6 +51,17 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             
             var reference = workItemReferences.First();
             Assert.AreEqual("BT2-1234", reference);
+        }
+        
+        [TestCase("Fixes [BT2-1234]", "BT2-1234")]
+        [TestCase("Fixes (BT2-1234)", "BT2-1234")]
+        public void StandardIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferenceGetsParsedCorrectly(string comment, string expectedReference)
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
+            Assert.IsNotEmpty(workItemReferences);
+            
+            var reference = workItemReferences.First();
+            Assert.AreEqual(expectedReference, reference);
         }
 
         [Test]
@@ -42,6 +77,20 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             Assert.AreEqual("JRE-2345", reference);
         }
 
+        [TestCase("Fixes [JRE-1234],[JRE-2345]", "JRE-1234","JRE-2345")]
+        [TestCase("Fixes (JRE-1234),(JRE-2345)", "JRE-1234","JRE-2345")]
+        public void MultipleIssueNumberReferencesEnclosedInBracketsGetsParsedCorrectly(string comment, params string[] expectedReferences)
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
+            Assert.IsNotEmpty(workItemReferences);
+            Assert.AreEqual(2, workItemReferences.Length);
+            
+            var reference = workItemReferences.First();
+            Assert.AreEqual(expectedReferences[0], reference);
+            reference = workItemReferences.Last();
+            Assert.AreEqual(expectedReferences[1], reference);
+        }
+
         [Test]
         public void MultipleIssueNumberWithAlphaNumericProjectIdentifierReferencesGetsParsedCorrectly()
         {
@@ -55,6 +104,19 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             Assert.AreEqual("Bt2-2345", reference);
         }
 
+        [TestCase("Fixes Bt2-1234,Bt2-2345", "Bt2-1234", "Bt2-2345")]
+        public void MultipleIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferencesGetsParsedCorrectly(string comment, params string[] expectedReferences)
+        {
+            var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes Bt2-1234,Bt2-2345"));
+            Assert.IsNotEmpty(workItemReferences);
+            Assert.AreEqual(2, workItemReferences.Length);
+            
+            var reference = workItemReferences.First();
+            Assert.AreEqual(expectedReferences[0], reference);
+            reference = workItemReferences.Last();
+            Assert.AreEqual(expectedReferences[1], reference);
+        }
+
         [TestCase("Test with BT2-1234", 1)]
         [TestCase("BT2-1234", 1)]
         [TestCase(" BT2-1234", 1)]
@@ -63,6 +125,10 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
         [TestCase("Fixes BT2-1234,BT2-2345", 2)]
         [TestCase("Fixes BT2-1234, BT2-2345", 2)]
         [TestCase("Fixes BT2-1234. And include text that may cause confusion test.TST-01.com", 1)]
+        [TestCase("[BT2-1234] Implementation", 1)]
+        [TestCase("(BT2-1234) Implementation", 1)]
+        [TestCase("[BT2-1234] Implementation. And include text that may cause confusion test.TST-01.com", 1)]
+        [TestCase("(BT2-1234) Implementation. And include text that may cause confusion test.TST-01.com", 1)]
         public void CommentsGetParsedCorrectly(string comment, int expectedNumber)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
