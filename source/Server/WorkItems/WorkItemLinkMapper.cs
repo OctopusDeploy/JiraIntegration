@@ -30,7 +30,10 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 
         public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusPackageMetadata packageMetadata)
         {
-            if (packageMetadata.CommentParser != CommentParser)
+
+            if (!IsEnabled || 
+                string.IsNullOrEmpty(store.GetJiraUsername()) || 
+                string.IsNullOrEmpty(store.GetJiraPassword()))
                 return null;
 
             var baseUrl = store.GetBaseUrl();
