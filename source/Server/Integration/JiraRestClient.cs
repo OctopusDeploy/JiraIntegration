@@ -86,6 +86,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
             Fields = new JiraIssueFields();
         }
         
+        [JsonProperty("key")]
+        public string Key { get; set; }
         [JsonProperty("fields")]
         public JiraIssueFields Fields { get; set; }
     }
