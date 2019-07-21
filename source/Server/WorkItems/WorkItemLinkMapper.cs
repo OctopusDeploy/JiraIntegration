@@ -51,7 +51,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
                 return new WorkItemLink
                 {
                     Id = workItemId,
-                    Description = GetReleaseNote(issue, workItemId, releaseNotePrefix),
+                    Description = GetReleaseNote(issue, releaseNotePrefix),
                     LinkUrl = baseUrl + "/browse/" + workItemId
                 };
             })
@@ -59,18 +59,18 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
             .ToArray();
         }
 
-        public string GetReleaseNote(JiraIssue issue, string workItemId, string releaseNotePrefix)
+        public string GetReleaseNote(JiraIssue issue, string releaseNotePrefix)
         {
             if (issue.Fields.Comments.Total == 0 || string.IsNullOrWhiteSpace(releaseNotePrefix))
                 return issue.Fields.Summary;
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var issueComments = jira.Value.GetIssueComments(workItemId).Result;
+            var issueComments = jira.Value.GetIssueComments(issue.Key).Result;
 
             var releaseNote = issueComments?.Comments.LastOrDefault(c => releaseNoteRegex.IsMatch(c.Body))?.Body;
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, "")?.Trim()
-                : issue.Fields.Summary ?? workItemId;
+                : issue.Fields.Summary ?? issue.Key;
         }
     }
 }

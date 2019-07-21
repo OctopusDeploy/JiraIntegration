@@ -31,6 +31,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
             var jiraIssue = new JiraIssue
             {
+                Key = linkData,
                 Fields = new JiraIssueFields
                 {
                     Summary = "Test title",
@@ -46,7 +47,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
                 Comments = new [] {new JiraIssueComment { Body = releaseNote }}
             });
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy).GetReleaseNote(jiraIssue,linkData, releaseNotePrefix);
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy).GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
 
         [Test]
