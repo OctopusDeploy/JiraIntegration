@@ -37,7 +37,12 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                     return result;
                 }
 
-                log.Warn($"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Status Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})": "")}");
+                var msg =
+                    $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Status Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                if(response.StatusCode == HttpStatusCode.NotFound)
+                    log.Trace(msg);
+                else
+                    log.Warn(msg);
                 return null;
             }
         }
@@ -50,7 +55,12 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 if (response.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<JiraIssueComments>(await response.Content.ReadAsStringAsync());
 
-                log.Warn($"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Status Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})": "")}");
+                var msg =
+                    $"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Status Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                if (response.StatusCode == HttpStatusCode.NotFound)
+                    log.Trace(msg);
+                else
+                    log.Warn(msg);
                 return new JiraIssueComments();
             }
         }
@@ -76,6 +86,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
             Fields = new JiraIssueFields();
         }
         
+        [JsonProperty("key")]
+        public string Key { get; set; }
         [JsonProperty("fields")]
         public JiraIssueFields Fields { get; set; }
     }

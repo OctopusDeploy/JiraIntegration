@@ -30,42 +30,47 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 
         public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusPackageMetadata packageMetadata)
         {
-            if (packageMetadata.CommentParser != CommentParser)
+
+            if (!IsEnabled || 
+                string.IsNullOrEmpty(store.GetJiraUsername()) || 
+                string.IsNullOrEmpty(store.GetJiraPassword()))
                 return null;
 
             var baseUrl = store.GetBaseUrl();
             if (string.IsNullOrWhiteSpace(baseUrl))
                 return null;
 
-            var isEnabled = store.GetIsEnabled();
-
             var releaseNotePrefix = store.GetReleaseNotePrefix();
             var workItemIds = commentParser.ParseWorkItemIds(packageMetadata).Distinct();
 
-            return workItemIds.Select(workItemId => new WorkItemLink
+            return workItemIds.Select(workItemId =>
+            {
+                var issue = jira.Value.GetIssue(workItemId).Result;
+                if (issue is null) return null;
+                
+                return new WorkItemLink
                 {
                     Id = workItemId,
-                    Description = isEnabled ? GetReleaseNote(workItemId, releaseNotePrefix) : workItemId,
-                    LinkUrl = isEnabled ? baseUrl + "/browse/" + workItemId : null
-                })
-                .ToArray();
+                    Description = GetReleaseNote(issue, releaseNotePrefix),
+                    LinkUrl = baseUrl + "/browse/" + workItemId
+                };
+            })
+            .Where(i => i != null)
+            .ToArray();
         }
 
-        public string GetReleaseNote(string workItemId, string releaseNotePrefix)
+        public string GetReleaseNote(JiraIssue issue, string releaseNotePrefix)
         {
-            var issue = jira.Value.GetIssue(workItemId).Result;
-            if (issue is null) return workItemId;
-            
             if (issue.Fields.Comments.Total == 0 || string.IsNullOrWhiteSpace(releaseNotePrefix))
                 return issue.Fields.Summary;
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var issueComments = jira.Value.GetIssueComments(workItemId).Result;
+            var issueComments = jira.Value.GetIssueComments(issue.Key).Result;
 
             var releaseNote = issueComments?.Comments.LastOrDefault(c => releaseNoteRegex.IsMatch(c.Body))?.Body;
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, "")?.Trim()
-                : issue.Fields.Summary ?? workItemId;
+                : issue.Fields.Summary ?? issue.Key;
         }
     }
 }
