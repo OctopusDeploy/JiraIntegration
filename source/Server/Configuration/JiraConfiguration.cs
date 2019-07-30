@@ -1,6 +1,5 @@
-﻿using Octopus.Data.Resources.Attributes;
+﻿using Octopus.Data.Model;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
-using Octopus.Shared.Model;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
