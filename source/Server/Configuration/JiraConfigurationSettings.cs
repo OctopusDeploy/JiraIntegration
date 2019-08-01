@@ -31,9 +31,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 
             yield return new ConfigurationValue<bool>("Octopus.IssueTracker.JiraIssueTracker", isEnabled, isEnabled, "Is Enabled");
             yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraBaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
-            yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()), "Jira Connect App Password");
+            yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()), "Jira Connect App Password", isSensitive: true);
             yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraUsername", ConfigurationDocumentStore.GetJiraUsername(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraUsername()), "Jira Username");
-            yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraPassword", ConfigurationDocumentStore.GetJiraPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraPassword()), "Jira Password");
+            yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraPassword", ConfigurationDocumentStore.GetJiraPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraPassword()), "Jira Password", isSensitive: true);
             yield return new ConfigurationValue<string>("Octopus.IssueTracker.JiraReleaseNotePrefix", ConfigurationDocumentStore.GetReleaseNotePrefix(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetReleaseNotePrefix()), "Jira Release Note Prefix");
         }
 
