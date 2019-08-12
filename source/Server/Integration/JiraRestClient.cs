@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
@@ -26,6 +27,21 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
             AuthorizationHeader = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
         }
 
+        public async Task<ConnectivityCheckResponse> GetServerInfo()
+        {
+            using (var client = CreateHttpClient())
+            {
+                var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/serverInfo");
+                if (response.IsSuccessStatusCode)
+                {
+                    return ConnectivityCheckResponse.Success;
+                }
+
+                return ConnectivityCheckResponse.Failure(
+                    $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $"Reason: {response.ReasonPhrase}" : "")}");
+            }
+        }
+
         public async Task<JiraIssue> GetIssue(string workItemId)
         {
             using (var client = CreateHttpClient())
@@ -38,7 +54,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 }
 
                 var msg =
-                    $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Status Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                    $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
                 if(response.StatusCode == HttpStatusCode.NotFound)
                     log.Trace(msg);
                 else
@@ -56,7 +72,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                     return JsonConvert.DeserializeObject<JiraIssueComments>(await response.Content.ReadAsStringAsync());
 
                 var msg =
-                    $"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Status Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                    $"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
                 if (response.StatusCode == HttpStatusCode.NotFound)
                     log.Trace(msg);
                 else
