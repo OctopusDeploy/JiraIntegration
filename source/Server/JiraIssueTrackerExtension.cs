@@ -37,6 +37,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 .As<IContributeMappings>()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterType<JiraConnectAppClient>().AsSelf().InstancePerDependency();
+            
             builder.RegisterType<JiraIssueTracker>()
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
