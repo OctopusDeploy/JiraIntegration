@@ -15,8 +15,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
             Func<SecuredAsyncActionInvoker<JiraConnectAppConnectivityCheckAction, IJiraConfigurationStore>> jiraConnectAppConnectivityCheckInvokerFactory,
             Func<SecuredAsyncActionInvoker<JiraCredentialsConnectivityCheckAction, IJiraConfigurationStore>> jiraCredentialsConnectivityCheckInvokerFactory)
         {
-            Add("GET", ApiJiraCredentialsTest, jiraCredentialsConnectivityCheckInvokerFactory().ExecuteAsync);
-            Add("GET", ApiConnectAppCredentialsTest, jiraConnectAppConnectivityCheckInvokerFactory().ExecuteAsync);
+            Add("POST", ApiJiraCredentialsTest, jiraCredentialsConnectivityCheckInvokerFactory().ExecuteAsync);
+            Add("POST", ApiConnectAppCredentialsTest, jiraConnectAppConnectivityCheckInvokerFactory().ExecuteAsync);
         }
     }
 }

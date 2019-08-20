@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -5,6 +6,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
@@ -29,28 +31,31 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
             this.connectAppClient = connectAppClient;
         }
         
-        public Task ExecuteAsync(OctoContext context)
+        public async Task ExecuteAsync(OctoContext context)
         {
-            var baseUrl = context.Request.Query["BaseUrl"].FirstOrDefault();
+            var json = await new StreamReader(context.Request.Body).ReadToEndAsync();
+            var request = JsonConvert.DeserializeObject<JObject>(json);
+            var baseUrl = request.GetValue("BaseUrl").ToString();
+            
             var username = installationIdProvider.GetInstallationId().ToString();
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(context.Request.Query["Password"].FirstOrDefault()) ? configurationStore.GetConnectAppPassword() : context.Request.Query["Password"].FirstOrDefault();
+            var password = string.IsNullOrEmpty(request.GetValue("Password").ToString()) ? configurationStore.GetConnectAppPassword() : request.GetValue("Password").ToString();
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(password))
             {
                 context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure(
                     string.IsNullOrEmpty(baseUrl) ? "Please provide a value for Jira Base Url." : null,
                     string.IsNullOrEmpty(password) ? "Please provide a value for Jira Connect App Password." : null)
                 );
-                return Task.FromResult(0);
+                return;
             }
 
             var token = connectAppClient.GetAuthTokenFromConnectApp(username, password);
             if (token is null)
             {
                 context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure("Failed to get authentication token from Jira Connect App."));
-                return Task.FromResult(0);
+                return;
             }
             
             using (var client = new HttpClient())
@@ -59,11 +64,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 
                 var connectivityCheckPayload =
                     JsonConvert.SerializeObject(new JiraConnectAppConnectivityCheckRequest {BaseHostUrl = baseUrl, OctopusInstallationId = username});
-                var result = client.PostAsync(
+                var result = await client.PostAsync(
                         $"{configurationStore.GetConnectAppUrl()}/relay/connectivitycheck",
-                        new StringContent(connectivityCheckPayload, Encoding.UTF8, "application/json"))
-                    .GetAwaiter()
-                    .GetResult();
+                        new StringContent(connectivityCheckPayload, Encoding.UTF8, "application/json"));
 
                 if (!result.IsSuccessStatusCode)
                 {
@@ -71,11 +74,10 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
                         ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIssueTracker)."
                         : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}")
                     );
-                    return Task.FromResult(0);
+                    return;
                 }
 
                 context.Response.AsOctopusJson(ConnectivityCheckResponse.Success);
-                return Task.FromResult(0);
             }
         }
 
