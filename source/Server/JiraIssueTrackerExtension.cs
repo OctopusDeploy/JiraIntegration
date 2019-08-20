@@ -7,10 +7,12 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
+using Octopus.Server.Extensibility.HostServices.Web;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Web;
 using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
@@ -37,6 +39,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 .As<IContributeMappings>()
                 .InstancePerLifetimeScope();
 
+            builder.RegisterType<JiraConnectAppClient>().AsSelf().InstancePerDependency();
+            
             builder.RegisterType<JiraIssueTracker>()
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
@@ -49,6 +53,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 .As<IContributeToConfigureCommand>()
                 .InstancePerDependency();
 
+            builder.RegisterType<JiraConnectAppConnectivityCheckAction>().AsSelf().InstancePerDependency();
+            builder.RegisterType<JiraCredentialsConnectivityCheckAction>().AsSelf().InstancePerDependency();
+            
             builder.RegisterType<CommentParser>().AsSelf().InstancePerDependency();
             builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
 
@@ -65,6 +72,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 return new JiraRestClient(baseUrl, username, password, log);
             }).As<IJiraRestClient>()
             .InstancePerDependency();
+
+            builder.RegisterType<JiraIssueTrackerHomeLinksContributor>().As<IHomeLinksContributor>()
+                .InstancePerDependency();
         }
     }
 }

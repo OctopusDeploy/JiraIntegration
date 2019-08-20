@@ -16,6 +16,7 @@ using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
+using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
 using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
@@ -24,6 +25,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
     {
         private readonly ILogWithContext log;
         private readonly IJiraConfigurationStore store;
+        private readonly JiraConnectAppClient connectAppClient;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IClock clock;
         private readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
@@ -35,6 +37,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
         public DeploymentObserver(ILogWithContext log,
             IJiraConfigurationStore store,
+            JiraConnectAppClient connectAppClient,
             IInstallationIdProvider installationIdProvider,
             IClock clock,
             IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider,
@@ -46,6 +49,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         {
             this.log = log;
             this.store = store;
+            this.connectAppClient = connectAppClient;
             this.installationIdProvider = installationIdProvider;
             this.clock = clock;
             this.deploymentEnvironmentSettingsProvider = deploymentEnvironmentSettingsProvider;
@@ -75,7 +79,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                 }
 
                 // get token from connect App
-                var token = GetAuthTokenFromConnectApp();
+                var token = connectAppClient.GetAuthTokenFromConnectApp();
                 if (token is null)
                 {
                     log.Finish();
@@ -87,34 +91,6 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
                 log.Finish();
             }
-        }
-
-        string GetAuthTokenFromConnectApp()
-        {
-            using (var client = new HttpClient())
-            {
-                var username = installationIdProvider.GetInstallationId();
-                var password = store.GetConnectAppPassword();
-                var encodedAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
-
-                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
-                var result = client.GetAsync($"{store.GetConnectAppUrl()}/token").GetAwaiter().GetResult();
-
-                if (result.IsSuccessStatusCode)
-                {
-                    var authTokenFromConnectApp = JsonConvert.DeserializeObject<JsonTokenData>(result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
-                    return authTokenFromConnectApp.Token;
-                }
-
-                log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}", result.StatusCode);
-                return null;
-            }
-        }
-
-        class JsonTokenData
-        {
-            [JsonProperty("token")]
-            public string Token { get; set; }
         }
 
         void PublishToJira(string token, DeploymentEventType eventType, IDeployment deployment)
