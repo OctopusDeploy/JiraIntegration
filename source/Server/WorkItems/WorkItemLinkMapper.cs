@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
-using Octopus.Server.Extensibility.HostServices.Model.PackageMetadata;
+using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
 using Octopus.Server.Extensibility.Resources.IssueTrackers;
@@ -28,9 +28,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusPackageMetadata packageMetadata)
+        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
         {
-
             if (!IsEnabled || 
                 string.IsNullOrEmpty(store.GetJiraUsername()) || 
                 string.IsNullOrEmpty(store.GetJiraPassword()))
@@ -41,18 +40,19 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
                 return null;
 
             var releaseNotePrefix = store.GetReleaseNotePrefix();
-            var workItemIds = commentParser.ParseWorkItemIds(packageMetadata).Distinct();
+            var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct();
 
             return workItemIds.Select(workItemId =>
             {
-                var issue = jira.Value.GetIssue(workItemId).Result;
+                var issue = jira.Value.GetIssue(workItemId).GetAwaiter().GetResult();
                 if (issue is null) return null;
                 
                 return new WorkItemLink
                 {
                     Id = workItemId,
                     Description = GetReleaseNote(issue, releaseNotePrefix),
-                    LinkUrl = baseUrl + "/browse/" + workItemId
+                    LinkUrl = baseUrl + "/browse/" + workItemId,
+                    Source = JiraConfigurationStore.CommentParser
                 };
             })
             .Where(i => i != null)
@@ -65,7 +65,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
                 return issue.Fields.Summary;
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var issueComments = jira.Value.GetIssueComments(issue.Key).Result;
+            var issueComments = jira.Value.GetIssueComments(issue.Key).GetAwaiter().GetResult();
 
             var releaseNote = issueComments?.Comments.LastOrDefault(c => releaseNoteRegex.IsMatch(c.Body))?.Body;
             return !string.IsNullOrWhiteSpace(releaseNote)

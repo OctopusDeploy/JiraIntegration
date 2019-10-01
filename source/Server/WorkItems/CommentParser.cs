@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
-using Octopus.Server.Extensibility.HostServices.Model.PackageMetadata;
+using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 {
@@ -10,9 +10,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
         // with added '$' and '.' to exclude strings that look similar to Jira issues, e.g. `text that may cause confusion: $foo-1 or test.TST-01.com`
         private static readonly Regex Expression = new Regex("(?<![A-Z0-9\\$\\.]-?)(?>[A-Z0-9]+-\\d+)(?![A-Z])", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         
-        public string[] ParseWorkItemIds(OctopusPackageMetadata packageMetadata)
+        public string[] ParseWorkItemIds(OctopusBuildInformation buildInformation)
         {
-            return packageMetadata.Commits.SelectMany(c => WorkItemIds(c.Comment))
+            return buildInformation.Commits.SelectMany(c => WorkItemIds(c.Comment))
                 .Where(workItemId => !string.IsNullOrWhiteSpace(workItemId))
                 .ToArray();
         }

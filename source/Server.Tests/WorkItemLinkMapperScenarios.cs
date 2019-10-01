@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
-using Octopus.Server.Extensibility.HostServices.Model.PackageMetadata;
+using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
@@ -68,9 +69,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
 
-            var workItems = mapper.Map(new OctopusPackageMetadata
+            var workItems = mapper.Map(new OctopusBuildInformation
             {
-                CommentParser = "Jira",
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"},
@@ -80,6 +80,36 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
 
             Assert.IsTrue(workItems.Succeeded);
             Assert.AreEqual(1, workItems.Value.Length);
+        }
+
+        [Test]
+        public void SourceGetsSet()
+        {
+            var store = Substitute.For<IJiraConfigurationStore>();
+            var jiraClient = Substitute.For<IJiraRestClient>();
+            var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
+            store.GetBaseUrl().Returns("https://github.com");
+            store.GetIsEnabled().Returns(true);
+            store.GetJiraUsername().Returns("user");
+            store.GetJiraPassword().Returns("password");
+            jiraClient.GetIssue(Arg.Is("JRE-1234")).Returns(new JiraIssue());
+            jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
+            {
+                Comments = new [] {new JiraIssueComment { Body = string.Empty }}
+            });
+            
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
+
+            var workItems = mapper.Map(new OctopusBuildInformation
+            {
+                Commits = new Commit[]
+                {
+                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"}
+                }
+            });
+
+            Assert.IsTrue(workItems.Succeeded);
+            Assert.AreEqual("Jira", workItems.Value.Single().Source);
         }
     }
 }

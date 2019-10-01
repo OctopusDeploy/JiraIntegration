@@ -64,8 +64,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         {
             if (!store.GetIsEnabled() ||
                 store.GetJiraInstanceType() == JiraInstanceType.Server ||
-                domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => pm.CommentParser != JiraConfigurationStore.CommentParser)) ||
-                domainEvent.Deployment.Changes.All(drn => drn.VersionMetadata.All(pm => !pm.WorkItems.Any())))
+                domainEvent.Deployment.Changes.All(drn => drn.VersionBuildInformation.All(pm => pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
                 return;
 
             using (log.OpenBlock($"Sending Jira state update - {StateFromEventType(domainEvent.EventType)}"))
@@ -125,9 +124,9 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                             DeploymentSequenceNumber = int.Parse(deployment.Id.Split('-')[1]),
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
                             DisplayName = serverTask.Description,
-                            IssueKeys = deployment.Changes.SelectMany(drn => drn.VersionMetadata
-                                .Where(pm => pm.CommentParser == JiraConfigurationStore.CommentParser)
+                            IssueKeys = deployment.Changes.SelectMany(drn => drn.VersionBuildInformation
                                 .SelectMany(pm => pm.WorkItems)
+                                .Where(wi => wi.Source == JiraConfigurationStore.CommentParser)
                                 .Select(wi => wi.Id)
                                 .Distinct()).ToArray(),
                             Url =
