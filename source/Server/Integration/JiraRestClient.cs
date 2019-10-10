@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -49,8 +50,18 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}?fields=summary,comment");
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JsonConvert.DeserializeObject<JiraIssue>(await response.Content.ReadAsStringAsync());
-                    return result;
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var hasContentTypeHeader = response.Headers.TryGetValues("Content-Type", out var contentType);
+                    if (hasContentTypeHeader && contentType.First().ToLower().Equals("application/json"))
+                    {
+                        var result = JsonConvert.DeserializeObject<JiraIssue>(content);
+                        return result;
+                    }
+
+                    var errMsg = $"Received response with non-JSON content type of '{contentType}', content: {content}";
+                    log.Error(errMsg);
+                    throw new ApplicationException(errMsg);
                 }
 
                 var msg =
