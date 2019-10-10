@@ -50,18 +50,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}?fields=summary,comment");
                 if (response.IsSuccessStatusCode)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    var hasContentTypeHeader = response.Headers.TryGetValues("Content-Type", out var contentType);
-                    if (hasContentTypeHeader && contentType.First().ToLower().Equals("application/json"))
-                    {
-                        var result = JsonConvert.DeserializeObject<JiraIssue>(content);
-                        return result;
-                    }
-
-                    var errMsg = $"Received response with non-JSON content type of '{contentType}', content: {content}";
-                    log.Error(errMsg);
-                    throw new ApplicationException(errMsg);
+                    var result = await GetResult<JiraIssue>(response);
+                    return result;
                 }
 
                 var msg =
@@ -80,7 +70,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
             {
                 var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}/comment");
                 if (response.IsSuccessStatusCode)
-                    return JsonConvert.DeserializeObject<JiraIssueComments>(await response.Content.ReadAsStringAsync());
+                    return await GetResult<JiraIssueComments>(response);
 
                 var msg =
                     $"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
@@ -89,6 +79,23 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 else
                     log.Warn(msg);
                 return new JiraIssueComments();
+            }
+        }
+
+        async Task<TResult> GetResult<TResult>(HttpResponseMessage response)
+        {
+            var content = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var result = JsonConvert.DeserializeObject<TResult>(content);
+                return result;
+            }
+            catch
+            {
+                response.Headers.TryGetValues("Content-Type", out var contentType);
+                var errMsg = $"Error parsing JSON content for type {typeof(TResult)}. Content Type: '{contentType}', content: {content}";
+                log.Error(errMsg);
+                throw;
             }
         }
 
