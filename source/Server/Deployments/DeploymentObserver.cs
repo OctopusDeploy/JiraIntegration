@@ -21,7 +21,7 @@ using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 {
-    public class DeploymentObserver : IObserveDomainEvent<DeploymentEvent>
+    class DeploymentObserver : IObserveDomainEvent<DeploymentEvent>
     {
         private readonly ILogWithContext log;
         private readonly IJiraConfigurationStore store;
@@ -119,7 +119,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                 {
                     Deployments = new[]
                     {
-                        new JiraPayloadData.JiraDeploymentData
+                        new JiraDeploymentData
                         {
                             DeploymentSequenceNumber = int.Parse(deployment.Id.Split('-')[1]),
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
@@ -134,13 +134,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
                             Description = serverTask.Description,
                             LastUpdated = clock.GetUtcTime(),
                             State = StateFromEventType(eventType),
-                            Pipeline = new JiraPayloadData.JiraDeploymentPipeline
+                            Pipeline = new JiraDeploymentPipeline
                             {
                                 Id = deployment.ProjectId,
                                 DisplayName = project.Name,
                                 Url = $"{serverUri}/app#/{project.SpaceId}/projects/{project.Slug}"
                             },
-                            Environment = new JiraPayloadData.JiraDeploymentEnvironment
+                            Environment = new JiraDeploymentEnvironment
                             {
                                 Id = $"{deployment.EnvironmentId}{(string.IsNullOrWhiteSpace(deployment.TenantId) ? "" : $"-{deployment.TenantId}")}",
                                 DisplayName = deploymentEnvironment.Name,

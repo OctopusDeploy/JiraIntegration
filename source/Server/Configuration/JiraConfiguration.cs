@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
-    public class JiraConfiguration : ExtensionConfigurationDocument
+    class JiraConfiguration : ExtensionConfigurationDocument
     {
         public JiraConfiguration() : base("Jira", "Octopus Deploy", "1.1")
         {
@@ -24,13 +24,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         public ReleaseNoteOptions ReleaseNoteOptions { get; set; } = new ReleaseNoteOptions();
     }
 
-    public enum JiraInstanceType
+    enum JiraInstanceType
     {
         Cloud,
         Server
     }
 
-    public class ReleaseNoteOptions
+    class ReleaseNoteOptions
     {
         public string Username { get; set; }
         [Encrypted]

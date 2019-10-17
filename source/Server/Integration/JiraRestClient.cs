@@ -12,7 +12,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
-    public class JiraRestClient : IJiraRestClient
+    class JiraRestClient : IJiraRestClient
     {
         private readonly ProductInfoHeaderValue UserAgentHeader = new ProductInfoHeaderValue("octopus-jira-issue-tracker", "1.0");
         private readonly AuthenticationHeaderValue AuthorizationHeader;
@@ -113,7 +113,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         }
     }
 
-    public class JiraIssue
+    class JiraIssue
     {
         public JiraIssue()
         {
@@ -126,7 +126,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         public JiraIssueFields Fields { get; set; }
     }
 
-    public class JiraIssueFields
+    class JiraIssueFields
     {
         public JiraIssueFields()
         {
@@ -139,7 +139,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         public JiraIssueComments Comments { get; set; }
     }
 
-    public class JiraIssueComments
+    class JiraIssueComments
     {
         public JiraIssueComments()
         {
@@ -152,7 +152,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         public int Total { get; set; }
     }
 
-    public class JiraIssueComment
+    class JiraIssueComment
     {
         [JsonProperty("body")]
         public string Body { get; set; }

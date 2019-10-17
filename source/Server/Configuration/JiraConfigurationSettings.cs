@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
-    public class JiraConfigurationSettings : ExtensionConfigurationSettings<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
+    class JiraConfigurationSettings : ExtensionConfigurationSettings<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
     {
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IServerConfigurationStore serverConfigurationStore;

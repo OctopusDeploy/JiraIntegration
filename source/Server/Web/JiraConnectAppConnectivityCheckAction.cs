@@ -15,7 +15,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 {
-    public class JiraConnectAppConnectivityCheckAction : IAsyncApiAction
+    class JiraConnectAppConnectivityCheckAction : IAsyncApiAction
     {
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IInstallationIdProvider installationIdProvider;

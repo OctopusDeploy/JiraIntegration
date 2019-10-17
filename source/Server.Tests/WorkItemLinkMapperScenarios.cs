@@ -11,7 +11,7 @@ using Commit = Octopus.Server.Extensibility.HostServices.Model.IssueTrackers.Com
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
 {
     [TestFixture]
-    public class WorkItemLinkMapperScenarios
+    class WorkItemLinkMapperScenarios
     {
         [TestCase("JRE-1234", "Release note:", "Release note: This is the release note", ExpectedResult = "This is the release note")]
         [TestCase("JRE-1234", "Release note:", "release note: This is the release note", ExpectedResult = "This is the release note")]
