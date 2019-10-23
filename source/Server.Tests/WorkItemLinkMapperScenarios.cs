@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
@@ -66,7 +67,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             {
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
-            
+
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
 
             var workItems = mapper.Map(new OctopusBuildInformation
@@ -76,7 +77,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"},
                     new Commit { Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234"}
                 }
-            });
+            }, Substitute.For<ILogWithContext>());
 
             Assert.IsTrue(workItems.Succeeded);
             Assert.AreEqual(1, workItems.Value.Length);
@@ -97,7 +98,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
             {
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
-            
+
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
 
             var workItems = mapper.Map(new OctopusBuildInformation
@@ -106,7 +107,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"}
                 }
-            });
+            }, Substitute.For<ILogWithContext>());
 
             Assert.IsTrue(workItems.Succeeded);
             Assert.AreEqual("Jira", workItems.Value.Single().Source);

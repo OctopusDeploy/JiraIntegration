@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
@@ -28,7 +29,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
+        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusBuildInformation buildInformation, ILogWithContext log)
         {
             if (!IsEnabled || 
                 string.IsNullOrEmpty(store.GetJiraUsername()) || 

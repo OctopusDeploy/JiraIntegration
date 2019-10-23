@@ -15,7 +15,7 @@
     <PackageReference Include="Octopus.Diagnostics" Version="1.3.0" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Server.Extensibility" Version="7.1.1" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="7.1.2-enh-release-crea0001" />
     <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
 </Project>
