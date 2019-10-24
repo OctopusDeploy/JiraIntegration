@@ -8,6 +8,7 @@ using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
 using Octopus.Server.Extensibility.Resources.IssueTrackers;
+using Octopus.Versioning;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 {
@@ -29,7 +30,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public SuccessOrErrorResult<WorkItemLink[]> Map(OctopusBuildInformation buildInformation, ILogWithContext log)
+        public SuccessOrErrorResult<WorkItemLink[]> Map(string packageId, IVersion version, OctopusBuildInformation buildInformation, ILogWithContext log)
         {
             if (!IsEnabled || 
                 string.IsNullOrEmpty(store.GetJiraUsername()) || 

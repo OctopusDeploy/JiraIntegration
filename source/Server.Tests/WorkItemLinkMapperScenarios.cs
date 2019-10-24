@@ -7,6 +7,7 @@ using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Versioning.Semver;
 using Commit = Octopus.Server.Extensibility.HostServices.Model.IssueTrackers.Commit;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
@@ -70,7 +71,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = mapper.Map("P", new SemanticVersion("1"), new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
@@ -101,7 +102,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = mapper.Map("P", new SemanticVersion("1"), new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
