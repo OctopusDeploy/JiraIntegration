@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -14,6 +13,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
     public class JiraRestClient : IJiraRestClient
     {
+        const string BrowseProjectsKey = "BROWSE_PROJECTS";
+
         private readonly ProductInfoHeaderValue UserAgentHeader = new ProductInfoHeaderValue("octopus-jira-issue-tracker", "1.0");
         private readonly AuthenticationHeaderValue AuthorizationHeader;
         
@@ -28,14 +29,30 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
             AuthorizationHeader = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
         }
 
-        public async Task<ConnectivityCheckResponse> GetServerInfo()
+        public async Task<ConnectivityCheckResponse> ConnectivityCheck()
         {
             using (var client = CreateHttpClient())
             {
-                var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/serverInfo");
+                // make sure the user can authenticate
+                var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/myself");
                 if (response.IsSuccessStatusCode)
                 {
-                    return ConnectivityCheckResponse.Success;
+                    // make sure the user has browse projects permission
+                    response = await client.GetAsync($"{baseUrl}/{baseApiUri}/mypermissions?permissions={BrowseProjectsKey}");
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonContent = await response.Content.ReadAsStringAsync();
+                        var permissionsContainer = JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
+
+                        if (!permissionsContainer.permissions.ContainsKey(BrowseProjectsKey))
+                            return ConnectivityCheckResponse.Failure($"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+
+                        var setting = permissionsContainer.permissions[BrowseProjectsKey];
+                        if (!setting.havePermission)
+                            return ConnectivityCheckResponse.Failure($"User does not have the '{setting.Name}' permission in Jira");
+
+                        return ConnectivityCheckResponse.Success;
+                    }
                 }
 
                 return ConnectivityCheckResponse.Failure(
@@ -156,5 +173,16 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
     {
         [JsonProperty("body")]
         public string Body { get; set; }
+    }
+    
+    class PermissionSettingsContainer
+    {
+        public Dictionary<string, PermissionSettings> permissions { get; set; }
+    }
+
+    class PermissionSettings
+    {
+        public string Name { get; set; }
+        public bool havePermission { get; set; }
     }
 }
