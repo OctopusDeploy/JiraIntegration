@@ -9,7 +9,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
-    public class JiraConnectAppClient
+    class JiraConnectAppClient
     {
         private readonly ILogWithContext log;
         private readonly IInstallationIdProvider installationIdProvider;

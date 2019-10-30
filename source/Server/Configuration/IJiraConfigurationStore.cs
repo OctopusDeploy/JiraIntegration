@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
-    public interface IJiraConfigurationStore : IExtensionConfigurationStore<JiraConfiguration>
+    interface IJiraConfigurationStore : IExtensionConfigurationStore<JiraConfiguration>
     {
         JiraInstanceType GetJiraInstanceType();
         void SetJiraInstanceType(JiraInstanceType jiraInstanceType);

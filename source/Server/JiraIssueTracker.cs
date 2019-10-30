@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
-    public class JiraIssueTracker : IIssueTracker
+    class JiraIssueTracker : IIssueTracker
     {
         internal static string Name = "Jira";
 

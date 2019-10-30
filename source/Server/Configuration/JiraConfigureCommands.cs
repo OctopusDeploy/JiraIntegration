@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
-    public class JiraConfigureCommands : IContributeToConfigureCommand
+    class JiraConfigureCommands : IContributeToConfigureCommand
     {
         readonly ILog log;
         readonly Lazy<IJiraConfigurationStore> jiraConfiguration;

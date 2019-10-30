@@ -7,7 +7,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
 {
     [TestFixture]
-    public class CommentParserScenarios
+    class CommentParserScenarios
     {
         [Test]
         public void StandardIssueNumberReferenceGetsParsedCorrectly()

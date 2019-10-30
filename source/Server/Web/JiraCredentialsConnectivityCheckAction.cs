@@ -11,7 +11,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 {
-    public class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
+    class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
         private readonly IJiraConfigurationStore configurationStore;
         private readonly ILog log;

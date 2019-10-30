@@ -3,7 +3,7 @@ using System.Runtime.Remoting.Messaging;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response
 {
-    public class ConnectivityCheckResponse
+    class ConnectivityCheckResponse
     {
         public bool WasSuccessful => ErrorMessages == null || ErrorMessages.Length == 0;
         public string[] ErrorMessages { get; set; }
