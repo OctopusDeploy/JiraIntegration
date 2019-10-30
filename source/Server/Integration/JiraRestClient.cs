@@ -37,7 +37,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/myself");
                 if (response.IsSuccessStatusCode)
                 {
-                    // 
+                    // make sure the user has browse projects permission
                     response = await client.GetAsync($"{baseUrl}/{baseApiUri}/mypermissions?permissions={BrowseProjectsKey}");
                     if (response.IsSuccessStatusCode)
                     {
