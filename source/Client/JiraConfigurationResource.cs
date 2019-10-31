@@ -5,7 +5,7 @@ using Octopus.Client.Model;
 
 namespace Octopus.Client.Extensibility.IssueTracker.Jira
 {
-    class JiraConfigurationResource : ExtensionConfigurationResource
+    public class JiraConfigurationResource : ExtensionConfigurationResource
     {
         public const string JiraBaseUrlDescription = "Set the base url for the Jira instance.";
 
@@ -33,7 +33,7 @@ namespace Octopus.Client.Extensibility.IssueTracker.Jira
         public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
     }
 
-    class ReleaseNoteOptionsResource
+    public class ReleaseNoteOptionsResource
     {
         public const string UsernameDescription = "Set the username to authenticate with against your Jira instance.";
         public const string PasswordDescription = "Set the password to authenticate with against your Jira instance.";
