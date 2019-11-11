@@ -45,7 +45,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log);
-            var connectivityCheckResult = jiraRestClient.ConnectivityCheck().Result;
+            var connectivityCheckResult = jiraRestClient.ConnectivityCheck().GetAwaiter().GetResult();
             context.Response.AsOctopusJson(connectivityCheckResult);
         }
     }
