@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Web;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
-    public class JiraIssueTrackerApi : RegisterEndpoint
+    class JiraIssueTrackerApi : RegisterEndpoint
     {
         public const string ApiConnectAppCredentialsTest = "/api/jiraissuetracker/connectivitycheck/connectapp";
         public const string ApiJiraCredentialsTest = "/api/jiraissuetracker/connectivitycheck/jira";

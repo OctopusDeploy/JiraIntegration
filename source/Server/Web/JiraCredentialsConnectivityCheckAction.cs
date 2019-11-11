@@ -11,7 +11,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 {
-    public class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
+    class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
         private readonly IJiraConfigurationStore configurationStore;
         private readonly ILog log;
@@ -45,7 +45,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log);
-            var connectivityCheckResult = jiraRestClient.GetServerInfo().Result;
+            var connectivityCheckResult = jiraRestClient.ConnectivityCheck().Result;
             context.Response.AsOctopusJson(connectivityCheckResult);
         }
     }

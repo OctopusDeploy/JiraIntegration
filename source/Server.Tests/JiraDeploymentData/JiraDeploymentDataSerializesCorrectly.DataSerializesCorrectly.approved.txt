@@ -1,0 +1,32 @@
+{
+  "InstallationId": "12345",
+  "BaseHostUrl": "https://octopussample.com",
+  "DeploymentsInfo": {
+    "deployments": [
+      {
+        "deploymentSequenceNumber": 11,
+        "updateSequenceNumber": 3,
+        "displayName": "Task Name",
+        "issueKeys": [
+          "JIR-1",
+          "JIR-2"
+        ],
+        "url": "https://octopussample.com/app#/Spaces-1/projects/foo/releases/1.0.0/deployments/deployments-123",
+        "description": "Task Description",
+        "lastUpdated": "2018-10-27T00:00:00+10:00",
+        "state": "in_progress",
+        "pipeline": {
+          "id": "Projects-234",
+          "displayName": "Jira Project",
+          "url": "https://octopussample.com/app#/Spaces-1/projects/foo"
+        },
+        "environment": {
+          "id": "env-123",
+          "displayName": "Development",
+          "type": "development"
+        },
+        "id": "1.0"
+      }
+    ]
+  }
+}

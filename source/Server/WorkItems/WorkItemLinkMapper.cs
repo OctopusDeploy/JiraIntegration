@@ -12,7 +12,7 @@ using Octopus.Versioning;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
 {
-    public class WorkItemLinkMapper : IWorkItemLinkMapper
+    class WorkItemLinkMapper : IWorkItemLinkMapper
     {
         private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;

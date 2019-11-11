@@ -8,7 +8,7 @@ using Octopus.Server.Extensibility.Metadata;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Environments
 {
-    public class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
+    class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
     {
         private readonly IJiraConfigurationStore store;
 
@@ -34,7 +34,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Environments
         }
     }
 
-    public enum JiraEnvironmentType
+    enum JiraEnvironmentType
     {
         unmapped,
         development,

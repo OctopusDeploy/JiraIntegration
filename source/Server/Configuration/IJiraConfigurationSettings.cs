@@ -2,6 +2,6 @@
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
-    public interface IJiraConfigurationSettings : IHasConfigurationSettings
+    interface IJiraConfigurationSettings : IHasConfigurationSettings
     { }
 }

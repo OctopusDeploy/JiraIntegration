@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira
 {
-    public class JiraIssueTrackerHomeLinksContributor : IHomeLinksContributor
+    class JiraIssueTrackerHomeLinksContributor : IHomeLinksContributor
     {
         private readonly IJiraConfigurationStore configurationStore;
         public const string ApiConnectAppCredentialsTestLinkName = "JiraConnectAppCredentialsTest";

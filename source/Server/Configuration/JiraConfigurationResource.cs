@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
 {
     [Description("Configure the Jira Issue Tracker. [Learn more](https://g.octopushq.com/JiraIssueTracker).")]
-    public class JiraConfigurationResource : ExtensionConfigurationResource
+    class JiraConfigurationResource : ExtensionConfigurationResource
     {
         public const string JiraBaseUrlDescription = "Enter the base url of your Jira instance. Once set, work item references will render as links.";
 
@@ -45,7 +45,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
     }
 
-    public class ReleaseNoteOptionsResource
+    class ReleaseNoteOptionsResource
     {
         public const string UsernameDescription = "Set the username to authenticate with against your Jira instance.";
         public const string PasswordDescription = "Set the password to authenticate with against your Jira instance.";
