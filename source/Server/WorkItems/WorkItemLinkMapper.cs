@@ -42,12 +42,30 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
                 return null;
 
             var releaseNotePrefix = store.GetReleaseNotePrefix();
-            var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct();
+            var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
+
+            if (!workItemIds.Any())
+                return null;
+            
+            log.Info($"Found the following work item ids in the comments, '{string.Join(", ", workItemIds)}'");
+
+            var connectionCheckResult = jira.Value.ConnectivityCheck().GetAwaiter().GetResult();
+
+            if (!connectionCheckResult.WasSuccessful)
+            {
+                var errorMsg = $"Connection check to Jira failed. Error: {string.Join(", ", connectionCheckResult.ErrorMessages)}";
+                log.Error(errorMsg);
+                return SuccessOrErrorResult.Failure(errorMsg);
+            }
 
             return workItemIds.Select(workItemId =>
             {
                 var issue = jira.Value.GetIssue(workItemId).GetAwaiter().GetResult();
-                if (issue is null) return null;
+                if (issue is null)
+                {
+                    log.InfoFormat("Work item with Id '{0}' could not be found.", workItemId);
+                    return null;
+                }
                 
                 return new WorkItemLink
                 {
