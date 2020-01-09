@@ -4,6 +4,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
@@ -68,8 +69,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
                 var baseUrl = store.GetBaseUrl();
                 var username = store.GetJiraUsername();
                 var password = store.GetJiraPassword();
-                var log = c.Resolve<ILog>();
-                return new JiraRestClient(baseUrl, username, password, log);
+                return new JiraRestClient(
+                    baseUrl, 
+                    username, 
+                    password, 
+                    c.Resolve<ILog>(), 
+                    c.Resolve<IOctopusHttpClientFactory>()
+                );
             }).As<IJiraRestClient>()
             .InstancePerDependency();
 
