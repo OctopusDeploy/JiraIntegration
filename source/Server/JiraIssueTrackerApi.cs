@@ -12,8 +12,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira
         public const string ApiJiraCredentialsTest = "/api/jiraissuetracker/connectivitycheck/jira";
         
         public JiraIssueTrackerApi(
-            Func<SecuredAsyncActionInvoker<JiraConnectAppConnectivityCheckAction, IJiraConfigurationStore>> jiraConnectAppConnectivityCheckInvokerFactory,
-            Func<SecuredAsyncActionInvoker<JiraCredentialsConnectivityCheckAction, IJiraConfigurationStore>> jiraCredentialsConnectivityCheckInvokerFactory)
+            Func<SecuredAsyncActionInvoker<JiraConnectAppConnectivityCheckAction>> jiraConnectAppConnectivityCheckInvokerFactory,
+            Func<SecuredAsyncActionInvoker<JiraCredentialsConnectivityCheckAction>> jiraCredentialsConnectivityCheckInvokerFactory)
         {
             Add("POST", ApiJiraCredentialsTest, jiraCredentialsConnectivityCheckInvokerFactory().ExecuteAsync);
             Add("POST", ApiConnectAppCredentialsTest, jiraConnectAppConnectivityCheckInvokerFactory().ExecuteAsync);
