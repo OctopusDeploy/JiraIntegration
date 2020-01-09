@@ -7,31 +7,31 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
     public class JiraRestClient : IJiraRestClient
     {
-        private readonly ProductInfoHeaderValue UserAgentHeader = new ProductInfoHeaderValue("octopus-jira-issue-tracker", "1.0");
         private readonly AuthenticationHeaderValue AuthorizationHeader;
+        private readonly HttpClient httpClient;
         
         private readonly string baseUrl;
         private readonly ILog log;
         private readonly string baseApiUri = "rest/api/2";
 
-        public JiraRestClient(string baseUrl, string username, string password, ILog log)
+        public JiraRestClient(string baseUrl, string username, string password, ILog log, IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.baseUrl = baseUrl;
             this.log = log;
             AuthorizationHeader = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+            httpClient = CreateHttpClient(octopusHttpClientFactory);
         }
 
         public async Task<ConnectivityCheckResponse> GetServerInfo()
         {
-            using (var client = CreateHttpClient())
-            {
-                var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/serverInfo");
+                var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/serverInfo");
                 if (response.IsSuccessStatusCode)
                 {
                     return ConnectivityCheckResponse.Success;
@@ -39,14 +39,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 
                 return ConnectivityCheckResponse.Failure(
                     $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $"Reason: {response.ReasonPhrase}" : "")}");
-            }
         }
 
         public async Task<JiraIssue> GetIssue(string workItemId)
         {
-            using (var client = CreateHttpClient())
-            {
-                var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}?fields=summary,comment");
+                var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}?fields=summary,comment");
                 if (response.IsSuccessStatusCode)
                 {
                     var result = JsonConvert.DeserializeObject<JiraIssue>(await response.Content.ReadAsStringAsync());
@@ -60,14 +57,11 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 else
                     log.Warn(msg);
                 return null;
-            }
         }
 
         public async Task<JiraIssueComments> GetIssueComments(string workItemId)
         {
-            using (var client = CreateHttpClient())
-            {
-                var response = await client.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}/comment");
+                var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}/comment");
                 if (response.IsSuccessStatusCode)
                     return JsonConvert.DeserializeObject<JiraIssueComments>(await response.Content.ReadAsStringAsync());
 
@@ -78,20 +72,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                 else
                     log.Warn(msg);
                 return new JiraIssueComments();
-            }
         }
 
-        HttpClient CreateHttpClient()
+        HttpClient CreateHttpClient(IOctopusHttpClientFactory octopusHttpClientFactory)
         {
-            return new HttpClient
-            {
-                BaseAddress = new Uri(baseUrl),
-                DefaultRequestHeaders =
-                {
-                    Authorization = AuthorizationHeader,
-                    UserAgent = {UserAgentHeader},
-                },
-            };
+            var client = octopusHttpClientFactory.CreateClient();
+            client.BaseAddress = new Uri(baseUrl);
+            client.DefaultRequestHeaders.Authorization = AuthorizationHeader;
+            return client;
         }
     }
 
