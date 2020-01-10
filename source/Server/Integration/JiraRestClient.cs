@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
+using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
@@ -31,6 +31,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 
         public async Task<ConnectivityCheckResponse> ConnectivityCheck()
         {
+            var connectivityCheckResponse = new ConnectivityCheckResponse();
             using (var client = CreateHttpClient())
             {
                 // make sure the user can authenticate
@@ -45,18 +46,25 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                         var permissionsContainer = JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
 
                         if (!permissionsContainer.permissions.ContainsKey(BrowseProjectsKey))
-                            return ConnectivityCheckResponse.Failure($"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                        {
+                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                            return connectivityCheckResponse;
+                        }
 
                         var setting = permissionsContainer.permissions[BrowseProjectsKey];
                         if (!setting.havePermission)
-                            return ConnectivityCheckResponse.Failure($"User does not have the '{setting.Name}' permission in Jira");
+                        {
+                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"User does not have the '{setting.Name}' permission in Jira");
+                            return connectivityCheckResponse;
+                        }
 
-                        return ConnectivityCheckResponse.Success;
+                        return connectivityCheckResponse;
                     }
                 }
 
-                return ConnectivityCheckResponse.Failure(
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, 
                     $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $"Reason: {response.ReasonPhrase}" : "")}");
+                return connectivityCheckResponse;
             }
         }
 
