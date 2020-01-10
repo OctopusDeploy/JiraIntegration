@@ -45,7 +45,18 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log);
-            var connectivityCheckResult = jiraRestClient.ConnectivityCheck().Result;
+            var connectivityCheckResult = jiraRestClient.ConnectivityCheck().GetAwaiter().GetResult();
+            if (connectivityCheckResult.WasSuccessful)
+            {
+                if (!configurationStore.GetIsEnabled())
+                {
+                    context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure(
+                        "The Jira Connect App connection was tested successfully",
+                        "The Jira Issue Tracker is not enabled, so its functionality will not currently be available"));
+                    return;
+                }
+            }
+            
             context.Response.AsOctopusJson(connectivityCheckResult);
         }
     }
