@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
+using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {
@@ -16,7 +16,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
     {
         const string BrowseProjectsKey = "BROWSE_PROJECTS";
 
-        private readonly AuthenticationHeaderValue AuthorizationHeader;
+        private readonly AuthenticationHeaderValue authorizationHeader;
         private readonly HttpClient httpClient;
 
         private readonly string baseUrl;
@@ -28,13 +28,14 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         {
             this.baseUrl = baseUrl;
             this.log = log;
-            AuthorizationHeader = new AuthenticationHeaderValue("Basic",
+            authorizationHeader = new AuthenticationHeaderValue("Basic",
                 Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
             httpClient = CreateHttpClient(octopusHttpClientFactory);
         }
 
         public async Task<ConnectivityCheckResponse> ConnectivityCheck()
         {
+            var connectivityCheckResponse = new ConnectivityCheckResponse();
             // make sure the user can authenticate
             var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/myself");
             if (response.IsSuccessStatusCode)
@@ -48,20 +49,25 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
                     var permissionsContainer = JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
 
                     if (!permissionsContainer.permissions.ContainsKey(BrowseProjectsKey))
-                        return ConnectivityCheckResponse.Failure(
-                            $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                    {
+                        connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                        return connectivityCheckResponse;
+                    }
 
                     var setting = permissionsContainer.permissions[BrowseProjectsKey];
                     if (!setting.havePermission)
-                        return ConnectivityCheckResponse.Failure(
-                            $"User does not have the '{setting.Name}' permission in Jira");
+                    {
+                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"User does not have the '{setting.Name}' permission in Jira");
+                            return connectivityCheckResponse;
+                    }
 
-                    return ConnectivityCheckResponse.Success;
+                    return connectivityCheckResponse;
                 }
             }
 
-            return ConnectivityCheckResponse.Failure(
+            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, 
                 $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $"Reason: {response.ReasonPhrase}" : "")}");
+            return connectivityCheckResponse;
         }
 
         public async Task<JiraIssue> GetIssue(string workItemId)
@@ -121,7 +127,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         {
             var client = octopusHttpClientFactory.CreateClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization = AuthorizationHeader;
+            client.DefaultRequestHeaders.Authorization = authorizationHeader;
             return client;
         }
     }

@@ -1,6 +1,5 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
+using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
 {

@@ -1,5 +1,4 @@
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,7 +10,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
+using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 {
@@ -36,6 +35,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
             var json = await new StreamReader(context.Request.Body).ReadToEndAsync();
             var request = JsonConvert.DeserializeObject<JObject>(json);
             var baseUrl = request.GetValue("BaseUrl").ToString();
+
+            var connectivityCheckResponse = new ConnectivityCheckResponse();
             
             var username = installationIdProvider.GetInstallationId().ToString();
             // If password here is null, it could be that they're clicking the test connectivity button after saving
@@ -44,17 +45,17 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
             var password = string.IsNullOrEmpty(request.GetValue("Password").ToString()) ? configurationStore.GetConnectAppPassword() : request.GetValue("Password").ToString();
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(password))
             {
-                context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure(
-                    string.IsNullOrEmpty(baseUrl) ? "Please provide a value for Jira Base Url." : null,
-                    string.IsNullOrEmpty(password) ? "Please provide a value for Jira Connect App Password." : null)
-                );
+                if (string.IsNullOrEmpty(baseUrl)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
+                if (string.IsNullOrEmpty(password)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Connect App Password.");
+                context.Response.AsOctopusJson(connectivityCheckResponse);
                 return;
             }
 
             var token = connectAppClient.GetAuthTokenFromConnectApp(username, password);
             if (token is null)
             {
-                context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure("Failed to get authentication token from Jira Connect App."));
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Failed to get authentication token from Jira Connect App.");
+                context.Response.AsOctopusJson(connectivityCheckResponse);
                 return;
             }
             
@@ -70,15 +71,22 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 
                 if (!result.IsSuccessStatusCode)
                 {
-                    context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure(result.StatusCode == HttpStatusCode.NotFound
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, result.StatusCode == HttpStatusCode.NotFound
                         ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIssueTracker)."
-                        : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}")
-                    );
+                        : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}");
+                    context.Response.AsOctopusJson(connectivityCheckResponse);
                     return;
                 }
-
-                context.Response.AsOctopusJson(ConnectivityCheckResponse.Success);
             }
+
+            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
+            
+            if (!configurationStore.GetIsEnabled())
+            {
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Issue Tracker is not enabled, so its functionality will not currently be available");
+            }
+            
+            context.Response.AsOctopusJson(connectivityCheckResponse);
         }
 
         private class JiraConnectAppConnectivityCheckRequest

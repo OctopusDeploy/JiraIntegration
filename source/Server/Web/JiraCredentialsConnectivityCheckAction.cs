@@ -7,7 +7,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web.Response;
+using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
 {
@@ -39,16 +39,27 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
                 : request.GetValue("Password").ToString();
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                context.Response.AsOctopusJson(ConnectivityCheckResponse.Failure(
-                    string.IsNullOrEmpty(baseUrl) ? "Please provide a value for Jira Base Url." : null,
-                    string.IsNullOrEmpty(username) ? "Please provide a value for Jira Username." : null,
-                    string.IsNullOrEmpty(password) ? "Please provide a value for Jira Password." : null));
+                var response = new ConnectivityCheckResponse();
+                if (string.IsNullOrEmpty(baseUrl)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
+                if (string.IsNullOrEmpty(username)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Username.");
+                if (string.IsNullOrEmpty(password)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Password.");
+                context.Response.AsOctopusJson(response);
                 return;
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log, octopusHttpClientFactory);
-            var connectivityCheckResult = jiraRestClient.ConnectivityCheck().Result;
-            context.Response.AsOctopusJson(connectivityCheckResult);
+            var connectivityCheckResponse = jiraRestClient.ConnectivityCheck().GetAwaiter().GetResult();
+            if (connectivityCheckResponse.Messages.All(m => m.Category != ConnectivityCheckMessageCategory.Error))
+            {
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
+
+                if (!configurationStore.GetIsEnabled())
+                {
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Issue Tracker is not enabled, so its functionality will not currently be available");
+                }
+            }
+            
+            context.Response.AsOctopusJson(connectivityCheckResponse);
         }
     }
 }
