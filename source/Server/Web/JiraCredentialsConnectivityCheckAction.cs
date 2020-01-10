@@ -14,11 +14,13 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
     class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
         private readonly IJiraConfigurationStore configurationStore;
+        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
         private readonly ILog log;
 
-        public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore, ILog log)
+        public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore, IOctopusHttpClientFactory octopusHttpClientFactory, ILog log)
         {
             this.configurationStore = configurationStore;
+            this.octopusHttpClientFactory = octopusHttpClientFactory;
             this.log = log;
         }
 
@@ -45,7 +47,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
                 return;
             }
 
-            var jiraRestClient = new JiraRestClient(baseUrl, username, password, log);
+            var jiraRestClient = new JiraRestClient(baseUrl, username, password, log, octopusHttpClientFactory);
             var connectivityCheckResponse = jiraRestClient.ConnectivityCheck().GetAwaiter().GetResult();
             if (connectivityCheckResponse.Messages.All(m => m.Category != ConnectivityCheckMessageCategory.Error))
             {
