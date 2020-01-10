@@ -19,15 +19,18 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly JiraConnectAppClient connectAppClient;
+        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppConnectivityCheckAction(
             IJiraConfigurationStore configurationStore, 
             IInstallationIdProvider installationIdProvider,
-            JiraConnectAppClient connectAppClient)
+            JiraConnectAppClient connectAppClient,
+            IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.configurationStore = configurationStore;
             this.installationIdProvider = installationIdProvider;
             this.connectAppClient = connectAppClient;
+            this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
         
         public async Task ExecuteAsync(OctoContext context)
@@ -59,7 +62,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
                 return;
             }
             
-            using (var client = new HttpClient())
+            using (var client = octopusHttpClientFactory.CreateClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
