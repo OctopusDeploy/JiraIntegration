@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Domain;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Domain.Environments;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
@@ -34,6 +35,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
         private readonly IDeploymentEnvironmentStore deploymentEnvironmentStore;
         private readonly IReleaseStore releaseStore;
         private readonly IServerTaskStore serverTaskStore;
+        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public DeploymentObserver(ILogWithContext log,
             IJiraConfigurationStore store,
@@ -45,7 +47,8 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             IProjectStore projectStore,
             IDeploymentEnvironmentStore deploymentEnvironmentStore,
             IReleaseStore releaseStore,
-            IServerTaskStore serverTaskStore)
+            IServerTaskStore serverTaskStore,
+            IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.log = log;
             this.store = store;
@@ -58,6 +61,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
             this.deploymentEnvironmentStore = deploymentEnvironmentStore;
             this.releaseStore = releaseStore;
             this.serverTaskStore = serverTaskStore;
+            this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
         public void Handle(DeploymentEvent domainEvent)
@@ -157,7 +161,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
 
             var json = JsonConvert.SerializeObject(data);
 
-            using (var client = new HttpClient())
+            using (var client = octopusHttpClientFactory.CreateClient())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 

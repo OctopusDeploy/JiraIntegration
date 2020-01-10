@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
 
@@ -14,15 +15,18 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         private readonly ILogWithContext log;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IJiraConfigurationStore configurationStore;
+        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppClient(
             ILogWithContext log,
             IInstallationIdProvider installationIdProvider,
-            IJiraConfigurationStore configurationStore)
+            IJiraConfigurationStore configurationStore,
+            IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.log = log;
             this.installationIdProvider = installationIdProvider;
             this.configurationStore = configurationStore;
+            this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
         public string GetAuthTokenFromConnectApp()
@@ -34,7 +38,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
         
         public string GetAuthTokenFromConnectApp(string username, string password)
         {
-            using (var client = new HttpClient())
+            using (var client = octopusHttpClientFactory.CreateClient())
             {
                 var encodedAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
 
