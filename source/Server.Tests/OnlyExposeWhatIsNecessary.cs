@@ -3,7 +3,7 @@ using System.Linq;
 using Assent;
 using NUnit.Framework;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
+namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
     [TestFixture]
     public class OnlyExposeWhatIsNecessary

@@ -10,7 +10,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.Resources.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
+namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
     class JiraRestClient : IJiraRestClient
     {

@@ -1,15 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <RootNamespace>Octopus.Server.Extensibility.IssueTracker.Jira</RootNamespace>
-    <AssemblyName>Octopus.Server.Extensibility.IssueTracker.Jira</AssemblyName>
-    <Description>Implements the Jira issue tracker.</Description>
+    <RootNamespace>Octopus.Server.Extensibility.JiraIntegration</RootNamespace>
+    <AssemblyName>Octopus.Server.Extensibility.JiraIntegration</AssemblyName>
+    <Description>Implements the Jira issue tracker and Jira Service Desk.</Description>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Octopus Deploy</Authors>
-    <PackageId>Octopus.Server.Extensibility.IssueTracker.Jira</PackageId>
+    <PackageId>Octopus.Server.Extensibility.JiraIntegration</PackageId>
     <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
-    <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIssueTracker/blob/master/LICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIssueTracker</PackageProjectUrl>
+    <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/master/LICENSE.txt</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIntegration</PackageProjectUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Octopus.Data" Version="4.2.1" />

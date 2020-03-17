@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Mapping;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfigurationSettings : ExtensionConfigurationSettings<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
     {

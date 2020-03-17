@@ -1,14 +1,13 @@
 using System;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Integration
+namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
     class JiraConnectAppClient
     {

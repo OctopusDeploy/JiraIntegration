@@ -2,7 +2,7 @@
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class DatabaseInitializer : ExecuteWhenDatabaseInitializes
     {

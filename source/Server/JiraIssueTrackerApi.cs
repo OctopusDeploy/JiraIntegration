@@ -1,10 +1,8 @@
 using System;
-using System.Threading.Tasks;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web;
+using Octopus.Server.Extensibility.JiraIntegration.Web;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira
+namespace Octopus.Server.Extensibility.JiraIntegration
 {
     class JiraIssueTrackerApi : RegisterEndpoint
     {

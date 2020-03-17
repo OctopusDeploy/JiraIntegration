@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfigureCommands : IContributeToConfigureCommand
     {

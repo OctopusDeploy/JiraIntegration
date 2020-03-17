@@ -2,7 +2,7 @@ using System.Linq;
 using Assent;
 using NUnit.Framework;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests.PublicSurfaceArea
+namespace Octopus.Server.Extensibility.JiraIntegration.Tests.PublicSurfaceArea
 {
     [TestFixture]
     public class PublicSurfaceAreaScenario

@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
+namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class JiraPayloadData
     {

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Octopus.Server.Extensibility.HostServices.Web;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira
+namespace Octopus.Server.Extensibility.JiraIntegration
 {
     class JiraIssueTrackerHomeLinksContributor : IHomeLinksContributor
     {

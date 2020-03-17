@@ -3,7 +3,7 @@ using Octopus.Data.Resources;
 using Octopus.Data.Resources.Attributes;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     [Description("Configure the Jira Issue Tracker. [Learn more](https://g.octopushq.com/JiraIssueTracker).")]
     class JiraConfigurationResource : ExtensionConfigurationResource

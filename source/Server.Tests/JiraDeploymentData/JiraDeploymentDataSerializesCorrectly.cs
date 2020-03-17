@@ -2,11 +2,10 @@ using System;
 using Assent;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
+using Octopus.Server.Extensibility.JiraIntegration.Deployments;
+using Octopus.Server.Extensibility.JiraIntegration.Environments;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests.JiraDeploymentData
+namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
 {
     [TestFixture]
     public class JiraDeploymentDataSerializesCorrectly
@@ -22,7 +21,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests.JiraDeploymentDat
                 {
                     Deployments = new[]
                     {
-                        new Deployments.JiraDeploymentData
+                        new JiraIntegration.Deployments.JiraDeploymentData
                         {
                             DeploymentSequenceNumber = 11,
                             UpdateSequenceNumber = 3,

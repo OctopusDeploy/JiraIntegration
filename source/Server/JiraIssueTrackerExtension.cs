@@ -1,5 +1,4 @@
-﻿using System;
-using Autofac;
+﻿using Autofac;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
@@ -9,14 +8,14 @@ using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Web;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Deployments;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Web;
-using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Deployments;
+using Octopus.Server.Extensibility.JiraIntegration.Environments;
+using Octopus.Server.Extensibility.JiraIntegration.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.Web;
+using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira
+namespace Octopus.Server.Extensibility.JiraIntegration
 {
     [OctopusPlugin("Jira Issue Tracker", "Octopus Deploy")]
     public class JiraIssueTrackerExtension : IOctopusExtension

@@ -2,7 +2,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
+namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
     class CommentParser
     {
