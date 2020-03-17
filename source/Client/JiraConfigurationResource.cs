@@ -11,7 +11,7 @@ namespace Octopus.Client.Extensibility.JiraIntegration
 
         public JiraConfigurationResource()
         {
-            Id = "issuetracker-jira";
+            Id = "jira-integration";
         }
 
         [DisplayName("Jira Base Url")]
