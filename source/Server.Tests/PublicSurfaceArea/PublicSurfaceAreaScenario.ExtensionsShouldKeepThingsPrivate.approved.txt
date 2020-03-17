@@ -1,1 +1,1 @@
-Octopus.Server.Extensibility.IssueTracker.Jira.JiraIssueTrackerExtension
+Octopus.Server.Extensibility.JiraIntegration.JiraIntegrationExtension
