@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "Extensibility.IssueTracker.Jira": {
+    "Extensibility.JiraIntegration": {
       "commandName": "Executable",
       "executablePath": "..\\..\\..\\..\\..\\..\\OctopusDeploy\\source\\Octopus.Server\\bin\\net452\\Octopus.Server.exe",
-      "commandLineArgs": "run --instance=master --customExtension=Octopus.Server.Extensibility.IssueTracker.Jira.dll"
+      "commandLineArgs": "run --instance=master --customExtension=Octopus.Server.Extensibility.JiraIntegration.dll"
     }
   }
 }

@@ -145,7 +145,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         // Due to relaxing the RegEx used to parse issues from comments this test case is no longer valid,
         // it's handled by us checking with the Jira instance if the issue exists, or if it doesnt exist
         // it doesn't get included in the list of work items returned to the UI
-        // See https://github.com/OctopusDeploy/JiraIssueTracker/issues/12 for more context
+        // See https://github.com/OctopusDeploy/JiraIntegration/issues/12 for more context
         // [TestCase("Merge branch 'master' of http://tst-01.com")]
         public void CommentsWithStringThatLookCloseToReferencesGetParsedCorrectly(string comment)
         {
