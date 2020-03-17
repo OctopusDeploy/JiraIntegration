@@ -18,7 +18,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
         }
 
         public string ExtensionId => JiraConfigurationStore.SingletonId;
-        public string ExtensionName => JiraIssueTracker.Name;
+        public string ExtensionName => JiraIntegration.Name;
 
         public List<PropertyMetadata> Properties => store.GetIsEnabled() && store.GetJiraInstanceType() == JiraInstanceType.Cloud
             ? new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>().Types.First().Properties

@@ -11,7 +11,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         [Test]
         public void ServerExtensionsShouldMinimiseWhatIsExposed()
         {
-            var assembly = typeof(JiraIssueTrackerExtension).Assembly;
+            var assembly = typeof(JiraIntegrationExtension).Assembly;
 
             var publicThings = assembly.GetExportedTypes()
                 .Select(t => t.FullName);

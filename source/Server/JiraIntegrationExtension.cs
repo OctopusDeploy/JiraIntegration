@@ -17,8 +17,8 @@ using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    [OctopusPlugin("Jira Issue Tracker", "Octopus Deploy")]
-    public class JiraIssueTrackerExtension : IOctopusExtension
+    [OctopusPlugin("Jira Integration", "Octopus Deploy")]
+    public class JiraIntegrationExtension : IOctopusExtension
     {
         public void Load(ContainerBuilder builder)
         {
@@ -41,7 +41,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
             builder.RegisterType<JiraConnectAppClient>().AsSelf().InstancePerDependency();
             
-            builder.RegisterType<JiraIssueTracker>()
+            builder.RegisterType<JiraIntegration>()
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
 
@@ -78,7 +78,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
             }).As<IJiraRestClient>()
             .InstancePerDependency();
 
-            builder.RegisterType<JiraIssueTrackerHomeLinksContributor>().As<IHomeLinksContributor>()
+            builder.RegisterType<JiraIntegrationHomeLinksContributor>().As<IHomeLinksContributor>()
                 .InstancePerDependency();
         }
     }

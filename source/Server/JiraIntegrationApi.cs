@@ -4,12 +4,12 @@ using Octopus.Server.Extensibility.JiraIntegration.Web;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraIssueTrackerApi : RegisterEndpoint
+    class JiraIntegrationApi : RegisterEndpoint
     {
-        public const string ApiConnectAppCredentialsTest = "/api/jiraissuetracker/connectivitycheck/connectapp";
-        public const string ApiJiraCredentialsTest = "/api/jiraissuetracker/connectivitycheck/jira";
+        public const string ApiConnectAppCredentialsTest = "/api/jiraintegration/connectivitycheck/connectapp";
+        public const string ApiJiraCredentialsTest = "/api/jiraintegration/connectivitycheck/jira";
         
-        public JiraIssueTrackerApi(
+        public JiraIntegrationApi(
             Func<SecuredAsyncActionInvoker<JiraConnectAppConnectivityCheckAction>> jiraConnectAppConnectivityCheckInvokerFactory,
             Func<SecuredAsyncActionInvoker<JiraCredentialsConnectivityCheckAction>> jiraCredentialsConnectivityCheckInvokerFactory)
         {

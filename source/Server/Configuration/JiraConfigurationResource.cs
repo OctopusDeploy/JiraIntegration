@@ -25,7 +25,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [Description("Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIssueTracker#connecting-jira-cloud-and-octopus).")]
         [Writeable]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
-        [AllowConnectivityCheck("Jira Connect App configuration", JiraIssueTrackerApi.ApiConnectAppCredentialsTest, nameof(BaseUrl), nameof(Password))]
+        [AllowConnectivityCheck("Jira Connect App configuration", JiraIntegrationApi.ApiConnectAppCredentialsTest, nameof(BaseUrl), nameof(Password))]
         public SensitiveValue Password { get; set; }
 
         [DisplayName("Octopus Installation Id")]
@@ -59,7 +59,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [DisplayName("Jira Password")]
         [Description(PasswordDescription)]
         [Writeable]
-        [AllowConnectivityCheck("Jira credentials", JiraIssueTrackerApi.ApiJiraCredentialsTest, nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
+        [AllowConnectivityCheck("Jira credentials", JiraIntegrationApi.ApiJiraCredentialsTest, nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
         public SensitiveValue Password { get; set; }
 
         [DisplayName("Release Note Prefix")]

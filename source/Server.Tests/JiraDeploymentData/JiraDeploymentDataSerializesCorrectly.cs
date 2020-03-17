@@ -21,7 +21,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
                 {
                     Deployments = new[]
                     {
-                        new JiraIntegration.Deployments.JiraDeploymentData
+                        new Extensibility.JiraIntegration.Deployments.JiraDeploymentData
                         {
                             DeploymentSequenceNumber = 11,
                             UpdateSequenceNumber = 3,

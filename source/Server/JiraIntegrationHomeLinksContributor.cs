@@ -4,13 +4,13 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraIssueTrackerHomeLinksContributor : IHomeLinksContributor
+    class JiraIntegrationHomeLinksContributor : IHomeLinksContributor
     {
         private readonly IJiraConfigurationStore configurationStore;
         public const string ApiConnectAppCredentialsTestLinkName = "JiraConnectAppCredentialsTest";
         public const string ApiJiraCredentialsTestLinkName = "JiraCredentialsTest";
 
-        public JiraIssueTrackerHomeLinksContributor(IJiraConfigurationStore configurationStore)
+        public JiraIntegrationHomeLinksContributor(IJiraConfigurationStore configurationStore)
         {
             this.configurationStore = configurationStore;
         }
@@ -19,8 +19,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
         {
             var linksToContribute = new Dictionary<string, string>
             {
-                {ApiConnectAppCredentialsTestLinkName, $"~{JiraIssueTrackerApi.ApiConnectAppCredentialsTest}"},
-                {ApiJiraCredentialsTestLinkName, $"~{JiraIssueTrackerApi.ApiJiraCredentialsTest}"}
+                {ApiConnectAppCredentialsTestLinkName, $"~{JiraIntegrationApi.ApiConnectAppCredentialsTest}"},
+                {ApiJiraCredentialsTestLinkName, $"~{JiraIntegrationApi.ApiJiraCredentialsTest}"}
             };
 
             return linksToContribute;
