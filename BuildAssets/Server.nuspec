@@ -1,20 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" xmlns:octopus="http://octopus.org">
   <metadata>
-    <id>Octopus.Server.Extensibility.IssueTracker.Jira</id>
-    <title>Octopus Server Extensibility Issue Tracker - Jira</title>
+    <id>Octopus.Server.Extensibility.JiraIntegration</id>
+    <title>Octopus Server Extensibility - Jira Integration</title>
     <version>$version$</version>
     <authors>Octopus Deploy</authors>
     <owners>Octopus Deploy</owners>
-    <summary>Octopus Deploy Jira issue tracker extension.</summary>
+    <summary>Octopus Deploy Jira Integration extension.</summary>
     <description>
-      Implements the Jira issue tracker extension.
+      Implements the Jira Issue Tracker and Jira Service Desk extension.
     </description>
     <releaseNotes></releaseNotes>
     <language>en-US</language>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>https://github.com/OctopusDeploy/JiraIssueTracker/blob/master/LICENSE.txt</licenseUrl>
-    <projectUrl>https://github.com/OctopusDeploy/JiraIssueTracker</projectUrl>
+    <licenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/OctopusDeploy/JiraIntegration</projectUrl>
     <iconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
     <tags>automation deployment</tags>
     <developmentDependency>true</developmentDependency>
