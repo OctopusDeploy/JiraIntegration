@@ -3,9 +3,9 @@ using Octopus.Data.Resources;
 using Octopus.Data.Resources.Attributes;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    [Description("Configure the Jira Issue Tracker. [Learn more](https://g.octopushq.com/JiraIssueTracker).")]
+    [Description("Configure the Jira Integration. [Learn more](https://g.octopushq.com/JiraIntegration).")]
     class JiraConfigurationResource : ExtensionConfigurationResource
     {
         public const string JiraBaseUrlDescription = "Enter the base url of your Jira instance. Once set, work item references will render as links.";
@@ -22,10 +22,10 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         public string BaseUrl { get; set; }
         
         [DisplayName("Jira Connect App Password")]
-        [Description("Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIssueTracker#connecting-jira-cloud-and-octopus).")]
+        [Description("Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIntegration#connecting-jira-cloud-and-octopus).")]
         [Writeable]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
-        [AllowConnectivityCheck("Jira Connect App configuration", JiraIssueTrackerApi.ApiConnectAppCredentialsTest, nameof(BaseUrl), nameof(Password))]
+        [AllowConnectivityCheck("Jira Connect App configuration", JiraIntegrationApi.ApiConnectAppCredentialsTest, nameof(BaseUrl), nameof(Password))]
         public SensitiveValue Password { get; set; }
 
         [DisplayName("Octopus Installation Id")]
@@ -59,7 +59,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
         [DisplayName("Jira Password")]
         [Description(PasswordDescription)]
         [Writeable]
-        [AllowConnectivityCheck("Jira credentials", JiraIssueTrackerApi.ApiJiraCredentialsTest, nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
+        [AllowConnectivityCheck("Jira credentials", JiraIntegrationApi.ApiJiraCredentialsTest, nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
         public SensitiveValue Password { get; set; }
 
         [DisplayName("Release Note Prefix")]

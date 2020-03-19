@@ -5,11 +5,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Resources.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
+namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {

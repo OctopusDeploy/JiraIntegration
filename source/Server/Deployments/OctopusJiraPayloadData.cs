@@ -1,4 +1,4 @@
-﻿namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
+﻿namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class OctopusJiraPayloadData
     {

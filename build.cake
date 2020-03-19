@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////
 // TOOLS
 //////////////////////////////////////////////////////////////////////
-#tool "nuget:?package=GitVersion.CommandLine&prerelease"
+#tool "nuget:?package=GitVersion.CommandLine&version=4.0.0"
 
 using Path = System.IO.Path;
 using IO = System.IO;
@@ -20,7 +20,7 @@ var publishDir = "./publish";
 var localPackagesDir = "../LocalPackages";
 var artifactsDir = "./artifacts";
 
-var extensionName = "IssueTracker.Jira";
+var extensionName = "JiraIntegration";
 
 var gitVersionInfo = GitVersion(new GitVersionSettings {
     OutputType = GitVersionOutput.Json
@@ -110,7 +110,7 @@ Task("__Pack")
         CreateDirectory(extPublishDir);
         CopyFileToDirectory(Path.Combine("BuildAssets", "Server.nuspec"), extPublishDir);
 
-		CopyFiles(Path.Combine("source", "Server", "bin", "Release", "netstandard2.0", $"*.{extensionName}.dll"), extPublishDir);
+		CopyFiles(Path.Combine("source", "Server", "bin", "Release", "netstandard2.1", $"*.{extensionName}.dll"), extPublishDir);
 
         NuGetPack(Path.Combine(extPublishDir, "Server.nuspec"), new NuGetPackSettings {
             Version = nugetVersion,

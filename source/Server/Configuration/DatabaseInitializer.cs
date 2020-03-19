@@ -2,7 +2,7 @@
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class DatabaseInitializer : ExecuteWhenDatabaseInitializes
     {
@@ -20,6 +20,15 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
             var doc = configurationStore.Get<JiraConfiguration>(JiraConfigurationStore.SingletonId);
             if (doc != null)
                 return;
+
+            var oldConfiguration = configurationStore.Get<JiraConfiguration>("issuetracker-jira");
+            if (oldConfiguration != null)
+            {
+                configurationStore.Delete(oldConfiguration);
+                oldConfiguration.Id = "jira-integration";
+                configurationStore.Create(oldConfiguration);
+                return;
+            }
 
             log.Info("Initializing Jira integration settings");
             doc = new JiraConfiguration();

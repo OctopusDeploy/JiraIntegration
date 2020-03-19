@@ -3,7 +3,7 @@ using Octopus.Client.Extensibility.Attributes;
 using Octopus.Client.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Client.Model;
 
-namespace Octopus.Client.Extensibility.IssueTracker.Jira
+namespace Octopus.Client.Extensibility.JiraIntegration
 {
     public class JiraConfigurationResource : ExtensionConfigurationResource
     {
@@ -11,7 +11,7 @@ namespace Octopus.Client.Extensibility.IssueTracker.Jira
 
         public JiraConfigurationResource()
         {
-            Id = "issuetracker-jira";
+            Id = "jira-integration";
         }
 
         [DisplayName("Jira Base Url")]

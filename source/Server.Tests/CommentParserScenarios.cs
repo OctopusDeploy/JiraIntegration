@@ -1,10 +1,10 @@
 using System.Linq;
 using NUnit.Framework;
-using Octopus.Server.Extensibility.HostServices.Model.IssueTrackers;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
-using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
+using Octopus.Server.Extensibility.HostServices.Model.IssueTrackers;
+using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
+namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
     [TestFixture]
     class CommentParserScenarios
@@ -145,7 +145,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
         // Due to relaxing the RegEx used to parse issues from comments this test case is no longer valid,
         // it's handled by us checking with the Jira instance if the issue exists, or if it doesnt exist
         // it doesn't get included in the list of work items returned to the UI
-        // See https://github.com/OctopusDeploy/JiraIssueTracker/issues/12 for more context
+        // See https://github.com/OctopusDeploy/JiraIntegration/issues/12 for more context
         // [TestCase("Merge branch 'master' of http://tst-01.com")]
         public void CommentsWithStringThatLookCloseToReferencesGetParsedCorrectly(string comment)
         {

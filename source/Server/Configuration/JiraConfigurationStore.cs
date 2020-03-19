@@ -1,14 +1,13 @@
-﻿using System;
-using Octopus.Data.Storage.Configuration;
+﻿using Octopus.Data.Storage.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Configuration
+namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfigurationStore : ExtensionConfigurationStore<JiraConfiguration>, IJiraConfigurationStore
     {
         public static string CommentParser = "Jira";
-        public static string SingletonId = "issuetracker-jira";
-        
+        public static string SingletonId = "jira-integration";
+
         public JiraConfigurationStore(IConfigurationStore configurationStore) : base(configurationStore)
         {
         }

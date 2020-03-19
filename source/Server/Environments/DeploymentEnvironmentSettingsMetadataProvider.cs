@@ -3,10 +3,10 @@ using System.ComponentModel;
 using System.Linq;
 using Octopus.Data.Resources.Attributes;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.Metadata;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Environments
+namespace Octopus.Server.Extensibility.JiraIntegration.Environments
 {
     class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
     {
@@ -18,7 +18,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Environments
         }
 
         public string ExtensionId => JiraConfigurationStore.SingletonId;
-        public string ExtensionName => JiraIssueTracker.Name;
+        public string ExtensionName => JiraIntegration.Name;
 
         public List<PropertyMetadata> Properties => store.GetIsEnabled() && store.GetJiraInstanceType() == JiraInstanceType.Cloud
             ? new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>().Types.First().Properties

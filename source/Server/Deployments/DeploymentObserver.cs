@@ -15,12 +15,12 @@ using Octopus.Server.Extensibility.HostServices.Domain.ServerTasks;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Environments;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Environments;
+using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Time;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Deployments
+namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class DeploymentObserver : IObserveDomainEvent<DeploymentEvent>
     {

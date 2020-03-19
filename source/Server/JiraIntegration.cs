@@ -1,16 +1,15 @@
-﻿using System;
-using Octopus.Server.Extensibility.Extensions.WorkItems;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
+﻿using Octopus.Server.Extensibility.Extensions.WorkItems;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira
+namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraIssueTracker : IIssueTracker
+    class JiraIntegration : IIssueTracker
     {
         internal static string Name = "Jira";
 
         readonly IJiraConfigurationStore configurationStore;
 
-        public JiraIssueTracker(IJiraConfigurationStore configurationStore)
+        public JiraIntegration(IJiraConfigurationStore configurationStore)
         {
             this.configurationStore = configurationStore;
         }

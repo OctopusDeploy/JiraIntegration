@@ -3,12 +3,12 @@ using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
 using Commit = Octopus.Server.Extensibility.HostServices.Model.IssueTrackers.Commit;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Tests
+namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
     [TestFixture]
     class WorkItemLinkMapperScenarios

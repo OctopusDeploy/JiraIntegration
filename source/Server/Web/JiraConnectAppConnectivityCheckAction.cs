@@ -8,11 +8,11 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Resources.Configuration;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
+namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraConnectAppConnectivityCheckAction : IAsyncApiAction
     {
@@ -75,7 +75,7 @@ namespace Octopus.Server.Extensibility.IssueTracker.Jira.Web
                 if (!result.IsSuccessStatusCode)
                 {
                     connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, result.StatusCode == HttpStatusCode.NotFound
-                        ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIssueTracker)."
+                        ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIntegration)."
                         : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}");
                     context.Response.AsOctopusJson(connectivityCheckResponse);
                     return;

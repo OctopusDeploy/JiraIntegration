@@ -4,11 +4,11 @@ using System.Text.RegularExpressions;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Configuration;
-using Octopus.Server.Extensibility.IssueTracker.Jira.Integration;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
+using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Resources.IssueTrackers;
 
-namespace Octopus.Server.Extensibility.IssueTracker.Jira.WorkItems
+namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
     class WorkItemLinkMapper : IWorkItemLinkMapper
     {
