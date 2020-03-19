@@ -1,4 +1,7 @@
-﻿namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
+﻿using System;
+using FluentValidation.Validators;
+
+namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class OctopusJiraPayloadData
     {

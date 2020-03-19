@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using Octopus.Data.Storage.Configuration;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
@@ -8,9 +7,8 @@ using Sashimi.Server.Contracts.ActionHandlers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    public class JiraServiceDeskActionHandler : IActionHandler
+    class JiraServiceDeskActionHandler : IActionHandler
     {
-
         class JiraServiceDeskActionHandlerResult : IActionHandlerResult
         {
             public IReadOnlyDictionary<string, OutputVariable> OutputVariables { get; }
@@ -35,7 +33,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
         readonly ILog Log;
         readonly IConfigurationStore ConfigurationStore;
         
-        JiraServiceDeskActionHandler(ILog log, IConfigurationStore configurationStore, JiraDeployment jiraDeployment)
+        public JiraServiceDeskActionHandler(ILog log, IConfigurationStore configurationStore, JiraDeployment jiraDeployment)
         {
             Log = log;
             ConfigurationStore = configurationStore;
