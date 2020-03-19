@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Newtonsoft.Json;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
@@ -17,8 +18,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         public long UpdateSequenceNumber { get; set; }
         [JsonProperty("displayName")]
         public string DisplayName { get; set; }
-        [JsonProperty("issueKeys")]
-        public string[] IssueKeys { get; set; }
+        [JsonProperty("associations")]
+        public JiraAssociation[] Associations { get; set; }
         [JsonProperty("url")]
         public string Url { get; set; }
         [JsonProperty("description")]
@@ -56,6 +57,26 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         public string DisplayName { get; set; }
         [JsonProperty("type")]
         public string Type { get; set; }
+    }
+
+    class JiraAssociation
+    {
+        private string _associationType;
+        [JsonProperty("associationType")]
+        public string AssociationType {
+            get => _associationType;
+            set
+            {
+                if (!JiraAssociationConstants.ValidJiraAssociationTypes.Contains(value))
+                {
+                    throw new Exception($"Association Type {value} is not a valid type.");
+                }
+
+                _associationType = value;
+            } 
+        }
+        [JsonProperty("values")]
+        public string[] Values { get; set; }
     }
 
 }
