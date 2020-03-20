@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Octopus.Data.Storage.Configuration;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.HostServices.Domain.Projects;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Sashimi.Server.Contracts.ActionHandlers;
@@ -29,23 +30,28 @@ namespace Octopus.Server.Extensibility.JiraIntegration
         public bool CanRunOnDeploymentTarget => false;
         public ActionHandlerCategory[] Categories => new[] {ActionHandlerCategory.BuiltInStep};
 
-        readonly JiraDeployment JiraDeployment;
-        readonly ILog Log;
-        readonly IConfigurationStore ConfigurationStore;
+        readonly JiraDeployment jiraDeployment;
+        readonly ILog log;
+        readonly IConfigurationStore configurationStore;
+        private readonly IDeploymentStore deploymentStore;
         
-        public JiraServiceDeskActionHandler(ILog log, IConfigurationStore configurationStore, JiraDeployment jiraDeployment)
+        public JiraServiceDeskActionHandler(
+            ILog log, 
+            IConfigurationStore configurationStore,
+            IDeploymentStore deploymentStore,
+            JiraDeployment jiraDeployment)
         {
-            Log = log;
-            ConfigurationStore = configurationStore;
-            JiraDeployment = jiraDeployment;
+            this.log = log;
+            this.configurationStore = configurationStore;
+            this.jiraDeployment = jiraDeployment;
         }
         
         public IActionHandlerResult Execute(IActionHanderContext context)
         {
-            IDeployment deployment = 
-                ConfigurationStore.Get<IDeployment>(context.Variables.Get("Octopus.Deployment.Id", ""));
+            string deploymentId = context.Variables.Get("Octopus.Deployment.Id", "");
+            IDeployment deployment = deploymentStore.Get(deploymentId);
 
-            JiraDeployment.PublishToJira("in_progress", deployment);
+            jiraDeployment.PublishToJira("in_progress", deployment);
 
             return new JiraServiceDeskActionHandlerResult
             {
