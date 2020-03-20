@@ -10,17 +10,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 {
     class JiraServiceDeskActionHandler : IActionHandler
     {
-        class JiraServiceDeskActionHandlerResult : IActionHandlerResult
-        {
-            public IReadOnlyDictionary<string, OutputVariable> OutputVariables { get; }
-            public IReadOnlyList<ScriptOutputAction> OutputActions { get; }
-            public IReadOnlyList<ServiceMessage> ServiceMessages { get; }
-            public ExecutionOutcome Outcome { get; }
-            public bool WasSuccessful { get; }
-            public string ResultMessage { get; }
-            public int ExitCode { get; }
-        }
-        
         public string Id => "Octopus.JiraIntegration.ServiceDeskAction";
         public string Name => "Log to Jira Service Desk";
         public string Description => "Create a log in Jira Service desk";
@@ -44,6 +33,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
             this.log = log;
             this.configurationStore = configurationStore;
             this.jiraDeployment = jiraDeployment;
+            this.deploymentStore = deploymentStore;
         }
         
         public IActionHandlerResult Execute(IActionHanderContext context)
@@ -53,12 +43,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
             jiraDeployment.PublishToJira("in_progress", deployment);
 
-            return new JiraServiceDeskActionHandlerResult
-            {
-                OutputActions = { },
-                OutputVariables = { },
-                ServiceMessages = { }
-            };
+            context.RawShellCommand().Execute();
         }
         
     }
