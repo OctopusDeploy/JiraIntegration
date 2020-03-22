@@ -32,7 +32,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
-            jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment);
+            jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment, new JiraIssueTrackerApiDeployment());
         }
 
         string StateFromEventType(DeploymentEventType eventType)

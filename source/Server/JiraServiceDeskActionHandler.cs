@@ -21,17 +21,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
         readonly JiraDeployment jiraDeployment;
         readonly ILog log;
-        readonly IConfigurationStore configurationStore;
         private readonly IDeploymentStore deploymentStore;
         
         public JiraServiceDeskActionHandler(
-            ILog log, 
-            IConfigurationStore configurationStore,
+            ILog log,
             IDeploymentStore deploymentStore,
             JiraDeployment jiraDeployment)
         {
             this.log = log;
-            this.configurationStore = configurationStore;
             this.jiraDeployment = jiraDeployment;
             this.deploymentStore = deploymentStore;
         }
@@ -41,9 +38,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration
             string deploymentId = context.Variables.Get("Octopus.Deployment.Id", "");
             IDeployment deployment = deploymentStore.Get(deploymentId);
 
-            jiraDeployment.PublishToJira("in_progress", deployment);
+            jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment());
 
-            context.RawShellCommand().Execute();
+            return context.RawShellCommand().Execute();
         }
         
     }

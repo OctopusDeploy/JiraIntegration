@@ -76,10 +76,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                            pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser)));
         }
 
-        public void PublishToJira(string eventType, IDeployment deployment)
+        public void PublishToJira(string eventType, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
         {
-            if (!JiraIntegrationAvailable(deployment)) return;
-            
+            if (!JiraIntegrationAvailable(deployment))
+            {
+                
+            }
+
             var serverUri = serverConfigurationStore.GetServerUri()?.TrimEnd('/');
 
             if (string.IsNullOrWhiteSpace(serverUri))
@@ -112,7 +115,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                         .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
                             JiraConfigurationStore.SingletonId, deployment.EnvironmentId) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
 
-                var data = PrepareOctopusJiraPayload(eventType, serverUri, deployment);
+                var data = PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment);
 
                 // Push data to Jira
                 SendToJira(token, data, deployment);
@@ -121,7 +124,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             }
         }
 
-        OctopusJiraPayloadData PrepareOctopusJiraPayload(string eventType, string serverUri, IDeployment deployment)
+        OctopusJiraPayloadData PrepareOctopusJiraPayload(string eventType, string serverUri, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
         {
            
             var project = projectStore.Get(deployment.ProjectId);
@@ -146,12 +149,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             {
                                 new JiraAssociation()
                                 {
-                                    AssociationType = JiraAssociationConstants.JiraAssociationTypeIssueIdOrKeys,
-                                    Values = deployment.Changes.SelectMany(drn => drn.VersionBuildInformation
-                                        .SelectMany(pm => pm.WorkItems)
-                                        .Where(wi => wi.Source == JiraConfigurationStore.CommentParser)
-                                        .Select(wi => wi.Id)
-                                        .Distinct()).ToArray()    
+                                    AssociationType = jiraApiDeployment.DeploymentType(),
+                                    Values = jiraApiDeployment.DeploymentValues(deployment)
                                 }
                             },
                             Url =
