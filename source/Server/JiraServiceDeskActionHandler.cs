@@ -37,10 +37,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration
         {
             string deploymentId = context.Variables.Get("Octopus.Deployment.Id", "");
             IDeployment deployment = deploymentStore.Get(deploymentId);
+            
+            string jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
+            jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId));
 
-            jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment());
-
-            return context.RawShellCommand().Execute();
+            return context.ScriptCommand().Execute();
         }
         
     }

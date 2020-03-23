@@ -4,6 +4,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     public class JiraServiceDeskApiDeployment : IJiraApiDeployment
     {
+        readonly string jiraServiceDeskChangeRequestId;
+
+        public JiraServiceDeskApiDeployment(string jiraServiceDeskChangeRequestId)
+        {
+            this.jiraServiceDeskChangeRequestId = jiraServiceDeskChangeRequestId;
+        }
+        
         public string DeploymentType()
         {
             return JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys;
@@ -11,7 +18,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public string[] DeploymentValues(IDeployment deployment)
         {
-            return new[] {""};
+            return new[] { jiraServiceDeskChangeRequestId };
         }
     }
 }

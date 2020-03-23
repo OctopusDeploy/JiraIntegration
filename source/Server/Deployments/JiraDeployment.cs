@@ -80,7 +80,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         {
             if (!JiraIntegrationAvailable(deployment))
             {
-                
+                return;
             }
 
             var serverUri = serverConfigurationStore.GetServerUri()?.TrimEnd('/');
