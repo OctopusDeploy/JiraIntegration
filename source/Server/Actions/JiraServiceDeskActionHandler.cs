@@ -6,7 +6,7 @@ using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Sashimi.Server.Contracts.ActionHandlers;
 
-namespace Octopus.Server.Extensibility.JiraIntegration
+namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 {
     class JiraServiceDeskActionHandler : IActionHandler
     {

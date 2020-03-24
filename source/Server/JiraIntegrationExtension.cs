@@ -8,6 +8,7 @@ using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Web;
+using Octopus.Server.Extensibility.JiraIntegration.Actions;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Octopus.Server.Extensibility.JiraIntegration.Environments;
