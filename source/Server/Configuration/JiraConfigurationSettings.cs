@@ -29,11 +29,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         {
             var isEnabled = ConfigurationDocumentStore.GetIsEnabled();
 
-            yield return new ConfigurationValue<bool>("Octopus.JiraIntegration", isEnabled, isEnabled, "Is Enabled");
-            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.JiraBaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
-            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.JiraConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()), "Jira Connect App Password", isSensitive: true);
-            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.JiraUsername", ConfigurationDocumentStore.GetJiraUsername(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraUsername()), "Jira Username");
-            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.JiraPassword", ConfigurationDocumentStore.GetJiraPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraPassword()), "Jira Password", isSensitive: true);
+            yield return new ConfigurationValue<bool>(  "Octopus.JiraIntegration", isEnabled, isEnabled, "Is Enabled");
+            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.BaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
+            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.ConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()), "Jira Connect App Password", isSensitive: true);
+            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.Username", ConfigurationDocumentStore.GetJiraUsername(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraUsername()), "Jira Username");
+            yield return new ConfigurationValue<string>("Octopus.JiraIntegration.Password", ConfigurationDocumentStore.GetJiraPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraPassword()), "Jira Password", isSensitive: true);
             yield return new ConfigurationValue<string>("Octopus.JiraIntegration.IssueTracker.JiraReleaseNotePrefix", ConfigurationDocumentStore.GetReleaseNotePrefix(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetReleaseNotePrefix()), "Jira Release Note Prefix");
         }
 

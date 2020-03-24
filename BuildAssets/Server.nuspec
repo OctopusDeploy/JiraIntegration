@@ -8,7 +8,7 @@
     <owners>Octopus Deploy</owners>
     <summary>Octopus Deploy Jira Integration extension.</summary>
     <description>
-      Implements the Jira Issue Tracker and Jira Service Desk extension.
+      Implements the Jira Integration and Jira Service Desk extension.
     </description>
     <releaseNotes></releaseNotes>
     <language>en-US</language>
