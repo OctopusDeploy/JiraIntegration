@@ -11,8 +11,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
     class JiraServiceDeskActionHandler : IActionHandler
     {
         public string Id => "Octopus.JiraIntegration.ServiceDeskAction";
-        public string Name => "Log to Jira Service Desk";
-        public string Description => "Create a log in Jira Service desk";
+        public string Name => "Jira Service Desk Change Request";
+        public string Description => "Initiate a Change Request in Jira Service Desk";
         public string? Keywords => null;
         public bool ShowInStepTemplatePickerUI => true;
         public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
