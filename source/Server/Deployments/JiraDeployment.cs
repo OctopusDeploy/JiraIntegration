@@ -5,6 +5,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Domain.Environments;
@@ -80,6 +81,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         {
             if (!JiraIntegrationAvailable(deployment))
             {
+                if (jiraApiDeployment.DeploymentType == JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys)
+                {
+                    log.Warn($"Trying to use Jira Service Desk Change Request without having Jira Integration enabled");
+                }
                 return;
             }
 
@@ -149,7 +154,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             {
                                 new JiraAssociation()
                                 {
-                                    AssociationType = jiraApiDeployment.DeploymentType(),
+                                    AssociationType = jiraApiDeployment.DeploymentType,
                                     Values = jiraApiDeployment.DeploymentValues(deployment)
                                 }
                             },
