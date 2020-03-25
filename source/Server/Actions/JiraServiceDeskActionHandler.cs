@@ -41,7 +41,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
             string jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
             jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId));
 
-            return context.ScriptCommand().Execute();
+            return ActionHandlerResult.FromSuccess();
         }
         
     }
