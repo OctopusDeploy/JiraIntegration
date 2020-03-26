@@ -30,7 +30,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
                             {
                                 new JiraAssociation()
                                 {
-                                    AssociationType = JiraAssociationConstants.JiraAssociationTypeIssueIdOrKeys,
+                                    AssociationType = JiraAssociationConstants.JiraAssociationTypeIssueKeys,
                                     Values = new [] { "JIR-1", "JIR-2"}
                                 },
                             },

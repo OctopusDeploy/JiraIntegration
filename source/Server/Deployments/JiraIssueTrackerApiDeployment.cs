@@ -7,7 +7,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class JiraIssueTrackerApiDeployment : IJiraApiDeployment
     {
-        public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeIssueIdOrKeys;
+        public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeIssueKeys;
 
         public string[] DeploymentValues(IDeployment deployment)
         {

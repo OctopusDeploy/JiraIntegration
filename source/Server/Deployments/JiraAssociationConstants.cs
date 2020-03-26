@@ -2,11 +2,11 @@
 {
     static class JiraAssociationConstants
     {
-        public static string JiraAssociationTypeIssueIdOrKeys = "issueIdOrKeys";
+        public static string JiraAssociationTypeIssueKeys = "issueKeys";
         public static string JiraAssociationTypeServiceIdOrKeys = "serviceIdOrKeys";
 
         public static readonly string[] ValidJiraAssociationTypes = {
-            JiraAssociationTypeIssueIdOrKeys,
+            JiraAssociationTypeIssueKeys,
             JiraAssociationTypeServiceIdOrKeys
         };
     }
