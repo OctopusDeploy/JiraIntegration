@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
-using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Domain.Environments;
