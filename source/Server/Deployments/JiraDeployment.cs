@@ -67,18 +67,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        bool JiraIntegrationAvailable(IDeployment deployment)
+        bool JiraIntegrationUnavailable(IDeployment deployment)
         {
             return !store.GetIsEnabled() ||
-                   store.GetJiraInstanceType() == JiraInstanceType.Server ||
-                   deployment.Changes.All(drn =>
-                       drn.VersionBuildInformation.All(pm =>
-                           pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser)));
+                   store.GetJiraInstanceType() == JiraInstanceType.Server;
         }
 
         public void PublishToJira(string eventType, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
         {
-            if (!JiraIntegrationAvailable(deployment))
+            if (JiraIntegrationUnavailable(deployment))
             {
                 return;
             }

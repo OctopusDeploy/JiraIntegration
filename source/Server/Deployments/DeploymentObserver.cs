@@ -32,6 +32,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
+            if (domainEvent.Deployment.Changes.All(drn =>
+                drn.VersionBuildInformation.All(pm =>
+                    pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
+                return;
+            
             jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment, new JiraIssueTrackerApiDeployment());
         }
 
