@@ -81,10 +81,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         {
             if (!JiraIntegrationAvailable(deployment))
             {
-                if (jiraApiDeployment.DeploymentType == JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys)
-                {
-                    log.Warn($"Trying to use Jira Service Desk Change Request without having Jira Integration enabled");
-                }
+                jiraApiDeployment.JiraIntegrationDisabled();
                 return;
             }
 
@@ -96,16 +93,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 return;
             }
             
+            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
+                string.IsNullOrWhiteSpace(store.GetConnectAppPassword()))
+            {
+                log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
+                return;
+            }
+            
             using (log.OpenBlock($"Sending Jira state update - {eventType}"))
             {
-                if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
-                    string.IsNullOrWhiteSpace(store.GetConnectAppPassword()))
-                {
-                    log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
-                    log.Finish();
-                    return;
-                }
-
                 // get token from connect App
                 var token = connectAppClient.GetAuthTokenFromConnectApp();
                 if (token is null)

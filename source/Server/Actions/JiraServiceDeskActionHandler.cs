@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Octopus.Data.Storage.Configuration;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
@@ -39,8 +40,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
             IDeployment deployment = deploymentStore.Get(deploymentId);
             
             string jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
-            jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId));
-
+            
+            try
+            {
+                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId));
+            }
+            catch (JiraDeploymentException exception)
+            {
+                throw new ControlledActionFailedException(exception.Message);
+            }
+            
             return ActionHandlerResult.FromSuccess();
         }
         

@@ -1,4 +1,5 @@
 using System.Linq;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
@@ -16,5 +17,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 .Select(wi => wi.Id)
                 .Distinct()).ToArray();
         }
+
+        public void JiraIntegrationDisabled() { }
     }
 }
