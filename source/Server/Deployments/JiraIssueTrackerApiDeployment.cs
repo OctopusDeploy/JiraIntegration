@@ -18,6 +18,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 .Distinct()).ToArray();
         }
 
-        public void JiraIntegrationDisabled() { }
+        public void HandleJiraIntegrationIsUnavailable() { }
     }
 }

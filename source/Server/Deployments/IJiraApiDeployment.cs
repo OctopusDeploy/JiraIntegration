@@ -6,6 +6,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
     {
         public string DeploymentType { get; }
         public string[] DeploymentValues(IDeployment deployment);
-        public void JiraIntegrationDisabled();
+        public void HandleJiraIntegrationIsUnavailable();
     }
 }

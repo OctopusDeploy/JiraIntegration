@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
-using Octopus.Server.Extensibility.Domain.Deployments;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Configuration;
 using Octopus.Server.Extensibility.HostServices.Domain.Environments;
@@ -68,20 +66,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        bool JiraIntegrationAvailable(IDeployment deployment)
+        bool JiraIntegrationUnavailable(IDeployment deployment)
         {
             return !store.GetIsEnabled() ||
-                   store.GetJiraInstanceType() == JiraInstanceType.Server ||
-                   deployment.Changes.All(drn =>
-                       drn.VersionBuildInformation.All(pm =>
-                           pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser)));
+                   store.GetJiraInstanceType() == JiraInstanceType.Server;
         }
 
         public void PublishToJira(string eventType, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
         {
-            if (!JiraIntegrationAvailable(deployment))
+            if (JiraIntegrationUnavailable(deployment))
             {
-                jiraApiDeployment.JiraIntegrationDisabled();
+                jiraApiDeployment.HandleJiraIntegrationIsUnavailable();
                 return;
             }
 

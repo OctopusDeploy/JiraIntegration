@@ -5,29 +5,29 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     public class JiraServiceDeskApiDeployment : IJiraApiDeployment
     {
-        readonly string jiraServiceDeskChangeRequestId;
+        readonly string jiraServiceId;
 
-        public JiraServiceDeskApiDeployment(string jiraServiceDeskChangeRequestId)
+        public JiraServiceDeskApiDeployment(string jiraServiceId)
         {
-            this.jiraServiceDeskChangeRequestId = jiraServiceDeskChangeRequestId;
+            this.jiraServiceId = jiraServiceId;
         }
 
         public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys;
 
         public string[] DeploymentValues(IDeployment deployment)
         {
-            if (String.IsNullOrEmpty(jiraServiceDeskChangeRequestId))
+            if (String.IsNullOrEmpty(jiraServiceId))
             {
-                throw new JiraDeploymentException("Service ID for empty. Please supply a Jira Service Desk Service ID and try again.");
+                throw new JiraDeploymentException("Service ID is empty. Please supply a Jira Service Desk Service ID and try again");
             }
-            return new[] { jiraServiceDeskChangeRequestId };
+            return new[] { jiraServiceId };
         }
 
-        public void JiraIntegrationDisabled()
+        public void HandleJiraIntegrationIsUnavailable()
         {
             throw new JiraDeploymentException($"Trying to use Jira Service Desk Change Request step without having " +
                                               $"Jira Integration enabled. Please enable Jira Integration or disable the Jira " +
-                                              $"Service Desk Change Request step.");
+                                              $"Service Desk Change Request step");
         }
     }
 }

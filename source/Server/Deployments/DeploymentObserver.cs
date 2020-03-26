@@ -18,6 +18,7 @@ using Octopus.Server.Extensibility.HostServices.Model.Environments;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Time;
+using Sashimi.Server.Contracts.ActionHandlers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
@@ -32,11 +33,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public void Handle(DeploymentEvent domainEvent)
         {
-            try
-            {
-                jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment, new JiraIssueTrackerApiDeployment());
-            }
-            catch (JiraDeploymentException e) { }
+            if (domainEvent.Deployment.Changes.All(drn =>
+                drn.VersionBuildInformation.All(pm =>
+                    pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
+                return;
+            
+            jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment, new JiraIssueTrackerApiDeployment());
         }
 
         string StateFromEventType(DeploymentEventType eventType)
