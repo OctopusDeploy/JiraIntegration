@@ -9,7 +9,7 @@
         "displayName": "Task Name",
         "associations": [
           {
-            "associationType": "issueIdOrKeys",
+            "associationType": "issueKeys",
             "values": [
               "JIR-1",
               "JIR-2"
