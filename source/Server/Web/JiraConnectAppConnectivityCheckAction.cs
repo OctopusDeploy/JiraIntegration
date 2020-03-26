@@ -86,7 +86,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             
             if (!configurationStore.GetIsEnabled())
             {
-                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Issue Tracker is not enabled, so its functionality will not currently be available");
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
             }
             
             context.Response.AsOctopusJson(connectivityCheckResponse);

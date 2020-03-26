@@ -1,9 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Octopus.Server.Extensibility.JiraIntegration</RootNamespace>
     <AssemblyName>Octopus.Server.Extensibility.JiraIntegration</AssemblyName>
-    <Description>Implements the Jira issue tracker and Jira Service Desk.</Description>
+    <Description>Implements the Jira Integration and Jira Service Desk.</Description>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Octopus Deploy</Authors>
     <PackageId>Octopus.Server.Extensibility.JiraIntegration</PackageId>
@@ -14,7 +14,8 @@
   <ItemGroup>
     <PackageReference Include="Octopus.Data" Version="4.3.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="1.3.0" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="7.2.0" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="8.1.0" />
     <PackageReference Include="Octopus.Time" Version="1.1.6" />
+    <PackageReference Include="Sashimi.Server.Contracts" Version="0.1.5" />
   </ItemGroup>
 </Project>

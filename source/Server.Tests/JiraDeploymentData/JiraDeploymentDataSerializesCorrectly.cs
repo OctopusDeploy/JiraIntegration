@@ -26,7 +26,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
                             DeploymentSequenceNumber = 11,
                             UpdateSequenceNumber = 3,
                             DisplayName = "Task Name",
-                            IssueKeys = new [] { "JIR-1", "JIR-2"},
+                            Associations = new []
+                            {
+                                new JiraAssociation()
+                                {
+                                    AssociationType = JiraAssociationConstants.JiraAssociationTypeIssueKeys,
+                                    Values = new [] { "JIR-1", "JIR-2"}
+                                },
+                            },
                             Url =
                                 "https://octopussample.com/app#/Spaces-1/projects/foo/releases/1.0.0/deployments/deployments-123",
                             Description = "Task Description",

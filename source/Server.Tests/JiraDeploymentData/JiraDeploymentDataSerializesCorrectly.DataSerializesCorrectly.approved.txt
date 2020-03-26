@@ -7,9 +7,14 @@
         "deploymentSequenceNumber": 11,
         "updateSequenceNumber": 3,
         "displayName": "Task Name",
-        "issueKeys": [
-          "JIR-1",
-          "JIR-2"
+        "associations": [
+          {
+            "associationType": "issueKeys",
+            "values": [
+              "JIR-1",
+              "JIR-2"
+            ]
+          }
         ],
         "url": "https://octopussample.com/app#/Spaces-1/projects/foo/releases/1.0.0/deployments/deployments-123",
         "description": "Task Description",

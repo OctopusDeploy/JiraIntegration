@@ -8,12 +8,14 @@ using Octopus.Server.Extensibility.Extensions.Mappings;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Web;
+using Octopus.Server.Extensibility.JiraIntegration.Actions;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Octopus.Server.Extensibility.JiraIntegration.Environments;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.JiraIntegration.Web;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
+using Sashimi.Server.Contracts.ActionHandlers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
@@ -59,6 +61,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration
             builder.RegisterType<CommentParser>().AsSelf().InstancePerDependency();
             builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
 
+            builder.RegisterType<JiraDeployment>().AsSelf().InstancePerDependency();
+
+            builder.RegisterType<JiraServiceDeskActionHandler>()
+                .As<IActionHandler>()
+                .AsSelf()
+                .InstancePerDependency();
+            
             builder.Register(c =>
             {
                 var store = c.Resolve<IJiraConfigurationStore>();

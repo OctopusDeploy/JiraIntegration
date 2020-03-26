@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Web;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 

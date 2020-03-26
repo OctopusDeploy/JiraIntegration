@@ -1,7 +1,7 @@
-This repository contains the [Octopus Deploy][1] Jira issue tracker extension.
+This repository contains the [Octopus Deploy][1] Jira Integration extension.
 
 ## Documentation
-- [Jira Issue Tracker][2]
+- [Jira Integration][2]
 
 ## Issues
 Please see [Contributing](CONTRIBUTING.md)
