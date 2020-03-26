@@ -10,11 +10,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         {
             this.jiraServiceDeskChangeRequestId = jiraServiceDeskChangeRequestId;
         }
-        
-        public string DeploymentType()
-        {
-            return JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys;
-        }
+
+        public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys;
 
         public string[] DeploymentValues(IDeployment deployment)
         {

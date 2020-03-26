@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
     <RootNamespace>Octopus.Server.Extensibility.JiraIntegration</RootNamespace>
@@ -16,6 +16,6 @@
     <PackageReference Include="Octopus.Diagnostics" Version="1.3.0" />
     <PackageReference Include="Octopus.Server.Extensibility" Version="8.1.0" />
     <PackageReference Include="Octopus.Time" Version="1.1.6" />
-    <PackageReference Include="Sashimi.Server.Contracts" Version="0.1.2" />
+    <PackageReference Include="Sashimi.Server.Contracts" Version="0.1.4" />
   </ItemGroup>
 </Project>

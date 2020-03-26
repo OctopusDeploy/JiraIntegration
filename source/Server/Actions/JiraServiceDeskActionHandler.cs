@@ -17,7 +17,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
         public bool ShowInStepTemplatePickerUI => true;
         public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
         public bool CanRunOnDeploymentTarget => false;
-        public ActionHandlerCategory[] Categories => new[] {ActionHandlerCategory.BuiltInStep};
+        public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
 
         readonly JiraDeployment jiraDeployment;
         readonly ILog log;
