@@ -5,7 +5,7 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
-    public class JiraIssueTrackerApiDeployment : IJiraApiDeployment
+    class JiraIssueTrackerApiDeployment : IJiraApiDeployment
     {
         public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeIssueIdOrKeys;
 

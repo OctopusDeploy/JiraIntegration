@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.HostServices.Model.Projects;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
-    public class JiraServiceDeskApiDeployment : IJiraApiDeployment
+    class JiraServiceDeskApiDeployment : IJiraApiDeployment
     {
         readonly string jiraServiceId;
 

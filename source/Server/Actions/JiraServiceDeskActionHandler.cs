@@ -5,6 +5,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
+using Sashimi.Server.Contracts;
 using Sashimi.Server.Contracts.ActionHandlers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Actions
@@ -36,7 +37,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
         
         public IActionHandlerResult Execute(IActionHanderContext context)
         {
-            string deploymentId = context.Variables.Get("Octopus.Deployment.Id", "");
+            string deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
             IDeployment deployment = deploymentStore.Get(deploymentId);
             
             string jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
