@@ -29,7 +29,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         {
             var isEnabled = ConfigurationDocumentStore.GetIsEnabled();
 
-            yield return new ConfigurationValue<bool>(  "Octopus.JiraIntegration", isEnabled, isEnabled, "Is Enabled");
+            yield return new ConfigurationValue<bool>(  "Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled, "Is Enabled");
             yield return new ConfigurationValue<string>("Octopus.JiraIntegration.BaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
             yield return new ConfigurationValue<string>("Octopus.JiraIntegration.ConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()), "Jira Connect App Password", isSensitive: true);
             yield return new ConfigurationValue<string>("Octopus.JiraIntegration.Username", ConfigurationDocumentStore.GetJiraUsername(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraUsername()), "Jira Username");
