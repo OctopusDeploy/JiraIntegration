@@ -32,7 +32,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             var username = installationIdProvider.GetInstallationId().ToString();
             var password = configurationStore.GetConnectAppPassword();
-            return GetAuthTokenFromConnectApp(username, password);
+            return GetAuthTokenFromConnectApp(username, password?.Value);
         }
         
         public string GetAuthTokenFromConnectApp(string username, string password)

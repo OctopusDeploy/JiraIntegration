@@ -80,7 +80,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 return new JiraRestClient(
                     baseUrl, 
                     username, 
-                    password, 
+                    password?.Value, 
                     c.Resolve<ILog>(), 
                     c.Resolve<IOctopusHttpClientFactory>()
                 );

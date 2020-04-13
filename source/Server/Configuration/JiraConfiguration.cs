@@ -16,8 +16,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         
         public string BaseUrl { get; set; }
         
-        [Encrypted]
-        public string Password { get; set; }
+        public SensitiveString Password { get; set; }
 
         public string ConnectAppUrl { get; set; }
         
@@ -33,8 +32,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
     class ReleaseNoteOptions
     {
         public string Username { get; set; }
-        [Encrypted]
-        public string Password { get; set; }
+        public SensitiveString Password { get; set; }
         public string ReleaseNotePrefix { get; set; }
     }
 }

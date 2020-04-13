@@ -89,7 +89,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             }
             
             if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
-                string.IsNullOrWhiteSpace(store.GetConnectAppPassword()))
+                string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
             {
                 log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                 return;
