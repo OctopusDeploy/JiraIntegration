@@ -21,7 +21,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
             if (doc != null)
                 return;
 
-            var oldConfiguration = configurationStore.Get<JiraConfiguration>("issuetracker-jira");
+            var oldConfiguration = configurationStore.Get<JiraConfigurationWithSettableId>("issuetracker-jira");
             if (oldConfiguration != null)
             {
                 configurationStore.Delete(oldConfiguration);
@@ -33,6 +33,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
             log.Info("Initializing Jira integration settings");
             doc = new JiraConfiguration();
             configurationStore.Create(doc);
+        }
+
+        class JiraConfigurationWithSettableId : JiraConfiguration
+        {
+            public new string Id { get; set; }
         }
     }
 }

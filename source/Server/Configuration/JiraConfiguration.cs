@@ -5,9 +5,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfiguration : ExtensionConfigurationDocument
     {
-        public JiraConfiguration() : base("Jira", "Octopus Deploy", "1.1")
+        public JiraConfiguration() : base(JiraConfigurationStore.SingletonId, "Jira", "Octopus Deploy", "1.1")
         {
-            Id = JiraConfigurationStore.SingletonId;
             ConnectAppUrl = "https://jiraconnectapp.octopus.com";
             JiraInstanceType = JiraInstanceType.Cloud;
         }
