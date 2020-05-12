@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
             var password = string.IsNullOrEmpty(request.GetValue("Password").ToString())
-                ? configurationStore.GetJiraPassword()
+                ? configurationStore.GetJiraPassword()?.Value
                 : request.GetValue("Password").ToString();
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {

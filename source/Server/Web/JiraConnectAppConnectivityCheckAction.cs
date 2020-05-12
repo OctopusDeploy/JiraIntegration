@@ -45,7 +45,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(request.GetValue("Password").ToString()) ? configurationStore.GetConnectAppPassword() : request.GetValue("Password").ToString();
+            var password = string.IsNullOrEmpty(request.GetValue("Password").ToString()) ? configurationStore.GetConnectAppPassword()?.Value : request.GetValue("Password").ToString();
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(password))
             {
                 if (string.IsNullOrEmpty(baseUrl)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");

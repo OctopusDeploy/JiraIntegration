@@ -5,9 +5,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfiguration : ExtensionConfigurationDocument
     {
-        public JiraConfiguration() : base("Jira", "Octopus Deploy", "1.1")
+        public JiraConfiguration() : base(JiraConfigurationStore.SingletonId, "Jira", "Octopus Deploy", "1.1")
         {
-            Id = JiraConfigurationStore.SingletonId;
             ConnectAppUrl = "https://jiraconnectapp.octopus.com";
             JiraInstanceType = JiraInstanceType.Cloud;
         }
@@ -16,8 +15,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         
         public string BaseUrl { get; set; }
         
-        [Encrypted]
-        public string Password { get; set; }
+        public SensitiveString Password { get; set; }
 
         public string ConnectAppUrl { get; set; }
         
@@ -33,8 +31,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
     class ReleaseNoteOptions
     {
         public string Username { get; set; }
-        [Encrypted]
-        public string Password { get; set; }
+        public SensitiveString Password { get; set; }
         public string ReleaseNotePrefix { get; set; }
     }
 }

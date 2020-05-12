@@ -32,7 +32,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         {
             if (!IsEnabled || 
                 string.IsNullOrEmpty(store.GetJiraUsername()) || 
-                string.IsNullOrEmpty(store.GetJiraPassword()))
+                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
                 return null;
 
             var baseUrl = store.GetBaseUrl();

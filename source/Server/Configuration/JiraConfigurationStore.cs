@@ -1,4 +1,5 @@
-﻿using Octopus.Data.Storage.Configuration;
+﻿using Octopus.Data.Model;
+using Octopus.Data.Storage.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
@@ -34,12 +35,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
             SetProperty(doc => doc.BaseUrl = baseUrl?.Trim('/'));
         }
 
-        public string GetConnectAppPassword()
+        public SensitiveString GetConnectAppPassword()
         {
             return GetProperty(doc => doc.Password);
         }
 
-        public void SetConnectAppPassword(string password)
+        public void SetConnectAppPassword(SensitiveString password)
         {
             SetProperty(doc => doc.Password = password);
         }
@@ -64,12 +65,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
             SetProperty(doc => doc.ReleaseNoteOptions.Username = username);
         }
 
-        public string GetJiraPassword()
+        public SensitiveString GetJiraPassword()
         {
             return GetProperty(doc => doc.ReleaseNoteOptions.Password);
         }
 
-        public void SetJiraPassword(string password)
+        public void SetJiraPassword(SensitiveString password)
         {
             SetProperty(doc => doc.ReleaseNoteOptions.Password = password);
         }

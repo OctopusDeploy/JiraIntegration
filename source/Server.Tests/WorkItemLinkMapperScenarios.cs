@@ -2,6 +2,7 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Octopus.Data.Model;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
@@ -60,7 +61,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             store.GetBaseUrl().Returns("https://github.com");
             store.GetIsEnabled().Returns(true);
             store.GetJiraUsername().Returns("user");
-            store.GetJiraPassword().Returns("password");
+            store.GetJiraPassword().Returns("password".ToSensitiveString());
             jiraClient.GetIssue(Arg.Is("JRE-1234")).Returns(new JiraIssue());
             jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
             {
@@ -91,7 +92,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             store.GetBaseUrl().Returns("https://github.com");
             store.GetIsEnabled().Returns(true);
             store.GetJiraUsername().Returns("user");
-            store.GetJiraPassword().Returns("password");
+            store.GetJiraPassword().Returns("password".ToSensitiveString());
             jiraClient.GetIssue(Arg.Is("JRE-1234")).Returns(new JiraIssue());
             jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
             {
