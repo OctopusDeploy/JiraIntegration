@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
             this.deploymentStore = deploymentStore;
         }
         
-        public IActionHandlerResult Execute(IActionHanderContext context)
+        public IActionHandlerResult Execute(IActionHandlerContext context)
         {
             string deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
             IDeployment deployment = deploymentStore.Get(deploymentId);
