@@ -4,7 +4,6 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
@@ -15,6 +14,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraConnectAppConnectivityCheckAction : IAsyncApiAction
     {
+        static readonly RequestBodyRegistration<JiraConnectAppConnectionCheckData> Data = new RequestBodyRegistration<JiraConnectAppConnectionCheckData>();
+        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
+
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly JiraConnectAppClient connectAppClient;
@@ -32,10 +34,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        public async Task<OctoResponse> ExecuteAsync(IOctoRequest request)
+        public async Task<IOctoResponseProvider> ExecuteAsync(IOctoRequest request)
         {
-            var requestData = request.GetBody<JObject>();
-            var baseUrl = requestData.GetValue("BaseUrl").ToString();
+            var requestData = request.GetBody(Data);
+            var baseUrl = requestData.BaseUrl;
 
             var connectivityCheckResponse = new ConnectivityCheckResponse();
 
@@ -43,19 +45,19 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(requestData.GetValue("Password").ToString()) ? configurationStore.GetConnectAppPassword()?.Value : requestData.GetValue("Password").ToString();
+            var password = string.IsNullOrEmpty(requestData.Password) ? configurationStore.GetConnectAppPassword()?.Value : requestData.Password;
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(password))
             {
                 if (string.IsNullOrEmpty(baseUrl)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
                 if (string.IsNullOrEmpty(password)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Connect App Password.");
-                return new OctoDataResponse(connectivityCheckResponse);
+                return Result.Response(connectivityCheckResponse);
             }
 
             var token = connectAppClient.GetAuthTokenFromConnectApp(username, password);
             if (token is null)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Failed to get authentication token from Jira Connect App.");
-                return new OctoDataResponse(connectivityCheckResponse);
+                return Result.Response(connectivityCheckResponse);
             }
 
             using (var client = octopusHttpClientFactory.CreateClient())
@@ -73,7 +75,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                     connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, result.StatusCode == HttpStatusCode.NotFound
                         ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIntegration)."
                         : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}");
-                    return new OctoDataResponse(connectivityCheckResponse);
+                    return Result.Response(connectivityCheckResponse);
                 }
             }
 
@@ -84,7 +86,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
             }
 
-            return new OctoDataResponse(connectivityCheckResponse);
+            return Result.Response(connectivityCheckResponse);
+        }
+
+        class JiraConnectAppConnectionCheckData
+        {
+            public string BaseUrl { get; set; }
+            public string Password { get; set; }
         }
 
         private class JiraConnectAppConnectivityCheckRequest

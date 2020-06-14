@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json.Linq;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
@@ -11,6 +10,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
+        static readonly RequestBodyRegistration<JiraCredentialsConnectionCheckData> Data = new RequestBodyRegistration<JiraCredentialsConnectionCheckData>();
+        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
+
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
         private readonly ILog log;
@@ -22,25 +24,25 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             this.log = log;
         }
 
-        public async Task<OctoResponse> ExecuteAsync(IOctoRequest request)
+        public async Task<IOctoResponseProvider> ExecuteAsync(IOctoRequest request)
         {
-            var requestData = request.GetBody<JObject>();
+            var requestData = request.GetBody(Data);
 
-            var baseUrl = requestData.GetValue("BaseUrl").ToString();
-            var username = requestData.GetValue("Username").ToString();
+            var baseUrl = requestData.BaseUrl;
+            var username = requestData.Username;
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(requestData.GetValue("Password").ToString())
+            var password = string.IsNullOrEmpty(requestData.Password)
                 ? configurationStore.GetJiraPassword()?.Value
-                : requestData.GetValue("Password").ToString();
+                : requestData.Password;
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 var response = new ConnectivityCheckResponse();
                 if (string.IsNullOrEmpty(baseUrl)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
                 if (string.IsNullOrEmpty(username)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Username.");
                 if (string.IsNullOrEmpty(password)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Password.");
-                return new OctoDataResponse(response);
+                return Result.Response(response);
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log, octopusHttpClientFactory);
@@ -55,7 +57,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 }
             }
 
-            return new OctoDataResponse(connectivityCheckResponse);
+            return Result.Response(connectivityCheckResponse);
         }
     }
+    
+    class JiraCredentialsConnectionCheckData
+    {
+        public string BaseUrl { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
 }

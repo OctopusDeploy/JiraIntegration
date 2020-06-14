@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.JiraIntegration.Web;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraIntegrationApi : RegisterEndpoint
+    class JiraIntegrationApi : RegistersEndpoints
     {
         public const string ApiConnectAppCredentialsTest = "/api/jiraintegration/connectivitycheck/connectapp";
         public const string ApiJiraCredentialsTest = "/api/jiraintegration/connectivitycheck/jira";

@@ -17,7 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Octopus.Data" Version="5.0.0" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="9.0.7-enh-nancyparams0006" />
+    <PackageReference Include="Octopus.Server.Extensibility" Version="9.0.7-enh-nancyparams0017" />
     <ProjectReference Include="..\Server\Server.csproj" />
   </ItemGroup>
 </Project>
