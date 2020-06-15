@@ -46,7 +46,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log, octopusHttpClientFactory);
-            var connectivityCheckResponse = jiraRestClient.ConnectivityCheck().GetAwaiter().GetResult();
+            var connectivityCheckResponse = await jiraRestClient.ConnectivityCheck();
             if (connectivityCheckResponse.Messages.All(m => m.Category != ConnectivityCheckMessageCategory.Error))
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
