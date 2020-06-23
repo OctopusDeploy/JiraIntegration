@@ -31,10 +31,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
         public ResultFromExtension<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
         {
-            if (!IsEnabled || 
-                string.IsNullOrEmpty(store.GetJiraUsername()) || 
-                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
+            if (!IsEnabled)
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
+            if (string.IsNullOrEmpty(store.GetJiraUsername()) || 
+                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
+                return ResultFromExtension<WorkItemLink[]>.Failed("Username/password not configured");
 
             var baseUrl = store.GetBaseUrl();
             if (string.IsNullOrWhiteSpace(baseUrl))
