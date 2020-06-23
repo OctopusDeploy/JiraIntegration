@@ -19,27 +19,27 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [DisplayName("Jira Base Url")]
         [Description(JiraBaseUrlDescription)]
         [Writeable]
-        public string BaseUrl { get; set; }
+        public string? BaseUrl { get; set; }
         
         [DisplayName("Jira Connect App Password")]
         [Description("Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIntegration#connecting-jira-cloud-and-octopus).")]
         [Writeable]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
         [AllowConnectivityCheck("Jira Connect App configuration", JiraIntegrationApi.ApiConnectAppCredentialsTest, nameof(BaseUrl), nameof(Password))]
-        public SensitiveValue Password { get; set; }
+        public SensitiveValue? Password { get; set; }
 
         [DisplayName("Octopus Installation Id")]
         [Description("Copy and paste this Id when configuring the Jira Connect application")]
         [ReadOnly(true)]
         [AllowCopyToClipboard]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
-        public string OctopusInstallationId { get; set; }
+        public string OctopusInstallationId { get; set; } = string.Empty;
         
         [DisplayName("Octopus Server Url")]
         [Description("This Url is required in order to push deployment data to Jira. If it is blank please set it in [Configuration/Nodes](/configuration/nodes)")]
         [ReadOnly(true)]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
-        public string OctopusServerUrl { get; set; }
+        public string OctopusServerUrl { get; set; } = string.Empty;
 
         [DisplayName("Release Note Options")] 
         public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
@@ -54,17 +54,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [DisplayName("Jira Username")]
         [Description(UsernameDescription)]
         [Writeable]
-        public string Username { get; set; }
+        public string? Username { get; set; }
         
         [DisplayName("Jira Password")]
         [Description(PasswordDescription)]
         [Writeable]
         [AllowConnectivityCheck("Jira credentials", JiraIntegrationApi.ApiJiraCredentialsTest, nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
-        public SensitiveValue Password { get; set; }
+        public SensitiveValue? Password { get; set; }
 
         [DisplayName("Release Note Prefix")]
         [Description(ReleaseNotePrefixDescription)]
         [Writeable]
-        public string ReleaseNotePrefix { get; set; }
+        public string? ReleaseNotePrefix { get; set; }
     }
 }

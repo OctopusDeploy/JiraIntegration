@@ -1,12 +1,9 @@
-﻿using System;
-using FluentValidation.Validators;
-
-namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
+﻿namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class OctopusJiraPayloadData
     {
-        public string InstallationId { get; set; }
-        public string BaseHostUrl { get; set; }
-        public JiraPayloadData DeploymentsInfo { get; set; }
+        public string InstallationId { get; set; } = string.Empty;
+        public string BaseHostUrl { get; set; } = string.Empty;
+        public JiraPayloadData DeploymentsInfo { get; set; } = new JiraPayloadData();
     }
 }

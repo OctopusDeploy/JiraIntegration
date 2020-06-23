@@ -37,7 +37,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 
         class JiraConfigurationWithSettableId : JiraConfiguration
         {
-            public new string Id { get; set; }
+            public new string Id { get; set; } = string.Empty;
         }
     }
 }

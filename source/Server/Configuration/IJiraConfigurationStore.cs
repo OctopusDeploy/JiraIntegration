@@ -7,22 +7,22 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
     {
         JiraInstanceType GetJiraInstanceType();
         void SetJiraInstanceType(JiraInstanceType jiraInstanceType);
-        string GetBaseUrl();
-        void SetBaseUrl(string baseUrl);
+        string? GetBaseUrl();
+        void SetBaseUrl(string? baseUrl);
         
-        SensitiveString GetConnectAppPassword();
-        void SetConnectAppPassword(SensitiveString password);
+        SensitiveString? GetConnectAppPassword();
+        void SetConnectAppPassword(SensitiveString? password);
         
-        string GetConnectAppUrl();
-        void SetConnectAppUrl(string url);
+        string? GetConnectAppUrl();
+        void SetConnectAppUrl(string? url);
         
-        string GetJiraUsername();
-        void SetJiraUsername(string username);
+        string? GetJiraUsername();
+        void SetJiraUsername(string? username);
         
-        SensitiveString GetJiraPassword();
-        void SetJiraPassword(SensitiveString password);
+        SensitiveString? GetJiraPassword();
+        void SetJiraPassword(SensitiveString? password);
         
-        string GetReleaseNotePrefix();
-        void SetReleaseNotePrefix(string releaseNotePrefix);
+        string? GetReleaseNotePrefix();
+        void SetReleaseNotePrefix(string? releaseNotePrefix);
     }
 }

@@ -12,12 +12,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         }
 
         public JiraInstanceType JiraInstanceType { get; set; }
-        
-        public string BaseUrl { get; set; }
-        
-        public SensitiveString Password { get; set; }
 
-        public string ConnectAppUrl { get; set; }
+        public string? BaseUrl { get; set; }
+        
+        public SensitiveString? Password { get; set; }
+
+        public string? ConnectAppUrl { get; set; }
         
         public ReleaseNoteOptions ReleaseNoteOptions { get; set; } = new ReleaseNoteOptions();
     }
@@ -30,8 +30,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 
     class ReleaseNoteOptions
     {
-        public string Username { get; set; }
-        public SensitiveString Password { get; set; }
-        public string ReleaseNotePrefix { get; set; }
+        public string? Username { get; set; }
+        public SensitiveString? Password { get; set; }
+        public string? ReleaseNotePrefix { get; set; }
     }
 }

@@ -79,7 +79,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.IsTrue(workItems.Succeeded);
+            Assert.IsTrue(workItems.WasSuccessful);
             Assert.AreEqual(1, workItems.Value.Length);
         }
 
@@ -109,7 +109,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.IsTrue(workItems.Succeeded);
+            Assert.IsTrue(workItems.WasSuccessful);
             Assert.AreEqual("Jira", workItems.Value.Single().Source);
         }
     }
