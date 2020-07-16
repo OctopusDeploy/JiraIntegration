@@ -81,7 +81,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.IsAssignableFrom<ISuccessResult<WorkItemLink[]>>(workItems);
             Assert.AreEqual(1, ((ISuccessResult<WorkItemLink[]>)workItems).Value.Length);
         }
 
@@ -111,7 +110,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.IsAssignableFrom<ISuccessResult<WorkItemLink[]>>(workItems);
             Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source);
         }
     }
