@@ -29,11 +29,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public ResultFromExtension<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
+        public IResultFromExtension<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
         {
             if (!IsEnabled)
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
-            if (string.IsNullOrEmpty(store.GetJiraUsername()) || 
+            if (string.IsNullOrEmpty(store.GetJiraUsername()) ||
                 string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
                 return ResultFromExtension<WorkItemLink[]>.Failed("Username/password not configured");
 
@@ -53,7 +53,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 {
                     var issue = jira.Value.GetIssue(workItemId).GetAwaiter().GetResult();
                     if (issue is null) return null;
-                
+
                     return new WorkItemLink
                     {
                         Id = workItemId,

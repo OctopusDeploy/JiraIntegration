@@ -20,7 +20,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [Description(JiraBaseUrlDescription)]
         [Writeable]
         public string? BaseUrl { get; set; }
-        
+
         [DisplayName("Jira Connect App Password")]
         [Description("Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIntegration#connecting-jira-cloud-and-octopus).")]
         [Writeable]
@@ -34,14 +34,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [AllowCopyToClipboard]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
         public string OctopusInstallationId { get; set; } = string.Empty;
-        
+
         [DisplayName("Octopus Server Url")]
         [Description("This Url is required in order to push deployment data to Jira. If it is blank please set it in [Configuration/Nodes](/configuration/nodes)")]
         [ReadOnly(true)]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
-        public string OctopusServerUrl { get; set; } = string.Empty;
+        public string? OctopusServerUrl { get; set; }
 
-        [DisplayName("Release Note Options")] 
+        [DisplayName("Release Note Options")]
         public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
     }
 
@@ -55,7 +55,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [Description(UsernameDescription)]
         [Writeable]
         public string? Username { get; set; }
-        
+
         [DisplayName("Jira Password")]
         [Description(PasswordDescription)]
         [Writeable]
