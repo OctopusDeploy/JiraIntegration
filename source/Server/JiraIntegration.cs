@@ -19,6 +19,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
         public bool IsEnabled => configurationStore.GetIsEnabled();
 
-        public string BaseUrl => configurationStore.GetIsEnabled() ? configurationStore.GetBaseUrl() : null;
+        public string? BaseUrl => configurationStore.GetIsEnabled() ? configurationStore.GetBaseUrl() : null;
     }
 }

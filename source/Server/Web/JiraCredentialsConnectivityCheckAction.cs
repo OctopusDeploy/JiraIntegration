@@ -29,14 +29,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             var json = await new StreamReader(context.Request.Body).ReadToEndAsync();
             var request = JsonConvert.DeserializeObject<JObject>(json);
 
-            var baseUrl = request.GetValue("BaseUrl").ToString();
-            var username = request.GetValue("Username").ToString();
+            var baseUrl = request.GetValue("BaseUrl")?.ToString();
+            var username = request.GetValue("Username")?.ToString();
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(request.GetValue("Password").ToString())
+            var password = string.IsNullOrEmpty(request.GetValue("Password")?.ToString())
                 ? configurationStore.GetJiraPassword()?.Value
-                : request.GetValue("Password").ToString();
+                : request.GetValue("Password")?.ToString();
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 var response = new ConnectivityCheckResponse();

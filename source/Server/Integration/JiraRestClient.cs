@@ -23,7 +23,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         private readonly ILog log;
         private readonly string baseApiUri = "rest/api/2";
 
-        public JiraRestClient(string baseUrl, string username, string password, ILog log,
+        public JiraRestClient(string baseUrl, string username, string? password, ILog log,
             IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.baseUrl = baseUrl;
@@ -48,14 +48,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     var jsonContent = await response.Content.ReadAsStringAsync();
                     var permissionsContainer = JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
 
-                    if (!permissionsContainer.permissions.ContainsKey(BrowseProjectsKey))
+                    if (!permissionsContainer.Permissions.ContainsKey(BrowseProjectsKey))
                     {
                         connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
                         return connectivityCheckResponse;
                     }
 
-                    var setting = permissionsContainer.permissions[BrowseProjectsKey];
-                    if (!setting.havePermission)
+                    var setting = permissionsContainer.Permissions[BrowseProjectsKey];
+                    if (!setting.HavePermission)
                     {
                             connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"User does not have the '{setting.Name}' permission in Jira");
                             return connectivityCheckResponse;
@@ -70,7 +70,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             return connectivityCheckResponse;
         }
 
-        public async Task<JiraIssue> GetIssue(string workItemId)
+        public async Task<JiraIssue?> GetIssue(string workItemId)
         {
             var response =
                 await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}?fields=summary,comment");
@@ -134,28 +134,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 
     class JiraIssue
     {
-        public JiraIssue()
-        {
-            Fields = new JiraIssueFields();
-        }
-        
         [JsonProperty("key")]
-        public string Key { get; set; }
+        public string Key { get; set; } = string.Empty;
         [JsonProperty("fields")]
-        public JiraIssueFields Fields { get; set; }
+        public JiraIssueFields Fields { get; set; } = new JiraIssueFields();
     }
 
     class JiraIssueFields
     {
-        public JiraIssueFields()
-        {
-            Comments = new JiraIssueComments();
-        }
-        
         [JsonProperty("summary")]
-        public string Summary { get; set; }
+        public string Summary { get; set; } = string.Empty;
         [JsonProperty("comment")]
-        public JiraIssueComments Comments { get; set; }
+        public JiraIssueComments Comments { get; set; } = new JiraIssueComments();
     }
 
     class JiraIssueComments
@@ -174,17 +164,19 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     class JiraIssueComment
     {
         [JsonProperty("body")]
-        public string Body { get; set; }
+        public string Body { get; set; } = string.Empty;
     }
     
     class PermissionSettingsContainer
     {
-        public Dictionary<string, PermissionSettings> permissions { get; set; }
+        [JsonProperty("permissions")]
+        public Dictionary<string, PermissionSettings> Permissions { get; set; } = new Dictionary<string, PermissionSettings>();
     }
 
     class PermissionSettings
     {
-        public string Name { get; set; }
-        public bool havePermission { get; set; }
+        public string Name { get; set; } = string.Empty;
+        [JsonProperty("havePermission")]
+        public bool HavePermission { get; set; }
     }
 }

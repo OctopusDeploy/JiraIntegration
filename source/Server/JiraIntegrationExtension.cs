@@ -76,6 +76,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 
                 var baseUrl = store.GetBaseUrl();
                 var username = store.GetJiraUsername();
+                if (baseUrl == null || username == null)
+                    return null;
+                
                 var password = store.GetJiraPassword();
                 return new JiraRestClient(
                     baseUrl, 
