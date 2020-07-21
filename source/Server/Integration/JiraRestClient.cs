@@ -65,7 +65,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 }
             }
 
-            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, 
+            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
                 $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $"Reason: {response.ReasonPhrase}" : "")}");
             return connectivityCheckResponse;
         }
@@ -80,12 +80,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 return result;
             }
 
-            var msg =
-                $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
-            if (response.StatusCode == HttpStatusCode.NotFound)
-                log.Trace(msg);
-            else
-                log.Warn(msg);
+            var msg = $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+            log.Warn(msg);
             return null;
         }
 
@@ -154,7 +150,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             Comments = new List<JiraIssueComment>();
         }
-        
+
         [JsonProperty("comments")]
         public IEnumerable<JiraIssueComment> Comments { get; set; }
         [JsonProperty("total")]
@@ -166,7 +162,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         [JsonProperty("body")]
         public string Body { get; set; } = string.Empty;
     }
-    
+
     class PermissionSettingsContainer
     {
         [JsonProperty("permissions")]
