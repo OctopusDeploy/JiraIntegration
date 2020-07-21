@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
@@ -16,14 +17,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;
         private readonly Lazy<IJiraRestClient> jira;
+        private readonly ILog log;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
             CommentParser commentParser,
-            Lazy<IJiraRestClient> jira)
+            Lazy<IJiraRestClient> jira,
+            ILog log)
         {
             this.store = store;
             this.commentParser = commentParser;
             this.jira = jira;
+            this.log = log;
         }
 
         public string CommentParser => JiraConfigurationStore.CommentParser;
@@ -52,7 +56,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             return workItemIds.Select(workItemId =>
                 {
                     var issue = jira.Value.GetIssue(workItemId).GetAwaiter().GetResult();
-                    if (issue is null) return null;
+                    if (issue is null)
+                    {
+                        log.Warn($"Parsed work item id {workItemId} from commit message but was unable to locate it in Jira");
+                        return null;
+                    }
 
                     return new WorkItemLink
                     {
@@ -63,6 +71,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                     };
                 })
                 .Where(i => i != null)
+                // ReSharper disable once RedundantEnumerableCastCall
                 .Cast<WorkItemLink>() // cast back from `WorkItemLink?` type to keep the compiler happy
                 .ToArray();
         }
