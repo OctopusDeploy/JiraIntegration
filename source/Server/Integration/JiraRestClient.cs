@@ -77,6 +77,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             if (response.IsSuccessStatusCode)
             {
                 var result = await GetResult<JiraIssue>(response);
+                log.Info($"Retrieved Jira Work Item data for work item id {workItemId}");
                 return result;
             }
 
