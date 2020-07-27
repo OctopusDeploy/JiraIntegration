@@ -97,8 +97,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 
         private class JiraConnectAppConnectivityCheckRequest
         {
-            public string BaseHostUrl { get; set; }
-            public string OctopusInstallationId { get; set; }
+            public string BaseHostUrl { get; set; } = string.Empty;
+            public string OctopusInstallationId { get; set; } = string.Empty;
         }
     }
 }

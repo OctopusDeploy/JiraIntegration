@@ -34,8 +34,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         private readonly IServerTaskStore serverTaskStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
-        private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings environmentSettings;
-        private IDeploymentEnvironment deploymentEnvironment;
+        private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
+        private IDeploymentEnvironment? deploymentEnvironment;
         
         public JiraDeployment(
             ILogWithContext log,
@@ -131,7 +131,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             return new OctopusJiraPayloadData
             {
                 InstallationId = installationIdProvider.GetInstallationId().ToString(),
-                BaseHostUrl = store.GetBaseUrl(),
+                BaseHostUrl = store.GetBaseUrl() ?? string.Empty,
                 DeploymentsInfo = new JiraPayloadData
                 {
                     Deployments = new[]
@@ -163,8 +163,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             Environment = new JiraDeploymentEnvironment
                             {
                                 Id = $"{deployment.EnvironmentId}{(string.IsNullOrWhiteSpace(deployment.TenantId) ? "" : $"-{deployment.TenantId}")}",
-                                DisplayName = deploymentEnvironment.Name,
-                                Type = environmentSettings.JiraEnvironmentType.ToString()
+                                DisplayName = deploymentEnvironment?.Name ?? string.Empty,
+                                Type = environmentSettings?.JiraEnvironmentType.ToString() ?? string.Empty
                             },
                             SchemeVersion = "1.0"
                         }
@@ -175,7 +175,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         
         void SendToJira(string token, OctopusJiraPayloadData data, IDeployment deployment)
         {
-            log.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment.Name}({environmentSettings.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
+            log.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment?.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
 
             var json = JsonConvert.SerializeObject(data);
 

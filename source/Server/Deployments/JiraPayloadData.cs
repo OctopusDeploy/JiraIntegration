@@ -7,7 +7,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
     class JiraPayloadData
     {
         [JsonProperty("deployments")]
-        public JiraDeploymentData[] Deployments { get; set; }
+        public JiraDeploymentData[] Deployments { get; set; } = Array.Empty<JiraDeploymentData>();
     }
 
     class JiraDeploymentData
@@ -17,54 +17,55 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         [JsonProperty("updateSequenceNumber")]
         public long UpdateSequenceNumber { get; set; }
         [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
+
         [JsonProperty("associations")]
-        public JiraAssociation[] Associations { get; set; }
+        public JiraAssociation[] Associations { get; set; } = Array.Empty<JiraAssociation>();
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public string Url { get; set; } = string.Empty;
         [JsonProperty("description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
         [JsonProperty("lastUpdated")]
         public DateTimeOffset LastUpdated { get; set; }
         [JsonProperty("state")]
-        public string State { get; set; }
+        public string State { get; set; } = string.Empty;
 
         [JsonProperty("pipeline")]
-        public JiraDeploymentPipeline Pipeline { get; set; }
+        public JiraDeploymentPipeline Pipeline { get; set; } = new JiraDeploymentPipeline();
 
         [JsonProperty("environment")]
-        public JiraDeploymentEnvironment Environment { get; set; }
+        public JiraDeploymentEnvironment Environment { get; set; } = new JiraDeploymentEnvironment();
 
         [JsonProperty("id")]
-        public string SchemeVersion { get; set; }
+        public string SchemeVersion { get; set; } = string.Empty;
     }
 
     class JiraDeploymentPipeline
     {
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
         [JsonProperty("url")]
-        public string Url { get; set; }
+        public string Url { get; set; } = string.Empty;
     }
 
     class JiraDeploymentEnvironment
     {
         [JsonProperty("id")]
-        public string Id { get; set; }
+        public string Id { get; set; } = string.Empty;
         [JsonProperty("displayName")]
-        public string DisplayName { get; set; }
+        public string DisplayName { get; set; } = string.Empty;
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
     }
 
     class JiraAssociation
     {
-        private string _associationType;
+        private string associationType = string.Empty;
         [JsonProperty("associationType")]
         public string AssociationType {
-            get => _associationType;
+            get => associationType;
             set
             {
                 if (!JiraAssociationConstants.ValidJiraAssociationTypes.Contains(value))
@@ -72,11 +73,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     throw new Exception($"Association Type {value} is not a valid type.");
                 }
 
-                _associationType = value;
+                associationType = value;
             } 
         }
+
         [JsonProperty("values")]
-        public string[] Values { get; set; }
+        public string[] Values { get; set; } = Array.Empty<string>();
     }
 
 }

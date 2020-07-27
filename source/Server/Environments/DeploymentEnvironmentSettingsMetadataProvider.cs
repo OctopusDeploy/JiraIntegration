@@ -22,7 +22,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
 
         public List<PropertyMetadata> Properties => store.GetIsEnabled() && store.GetJiraInstanceType() == JiraInstanceType.Cloud
             ? new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>().Types.First().Properties
-            : null;
+            : new List<PropertyMetadata>();
 
         internal class JiraDeploymentEnvironmentSettings
         {

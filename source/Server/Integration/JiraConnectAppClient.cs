@@ -28,14 +28,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        public string GetAuthTokenFromConnectApp()
+        public string? GetAuthTokenFromConnectApp()
         {
             var username = installationIdProvider.GetInstallationId().ToString();
             var password = configurationStore.GetConnectAppPassword();
             return GetAuthTokenFromConnectApp(username, password?.Value);
         }
         
-        public string GetAuthTokenFromConnectApp(string username, string password)
+        public string? GetAuthTokenFromConnectApp(string username, string? password)
         {
             using (var client = octopusHttpClientFactory.CreateClient())
             {
@@ -58,7 +58,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         class JsonTokenData
         {
             [JsonProperty("token")]
-            public string Token { get; set; }
+            public string Token { get; set; } = string.Empty;
         }
 
     }

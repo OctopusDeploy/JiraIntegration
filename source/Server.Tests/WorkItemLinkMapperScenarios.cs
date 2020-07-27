@@ -2,11 +2,14 @@
 using System.Linq;
 using NSubstitute;
 using NUnit.Framework;
+using Octopus.Data;
 using Octopus.Data.Model;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
+using Octopus.Server.Extensibility.Resources.IssueTrackers;
 using Commit = Octopus.Server.Extensibility.HostServices.Model.IssueTrackers.Commit;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
@@ -49,7 +52,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 Comments = new [] {new JiraIssueComment { Body = releaseNote }}
             });
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy).GetReleaseNote(jiraIssue, releaseNotePrefix);
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
 
         [Test]
@@ -67,8 +70,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             {
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
-            
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
+
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {
@@ -79,8 +82,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.IsTrue(workItems.Succeeded);
-            Assert.AreEqual(1, workItems.Value.Length);
+            Assert.AreEqual(1, ((ISuccessResult<WorkItemLink[]>)workItems).Value.Length);
         }
 
         [Test]
@@ -98,8 +100,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             {
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
-            
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy);
+
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {
@@ -109,8 +111,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.IsTrue(workItems.Succeeded);
-            Assert.AreEqual("Jira", workItems.Value.Single().Source);
+            Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source);
         }
     }
 }
