@@ -6,13 +6,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 {
     class JiraIntegrationApi : RegistersEndpoints
     {
-        public const string ApiConnectAppCredentialsTest = "/jiraintegration/connectivitycheck/connectapp";
-        public const string ApiJiraCredentialsTest = "/jiraintegration/connectivitycheck/jira";
+        public const string ApiConnectAppCredentialsTest = "/api/jiraintegration/connectivitycheck/connectapp";
+        public const string ApiJiraCredentialsTest = "/api/jiraintegration/connectivitycheck/jira";
 
         public JiraIntegrationApi()
         {
-            Add<JiraCredentialsConnectivityCheckAction>("POST", ApiJiraCredentialsTest, new SecuredEndpointInvocation());
-            Add<JiraConnectAppConnectivityCheckAction>("POST", ApiConnectAppCredentialsTest, new SecuredEndpointInvocation());
+            Add<JiraCredentialsConnectivityCheckAction>("POST", ApiJiraCredentialsTest, RouteCategory.Navigable, new SecuredEndpointInvocation());
+            Add<JiraConnectAppConnectivityCheckAction>("POST", ApiConnectAppCredentialsTest, RouteCategory.Navigable, new SecuredEndpointInvocation());
         }
     }
 }
