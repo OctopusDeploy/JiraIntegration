@@ -1,8 +1,5 @@
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
@@ -13,6 +10,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
+        static readonly RequestBodyRegistration<JiraCredentialsConnectionCheckData> Data = new RequestBodyRegistration<JiraCredentialsConnectionCheckData>();
+        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
+
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
         private readonly ILog log;
@@ -24,31 +24,29 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             this.log = log;
         }
 
-        public async Task ExecuteAsync(OctoContext context)
+        public async Task<IOctoResponseProvider> ExecuteAsync(IOctoRequest request)
         {
-            var json = await new StreamReader(context.Request.Body).ReadToEndAsync();
-            var request = JsonConvert.DeserializeObject<JObject>(json);
+            var requestData = request.GetBody(Data);
 
-            var baseUrl = request.GetValue("BaseUrl")?.ToString();
-            var username = request.GetValue("Username")?.ToString();
+            var baseUrl = requestData.BaseUrl;
+            var username = requestData.Username;
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(request.GetValue("Password")?.ToString())
+            var password = string.IsNullOrEmpty(requestData.Password)
                 ? configurationStore.GetJiraPassword()?.Value
-                : request.GetValue("Password")?.ToString();
+                : requestData.Password;
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 var response = new ConnectivityCheckResponse();
                 if (string.IsNullOrEmpty(baseUrl)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
                 if (string.IsNullOrEmpty(username)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Username.");
                 if (string.IsNullOrEmpty(password)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Password.");
-                context.Response.AsOctopusJson(response);
-                return;
+                return Result.Response(response);
             }
 
             var jiraRestClient = new JiraRestClient(baseUrl, username, password, log, octopusHttpClientFactory);
-            var connectivityCheckResponse = jiraRestClient.ConnectivityCheck().GetAwaiter().GetResult();
+            var connectivityCheckResponse = await jiraRestClient.ConnectivityCheck();
             if (connectivityCheckResponse.Messages.All(m => m.Category != ConnectivityCheckMessageCategory.Error))
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
@@ -58,8 +56,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                     connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
                 }
             }
-            
-            context.Response.AsOctopusJson(connectivityCheckResponse);
+
+            return Result.Response(connectivityCheckResponse);
         }
     }
+    
+    class JiraCredentialsConnectionCheckData
+    {
+        public string BaseUrl { get; set; }
+        public string Username { get; set; }
+        public string Password { get; set; }
+    }
+
 }
