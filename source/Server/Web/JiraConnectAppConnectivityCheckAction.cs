@@ -89,6 +89,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             return Result.Response(connectivityCheckResponse);
         }
 
+#nullable disable
         class JiraConnectAppConnectionCheckData
         {
             public string BaseUrl { get; set; }

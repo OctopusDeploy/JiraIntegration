@@ -61,6 +61,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
         }
     }
     
+#nullable disable
     class JiraCredentialsConnectionCheckData
     {
         public string BaseUrl { get; set; }
