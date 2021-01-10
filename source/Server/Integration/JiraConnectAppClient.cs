@@ -11,31 +11,28 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
     class JiraConnectAppClient
     {
-        private readonly ILogWithContext log;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppClient(
-            ILogWithContext log,
             IInstallationIdProvider installationIdProvider,
             IJiraConfigurationStore configurationStore,
             IOctopusHttpClientFactory octopusHttpClientFactory)
         {
-            this.log = log;
             this.installationIdProvider = installationIdProvider;
             this.configurationStore = configurationStore;
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        public string? GetAuthTokenFromConnectApp()
+        public string? GetAuthTokenFromConnectApp(ILog log)
         {
             var username = installationIdProvider.GetInstallationId().ToString();
             var password = configurationStore.GetConnectAppPassword();
-            return GetAuthTokenFromConnectApp(username, password?.Value);
+            return GetAuthTokenFromConnectApp(username, password?.Value, log);
         }
-        
-        public string? GetAuthTokenFromConnectApp(string username, string? password)
+
+        public string? GetAuthTokenFromConnectApp(string username, string? password, ILog log)
         {
             using (var client = octopusHttpClientFactory.CreateClient())
             {

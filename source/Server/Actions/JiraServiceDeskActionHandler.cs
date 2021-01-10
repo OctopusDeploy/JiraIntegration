@@ -20,37 +20,34 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
         public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
 
         readonly JiraDeployment jiraDeployment;
-        readonly ILog log;
         private readonly IDeploymentStore deploymentStore;
-        
+
         public JiraServiceDeskActionHandler(
-            ILog log,
             IDeploymentStore deploymentStore,
             JiraDeployment jiraDeployment)
         {
-            this.log = log;
             this.jiraDeployment = jiraDeployment;
             this.deploymentStore = deploymentStore;
         }
-        
+
         public IActionHandlerResult Execute(IActionHandlerContext context)
         {
             string deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
             IDeployment deployment = deploymentStore.Get(deploymentId);
-            
+
             string jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
-            
+
             try
             {
-                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId));
+                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), context.Log);
             }
             catch (JiraDeploymentException exception)
             {
                 throw new ControlledActionFailedException(exception.Message);
             }
-            
+
             return ActionHandlerResult.FromSuccess();
         }
-        
+
     }
 }

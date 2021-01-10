@@ -21,7 +21,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class JiraDeployment
     {
-        private readonly ILogWithContext log;
         private readonly IJiraConfigurationStore store;
         private readonly JiraConnectAppClient connectAppClient;
         private readonly IInstallationIdProvider installationIdProvider;
@@ -36,9 +35,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
         private IDeploymentEnvironment? deploymentEnvironment;
-        
+
         public JiraDeployment(
-            ILogWithContext log,
             IJiraConfigurationStore store,
             JiraConnectAppClient connectAppClient,
             IInstallationIdProvider installationIdProvider,
@@ -52,7 +50,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             IOctopusHttpClientFactory octopusHttpClientFactory
         )
         {
-            this.log = log;
             this.store = store;
             this.connectAppClient = connectAppClient;
             this.installationIdProvider = installationIdProvider;
@@ -72,7 +69,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                    store.GetJiraInstanceType() == JiraInstanceType.Server;
         }
 
-        public void PublishToJira(string eventType, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
+        public void PublishToJira(string eventType, IDeployment deployment, IJiraApiDeployment jiraApiDeployment,
+            ITaskLog taskLog)
         {
             if (JiraIntegrationUnavailable(deployment))
             {
@@ -84,27 +82,27 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
             if (string.IsNullOrWhiteSpace(serverUri))
             {
-                log.Warn("To use Jira integration you must have the Octopus server's external url configured (see the Configuration/Nodes page)");
+                taskLog.Warn("To use Jira integration you must have the Octopus server's external url configured (see the Configuration/Nodes page)");
                 return;
             }
-            
+
             if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
                 string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
             {
-                log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
+                taskLog.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                 return;
             }
-            
-            using (log.OpenBlock($"Sending Jira state update - {eventType}"))
+
+            using (var taskLogBlock = taskLog.CreateBlock($"Sending Jira state update - {eventType}"))
             {
                 // get token from connect App
-                var token = connectAppClient.GetAuthTokenFromConnectApp();
+                var token = connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock);
                 if (token is null)
                 {
-                    log.Finish();
+                    taskLogBlock.Finish();
                     return;
                 }
-                
+
                 deploymentEnvironment = deploymentEnvironmentStore.Get(deployment.EnvironmentId);
                 environmentSettings =
                     deploymentEnvironmentSettingsProvider
@@ -114,17 +112,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 var data = PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment);
 
                 // Push data to Jira
-                SendToJira(token, data, deployment);
+                SendToJira(token, data, deployment, taskLogBlock);
 
-                log.Finish();
+                taskLogBlock.Finish();
             }
         }
 
         OctopusJiraPayloadData PrepareOctopusJiraPayload(string eventType, string serverUri, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
         {
-           
+
             var project = projectStore.Get(deployment.ProjectId);
-            
+
             var release = releaseStore.Get(deployment.ReleaseId);
             var serverTask = serverTaskStore.Get(deployment.TaskId);
 
@@ -172,10 +170,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 }
             };
         }
-        
-        void SendToJira(string token, OctopusJiraPayloadData data, IDeployment deployment)
+
+        void SendToJira(string token, OctopusJiraPayloadData data, IDeployment deployment, ITaskLog taskLogBlock)
         {
-            log.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment?.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
+            taskLogBlock.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment?.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
 
             var json = JsonConvert.SerializeObject(data);
 
@@ -188,7 +186,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 var result = client.PostAsync($"{store.GetConnectAppUrl()}/relay/bulk", httpContent).GetAwaiter().GetResult();
 
                 if (!result.IsSuccessStatusCode)
-                    log.ErrorFormat("Unable to publish data to Jira. Response code: {0}, Message: {1}", result.StatusCode, result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                    taskLogBlock.ErrorFormat("Unable to publish data to Jira. Response code: {0}, Message: {1}", result.StatusCode, result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
             }
         }
     }
