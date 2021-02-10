@@ -61,9 +61,10 @@ source/OctopusTools.v2.ncrunchsolution
 *.lock.json
 .vs
 .vscode
-/tools/
+/tools/*
 /artifacts/
 /publish/
 TestResult.xml
 TestResults/
+!packages.config
 .idea/
