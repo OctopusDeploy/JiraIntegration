@@ -36,7 +36,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
         private IDeploymentEnvironment? deploymentEnvironment;
-        
+
         public JiraDeployment(
             ILogWithContext log,
             IJiraConfigurationStore store,
@@ -87,14 +87,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 log.Warn("To use Jira integration you must have the Octopus server's external url configured (see the Configuration/Nodes page)");
                 return;
             }
-            
+
             if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
                 string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
             {
                 log.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                 return;
             }
-            
+
             using (log.OpenBlock($"Sending Jira state update - {eventType}"))
             {
                 // get token from connect App
@@ -104,7 +104,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     log.Finish();
                     return;
                 }
-                
+
                 deploymentEnvironment = deploymentEnvironmentStore.Get(deployment.EnvironmentId);
                 environmentSettings =
                     deploymentEnvironmentSettingsProvider
@@ -122,9 +122,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         OctopusJiraPayloadData PrepareOctopusJiraPayload(string eventType, string serverUri, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
         {
-           
+
             var project = projectStore.Get(deployment.ProjectId);
-            
+
             var release = releaseStore.Get(deployment.ReleaseId);
             var serverTask = serverTaskStore.Get(deployment.TaskId);
 
@@ -156,7 +156,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             State = eventType,
                             Pipeline = new JiraDeploymentPipeline
                             {
-                                Id = deployment.ProjectId,
+                                Id = deployment.ProjectId.Value,
                                 DisplayName = project.Name,
                                 Url = $"{serverUri}/app#/{project.SpaceId}/projects/{project.Slug}"
                             },
@@ -172,7 +172,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 }
             };
         }
-        
+
         void SendToJira(string token, OctopusJiraPayloadData data, IDeployment deployment)
         {
             log.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment?.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
