@@ -1,10 +1,12 @@
 ﻿#nullable enable
+using FluentValidation;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
 using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Sashimi.Server.Contracts;
 using Sashimi.Server.Contracts.ActionHandlers;
+using Sashimi.Server.Contracts.ActionHandlers.Validation;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 {
@@ -18,6 +20,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
         public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
         public bool CanRunOnDeploymentTarget => false;
         public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
+        public IValidator<DeploymentActionValidationContext>? Validator { get; } = null;
 
         readonly JiraDeployment jiraDeployment;
         readonly ILog log;
