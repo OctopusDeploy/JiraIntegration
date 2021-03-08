@@ -1,7 +1,6 @@
 ﻿#nullable enable
-using Octopus.Diagnostics;
+using Octopus.Server.Extensibility.HostServices.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
-using Octopus.Server.Extensibility.HostServices.Model.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Sashimi.Server.Contracts;
 using Sashimi.Server.Contracts.ActionHandlers;
@@ -30,16 +29,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
             this.deploymentStore = deploymentStore;
         }
 
-        public IActionHandlerResult Execute(IActionHandlerContext context)
+        public IActionHandlerResult Execute(IActionHandlerContext context, ITaskLog taskLog)
         {
-            string deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
-            IDeployment deployment = deploymentStore.Get(deploymentId);
+            var deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
+            var deployment = deploymentStore.Get(deploymentId);
 
-            string jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
+            var jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
+            if (string.IsNullOrWhiteSpace(jiraServiceDeskChangeRequestId))
+                throw new ControlledActionFailedException("ServiceId is not set");
 
             try
             {
-                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), context.Log);
+                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), taskLog);
             }
             catch (JiraDeploymentException exception)
             {

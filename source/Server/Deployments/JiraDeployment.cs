@@ -3,9 +3,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
-using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Configuration;
+using Octopus.Server.Extensibility.HostServices.Diagnostics;
 using Octopus.Server.Extensibility.HostServices.Domain.Environments;
 using Octopus.Server.Extensibility.HostServices.Domain.Projects;
 using Octopus.Server.Extensibility.HostServices.Domain.ServerTasks;
@@ -93,29 +93,28 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 return;
             }
 
-            using (var taskLogBlock = taskLog.CreateBlock($"Sending Jira state update - {eventType}"))
+            var taskLogBlock = taskLog.CreateBlock($"Sending Jira state update - {eventType}");
+
+            // get token from connect App
+            var token = connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock);
+            if (token is null)
             {
-                // get token from connect App
-                var token = connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock);
-                if (token is null)
-                {
-                    taskLogBlock.Finish();
-                    return;
-                }
-
-                deploymentEnvironment = deploymentEnvironmentStore.Get(deployment.EnvironmentId);
-                environmentSettings =
-                    deploymentEnvironmentSettingsProvider
-                        .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
-                            JiraConfigurationStore.SingletonId, deployment.EnvironmentId) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
-
-                var data = PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment);
-
-                // Push data to Jira
-                SendToJira(token, data, deployment, taskLogBlock);
-
                 taskLogBlock.Finish();
+                return;
             }
+
+            deploymentEnvironment = deploymentEnvironmentStore.Get(deployment.EnvironmentId);
+            environmentSettings =
+                deploymentEnvironmentSettingsProvider
+                    .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
+                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
+
+            var data = PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment);
+
+            // Push data to Jira
+            SendToJira(token, data, deployment, taskLogBlock);
+
+            taskLogBlock.Finish();
         }
 
         OctopusJiraPayloadData PrepareOctopusJiraPayload(string eventType, string serverUri, IDeployment deployment, IJiraApiDeployment jiraApiDeployment)
