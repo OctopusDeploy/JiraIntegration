@@ -52,7 +52,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 Comments = new [] {new JiraIssueComment { Body = releaseNote }}
             });
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
 
         [Test]
@@ -71,7 +71,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
 
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>());
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {
@@ -101,7 +101,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 Comments = new [] {new JiraIssueComment { Body = string.Empty }}
             });
 
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>());
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {

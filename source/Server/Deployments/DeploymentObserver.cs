@@ -21,7 +21,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
                 return;
 
-            jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment, new JiraIssueTrackerApiDeployment());
+            jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), domainEvent.Deployment, new JiraIssueTrackerApiDeployment(), domainEvent.TaskLog);
         }
 
         string StateFromEventType(DeploymentEventType eventType)

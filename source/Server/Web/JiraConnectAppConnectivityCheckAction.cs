@@ -4,6 +4,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
@@ -17,17 +18,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
         static readonly RequestBodyRegistration<JiraConnectAppConnectionCheckData> Data = new RequestBodyRegistration<JiraConnectAppConnectionCheckData>();
         static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
 
+        private readonly ISystemLog systemLog;
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly JiraConnectAppClient connectAppClient;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppConnectivityCheckAction(
+            ISystemLog systemLog,
             IJiraConfigurationStore configurationStore,
             IInstallationIdProvider installationIdProvider,
             JiraConnectAppClient connectAppClient,
             IOctopusHttpClientFactory octopusHttpClientFactory)
         {
+            this.systemLog = systemLog;
             this.configurationStore = configurationStore;
             this.installationIdProvider = installationIdProvider;
             this.connectAppClient = connectAppClient;
@@ -53,7 +57,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 return Result.Response(connectivityCheckResponse);
             }
 
-            var token = connectAppClient.GetAuthTokenFromConnectApp(username, password);
+            var token = connectAppClient.GetAuthTokenFromConnectApp(username, password, systemLog);
             if (token is null)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Failed to get authentication token from Jira Connect App.");

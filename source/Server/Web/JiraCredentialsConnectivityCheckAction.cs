@@ -15,13 +15,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
-        private readonly ILog log;
+        private readonly ISystemLog systemLog;
 
-        public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore, IOctopusHttpClientFactory octopusHttpClientFactory, ILog log)
+        public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore, IOctopusHttpClientFactory octopusHttpClientFactory, ISystemLog systemLog)
         {
             this.configurationStore = configurationStore;
             this.octopusHttpClientFactory = octopusHttpClientFactory;
-            this.log = log;
+            this.systemLog = systemLog;
         }
 
         public async Task<IOctoResponseProvider> ExecuteAsync(IOctoRequest request)
@@ -45,7 +45,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 return Result.Response(response);
             }
 
-            var jiraRestClient = new JiraRestClient(baseUrl, username, password, log, octopusHttpClientFactory);
+            var jiraRestClient = new JiraRestClient(baseUrl, username, password, systemLog, octopusHttpClientFactory);
             var connectivityCheckResponse = await jiraRestClient.ConnectivityCheck();
             if (connectivityCheckResponse.Messages.All(m => m.Category != ConnectivityCheckMessageCategory.Error))
             {
@@ -60,7 +60,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             return Result.Response(connectivityCheckResponse);
         }
     }
-    
+
 #nullable disable
     class JiraCredentialsConnectionCheckData
     {

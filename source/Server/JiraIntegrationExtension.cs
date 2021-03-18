@@ -27,7 +27,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
             builder.RegisterType<JiraConfigurationMapping>()
                 .As<IConfigurationDocumentMapper>()
                 .InstancePerLifetimeScope();
-            
+
             builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConfigurationStore>()
@@ -42,7 +42,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConnectAppClient>().AsSelf().InstancePerDependency();
-            
+
             builder.RegisterType<JiraIntegration>()
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
@@ -57,7 +57,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
             builder.RegisterType<JiraConnectAppConnectivityCheckAction>().AsSelf().InstancePerDependency();
             builder.RegisterType<JiraCredentialsConnectivityCheckAction>().AsSelf().InstancePerDependency();
-            
+
             builder.RegisterType<CommentParser>().AsSelf().InstancePerDependency();
             builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
 
@@ -67,24 +67,24 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IActionHandler>()
                 .AsSelf()
                 .InstancePerDependency();
-            
+
             builder.Register(c =>
             {
                 var store = c.Resolve<IJiraConfigurationStore>();
                 if (!store.GetIsEnabled())
                     return null;
-                
+
                 var baseUrl = store.GetBaseUrl();
                 var username = store.GetJiraUsername();
                 if (baseUrl == null || username == null)
                     return null;
-                
+
                 var password = store.GetJiraPassword();
                 return new JiraRestClient(
-                    baseUrl, 
-                    username, 
-                    password?.Value, 
-                    c.Resolve<ILog>(), 
+                    baseUrl,
+                    username,
+                    password?.Value,
+                    c.Resolve<ISystemLog>(),
                     c.Resolve<IOctopusHttpClientFactory>()
                 );
             }).As<IJiraRestClient>()

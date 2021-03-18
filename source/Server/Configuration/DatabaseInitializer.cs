@@ -6,12 +6,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class DatabaseInitializer : ExecuteWhenDatabaseInitializes
     {
-        readonly ILog log;
+        readonly ISystemLog systemLog;
         readonly IConfigurationStore configurationStore;
 
-        public DatabaseInitializer(ILog log, IConfigurationStore configurationStore)
+        public DatabaseInitializer(ISystemLog systemLog, IConfigurationStore configurationStore)
         {
-            this.log = log;
+            this.systemLog = systemLog;
             this.configurationStore = configurationStore;
         }
 
@@ -30,7 +30,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
                 return;
             }
 
-            log.Info("Initializing Jira integration settings");
+            systemLog.Info("Initializing Jira integration settings");
             doc = new JiraConfiguration();
             configurationStore.Create(doc);
         }

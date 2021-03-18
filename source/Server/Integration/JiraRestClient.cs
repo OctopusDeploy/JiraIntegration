@@ -20,14 +20,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         private readonly HttpClient httpClient;
 
         private readonly string baseUrl;
-        private readonly ILog log;
+        private readonly ISystemLog systemLog;
         private readonly string baseApiUri = "rest/api/2";
 
-        public JiraRestClient(string baseUrl, string username, string? password, ILog log,
+        public JiraRestClient(string baseUrl, string username, string? password, ISystemLog systemLog,
             IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.baseUrl = baseUrl;
-            this.log = log;
+            this.systemLog = systemLog;
             authorizationHeader = new AuthenticationHeaderValue("Basic",
                 Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
             httpClient = CreateHttpClient(octopusHttpClientFactory);
@@ -77,12 +77,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             if (response.IsSuccessStatusCode)
             {
                 var result = await GetResult<JiraIssue>(response);
-                log.Info($"Retrieved Jira Work Item data for work item id {workItemId}");
+                systemLog.Info($"Retrieved Jira Work Item data for work item id {workItemId}");
                 return result;
             }
 
             var msg = $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
-            log.Warn(msg);
+            systemLog.Warn(msg);
             return null;
         }
 
@@ -95,9 +95,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             var msg =
                 $"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
             if (response.StatusCode == HttpStatusCode.NotFound)
-                log.Trace(msg);
+                systemLog.Trace(msg);
             else
-                log.Warn(msg);
+                systemLog.Warn(msg);
             return new JiraIssueComments();
         }
 
@@ -115,7 +115,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 response.Headers.TryGetValues("Content-Type", out var contentType);
                 var errMsg =
                     $"Error parsing JSON content for type {typeof(TResult)}. Content Type: '{contentType}', content: {content}";
-                log.Error(errMsg);
+                systemLog.Error(errMsg);
                 throw;
             }
         }

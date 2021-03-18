@@ -17,17 +17,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;
         private readonly Lazy<IJiraRestClient> jira;
-        private readonly ILog log;
+        private readonly ISystemLog systemLog;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
             CommentParser commentParser,
             Lazy<IJiraRestClient> jira,
-            ILog log)
+            ISystemLog systemLog)
         {
             this.store = store;
             this.commentParser = commentParser;
             this.jira = jira;
-            this.log = log;
+            this.systemLog = systemLog;
         }
 
         public string CommentParser => JiraConfigurationStore.CommentParser;
@@ -58,7 +58,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                     var issue = jira.Value.GetIssue(workItemId).GetAwaiter().GetResult();
                     if (issue is null)
                     {
-                        log.Warn($"Parsed work item id {workItemId} from commit message but was unable to locate it in Jira");
+                        systemLog.Warn($"Parsed work item id {workItemId} from commit message but was unable to locate it in Jira");
                         return null;
                     }
 
