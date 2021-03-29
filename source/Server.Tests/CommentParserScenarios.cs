@@ -1,8 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
-using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
-using Octopus.Server.Extensibility.HostServices.Model.IssueTrackers;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
+using Octopus.Server.MessageContracts.BuildInformation;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
@@ -14,7 +13,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes JRE-1234"));
             Assert.IsNotEmpty(workItemReferences);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual("JRE-1234", reference);
         }
@@ -38,28 +37,28 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsNotEmpty(workItemReferences);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual(expectedReference, reference);
         }
-        
+
         [Test]
         public void StandardIssueNumberWithAlphaNumericProjectIdentifierReferenceGetsParsedCorrectly()
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes BT2-1234"));
             Assert.IsNotEmpty(workItemReferences);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual("BT2-1234", reference);
         }
-        
+
         [TestCase("Fixes [BT2-1234]", "BT2-1234")]
         [TestCase("Fixes (BT2-1234)", "BT2-1234")]
         public void StandardIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferenceGetsParsedCorrectly(string comment, string expectedReference)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsNotEmpty(workItemReferences);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual(expectedReference, reference);
         }
@@ -70,7 +69,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes JRE-1234,JRE-2345"));
             Assert.IsNotEmpty(workItemReferences);
             Assert.AreEqual(2, workItemReferences.Length);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual("JRE-1234", reference);
             reference = workItemReferences.Last();
@@ -84,7 +83,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsNotEmpty(workItemReferences);
             Assert.AreEqual(2, workItemReferences.Length);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual(expectedReferences[0], reference);
             reference = workItemReferences.Last();
@@ -97,7 +96,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes Bt2-1234,Bt2-2345"));
             Assert.IsNotEmpty(workItemReferences);
             Assert.AreEqual(2, workItemReferences.Length);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual("Bt2-1234", reference);
             reference = workItemReferences.Last();
@@ -110,7 +109,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes Bt2-1234,Bt2-2345"));
             Assert.IsNotEmpty(workItemReferences);
             Assert.AreEqual(2, workItemReferences.Length);
-            
+
             var reference = workItemReferences.First();
             Assert.AreEqual(expectedReferences[0], reference);
             reference = workItemReferences.Last();
@@ -134,7 +133,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.AreEqual(expectedNumber, workItemReferences.Length);
         }
-        
+
         [TestCase("Some text -2-bar")]
         [TestCase("Test with test.TST-01.com")]
         [TestCase("Some text test-foo-2")]
@@ -152,7 +151,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsEmpty(workItemReferences);
         }
-        
+
         private OctopusBuildInformation Create(string comment)
         {
             return new OctopusBuildInformation

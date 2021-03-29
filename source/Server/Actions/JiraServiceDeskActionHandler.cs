@@ -1,7 +1,9 @@
 ﻿#nullable enable
+using System.Threading;
 using Octopus.Server.Extensibility.HostServices.Diagnostics;
-using Octopus.Server.Extensibility.HostServices.Domain.Projects;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
+using Octopus.Server.Extensibility.Mediator;
+using Octopus.Server.MessageContracts.Projects.Releases.Deployments;
 using Sashimi.Server.Contracts;
 using Sashimi.Server.Contracts.ActionHandlers;
 
@@ -18,21 +20,21 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
         public bool CanRunOnDeploymentTarget => false;
         public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
 
+        private readonly IMediator mediator;
         readonly JiraDeployment jiraDeployment;
-        private readonly IDeploymentStore deploymentStore;
 
         public JiraServiceDeskActionHandler(
-            IDeploymentStore deploymentStore,
+            IMediator mediator,
             JiraDeployment jiraDeployment)
         {
+            this.mediator = mediator;
             this.jiraDeployment = jiraDeployment;
-            this.deploymentStore = deploymentStore;
         }
 
         public IActionHandlerResult Execute(IActionHandlerContext context, ITaskLog taskLog)
         {
             var deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
-            var deployment = deploymentStore.Get(deploymentId);
+            var deployment = mediator.Request(new GetDeploymentRequest(deploymentId.ToDeploymentId()), CancellationToken.None).GetAwaiter().GetResult().Deployment;
 
             var jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
             if (string.IsNullOrWhiteSpace(jiraServiceDeskChangeRequestId))
@@ -40,7 +42,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 
             try
             {
-                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), taskLog);
+                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), taskLog, CancellationToken.None).GetAwaiter().GetResult();
             }
             catch (JiraDeploymentException exception)
             {
