@@ -1,6 +1,6 @@
 using System.Linq;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
-using Octopus.Server.MessageContracts.Projects.Releases.Deployments;
+using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {

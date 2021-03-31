@@ -2,8 +2,9 @@
   "profiles": {
     "Extensibility.JiraIntegration": {
       "commandName": "Executable",
-      "executablePath": "..\\..\\..\\..\\..\\..\\OctopusDeploy\\source\\Octopus.Server\\bin\\net452\\Octopus.Server.exe",
-      "commandLineArgs": "run --instance=master --customExtension=Octopus.Server.Extensibility.JiraIntegration.dll"
+      "executablePath": "..\\..\\..\\..\\..\\..\\OctopusDeploy\\source\\Octopus.Server\\bin\\net5.0\\Octopus.Server.exe",
+      "commandLineArgs": "run --instance=master --customExtension=Octopus.Server.Extensibility.JiraIntegration.dll",
+      "workingDirectory": "..\\..\\..\\..\\..\\..\\OctopusDeploy\\source\\Octopus.Server\\bin\\net5.0"
     }
   }
 }

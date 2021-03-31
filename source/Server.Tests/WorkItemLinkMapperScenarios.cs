@@ -8,8 +8,8 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
-using Octopus.Server.MessageContracts.BuildInformation;
-using Octopus.Server.MessageContracts.IssueTrackers;
+using Octopus.Server.MessageContracts.Features.BuildInformation;
+using Octopus.Server.MessageContracts.Features.IssueTrackers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {

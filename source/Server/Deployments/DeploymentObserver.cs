@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Octopus.Server.Extensibility.HostServices.Diagnostics;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.Mediator;
-using Octopus.Server.MessageContracts.Projects.Releases.Deployments;
+using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {

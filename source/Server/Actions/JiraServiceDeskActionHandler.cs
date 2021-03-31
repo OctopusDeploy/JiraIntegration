@@ -3,7 +3,7 @@ using System.Threading;
 using Octopus.Server.Extensibility.HostServices.Diagnostics;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Octopus.Server.Extensibility.Mediator;
-using Octopus.Server.MessageContracts.Projects.Releases.Deployments;
+using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 using Sashimi.Server.Contracts;
 using Sashimi.Server.Contracts.ActionHandlers;
 

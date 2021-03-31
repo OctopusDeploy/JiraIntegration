@@ -1,7 +1,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
-using Octopus.Server.MessageContracts.BuildInformation;
+using Octopus.Server.MessageContracts.Features.BuildInformation;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {

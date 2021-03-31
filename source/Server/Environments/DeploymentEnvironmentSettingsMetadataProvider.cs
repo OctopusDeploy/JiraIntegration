@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using Octopus.Data.Resources.Attributes;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.Metadata;
+using Octopus.Server.MessageContracts.Attributes;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Environments
 {

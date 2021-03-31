@@ -14,11 +14,11 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Environments;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Mediator;
-using Octopus.Server.MessageContracts.DeploymentEnvironments;
-using Octopus.Server.MessageContracts.Projects;
-using Octopus.Server.MessageContracts.Projects.Releases;
-using Octopus.Server.MessageContracts.Projects.Releases.Deployments;
-using Octopus.Server.MessageContracts.ServerTasks;
+using Octopus.Server.MessageContracts.Features.DeploymentEnvironments;
+using Octopus.Server.MessageContracts.Features.Projects;
+using Octopus.Server.MessageContracts.Features.Projects.Releases;
+using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
+using Octopus.Server.MessageContracts.Features.ServerTasks;
 using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
