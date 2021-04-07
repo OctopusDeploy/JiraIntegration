@@ -1,5 +1,5 @@
 using System;
-using Octopus.Server.Extensibility.HostServices.Model.Projects;
+using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
@@ -14,7 +14,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeServiceIdOrKeys;
 
-        public string[] DeploymentValues(IDeployment deployment)
+        public string[] DeploymentValues(DeploymentResource deployment)
         {
             if (String.IsNullOrEmpty(jiraServiceId))
             {

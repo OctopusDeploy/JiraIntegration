@@ -1,6 +1,6 @@
 using System.Linq;
 using System.Text.RegularExpressions;
-using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
+using Octopus.Server.MessageContracts.Features.BuildInformation;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {

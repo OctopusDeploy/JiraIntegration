@@ -5,12 +5,11 @@ using NUnit.Framework;
 using Octopus.Data;
 using Octopus.Data.Model;
 using Octopus.Diagnostics;
-using Octopus.Server.Extensibility.HostServices.Model.BuildInformation;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
-using Octopus.Server.Extensibility.Resources.IssueTrackers;
-using Commit = Octopus.Server.Extensibility.HostServices.Model.IssueTrackers.Commit;
+using Octopus.Server.MessageContracts.Features.BuildInformation;
+using Octopus.Server.MessageContracts.Features.IssueTrackers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
@@ -82,7 +81,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.AreEqual(1, ((ISuccessResult<WorkItemLink[]>)workItems).Value.Length);
+            Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id, "Single work item should be returned");
         }
 
         [Test]
@@ -111,7 +110,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 }
             });
 
-            Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source);
+            Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source, "Source should be set");
         }
     }
 }
