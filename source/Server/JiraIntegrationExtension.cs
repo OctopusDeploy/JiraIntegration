@@ -47,8 +47,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<DeploymentObserver>().AsImplementedInterfaces().InstancePerDependency();
-
             builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>().As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
 
             builder.RegisterType<JiraConfigureCommands>()
