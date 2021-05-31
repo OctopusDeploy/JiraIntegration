@@ -41,15 +41,32 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Summary = "Test title",
                     Comments = new JiraIssueComments
                     {
-                        Total = 1
+                        Total = 1,
+                        Comments = new []
+                        {
+                            new JiraIssueComment
+                            {
+                                Body = new JiraDoc
+                                {
+                                    Content = new []
+                                    {
+                                        new JiraDocContent {
+                                            Content = new []
+                                            {
+                                                new JiraDocContentElement
+                                                {
+                                                    Text = releaseNote
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             };
-            jiraClient.GetIssue(Arg.Is(linkData)).Returns(jiraIssue);
-            jiraClient.GetIssueComments(Arg.Is(linkData)).Returns(new JiraIssueComments
-            {
-                Comments = new [] {new JiraIssueComment { Body = releaseNote }}
-            });
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] { jiraIssue }});
 
             return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
@@ -64,11 +81,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             store.GetIsEnabled().Returns(true);
             store.GetJiraUsername().Returns("user");
             store.GetJiraPassword().Returns("password".ToSensitiveString());
-            jiraClient.GetIssue(Arg.Is("JRE-1234")).Returns(new JiraIssue());
-            jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
+            var jiraIssue = new JiraIssue
             {
-                Comments = new [] {new JiraIssueComment { Body = string.Empty }}
-            });
+                Key = "JRE-1234",
+                Fields = new JiraIssueFields
+                {
+                    Comments = new JiraIssueComments()
+                }
+            };
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] {jiraIssue}});
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
@@ -94,11 +115,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             store.GetIsEnabled().Returns(true);
             store.GetJiraUsername().Returns("user");
             store.GetJiraPassword().Returns("password".ToSensitiveString());
-            jiraClient.GetIssue(Arg.Is("JRE-1234")).Returns(new JiraIssue());
-            jiraClient.GetIssueComments(Arg.Is("JRE-1234")).Returns(new JiraIssueComments
+            var jiraIssue = new JiraIssue
             {
-                Comments = new [] {new JiraIssueComment { Body = string.Empty }}
-            });
+                Key = "JRE-1234",
+                Fields = new JiraIssueFields
+                {
+                    Comments = new JiraIssueComments()
+                }
+            };
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] { jiraIssue }});
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
