@@ -6,6 +6,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     interface IJiraRestClient
     {
         Task<ConnectivityCheckResponse> ConnectivityCheck();
-        Task<JiraSearchResult> GetIssues(string[] workItemId);
+        Task<JiraSearchResult?> GetIssues(string[] workItemId);
     }
 }
