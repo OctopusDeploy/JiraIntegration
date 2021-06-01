@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -70,35 +70,22 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             return connectivityCheckResponse;
         }
 
-        public async Task<JiraIssue?> GetIssue(string workItemId)
+        public async Task<JiraSearchResult?> GetIssues(string[] workItemIds)
         {
+            var workItemQuery = $"id in ({string.Join(", ", workItemIds)})";
+            var content = JsonConvert.SerializeObject(new { jql = workItemQuery, fields = new [] { "summary", "comment" }, maxResults = 10000 });
             var response =
-                await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}?fields=summary,comment");
+                await httpClient.PostAsync($"{baseUrl}/rest/api/3/search", new StringContent(content, Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
-                var result = await GetResult<JiraIssue>(response);
-                systemLog.Info($"Retrieved Jira Work Item data for work item id {workItemId}");
+                var result = await GetResult<JiraSearchResult>(response);
+                systemLog.Info($"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
                 return result;
             }
 
-            var msg = $"Failed to retrieve Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+            var msg = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
             systemLog.Warn(msg);
             return null;
-        }
-
-        public async Task<JiraIssueComments> GetIssueComments(string workItemId)
-        {
-            var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/issue/{workItemId}/comment");
-            if (response.IsSuccessStatusCode)
-                return await GetResult<JiraIssueComments>(response);
-
-            var msg =
-                $"Failed to retrieve comments for Jira issue '{workItemId}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
-            if (response.StatusCode == HttpStatusCode.NotFound)
-                systemLog.Trace(msg);
-            else
-                systemLog.Warn(msg);
-            return new JiraIssueComments();
         }
 
         async Task<TResult> GetResult<TResult>(HttpResponseMessage response)
@@ -110,11 +97,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 var result = JsonConvert.DeserializeObject<TResult>(content);
                 return result;
             }
-            catch
+            catch (Exception ex)
             {
                 response.Headers.TryGetValues("Content-Type", out var contentType);
                 var errMsg =
-                    $"Error parsing JSON content for type {typeof(TResult)}. Content Type: '{contentType}', content: {content}";
+                    $"Error parsing JSON content for type {typeof(TResult)}. Content Type: '{contentType}', content: {content}, error: {ex}";
                 systemLog.Error(errMsg);
                 throw;
             }
@@ -127,6 +114,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             client.DefaultRequestHeaders.Authorization = authorizationHeader;
             return client;
         }
+    }
+
+    class JiraSearchResult
+    {
+        [JsonProperty("issues")]
+        public JiraIssue[] Issues { get; set; } = new JiraIssue[0];
     }
 
     class JiraIssue
@@ -147,21 +140,43 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 
     class JiraIssueComments
     {
-        public JiraIssueComments()
-        {
-            Comments = new List<JiraIssueComment>();
-        }
-
         [JsonProperty("comments")]
-        public IEnumerable<JiraIssueComment> Comments { get; set; }
+        public IEnumerable<JiraIssueComment> Comments { get; set; } = new JiraIssueComment[0];
+
         [JsonProperty("total")]
-        public int Total { get; set; }
+        public int Total { get; set; } = 0;
     }
 
     class JiraIssueComment
     {
         [JsonProperty("body")]
-        public string Body { get; set; } = string.Empty;
+        public JiraDoc? Body { get; set; }
+    }
+
+    class JiraDoc
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; } = string.Empty;
+
+        [JsonProperty("content")]
+        public IEnumerable<JiraDocContent> Content { get; set; } = new JiraDocContent[0];
+    }
+
+    class JiraDocContent
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; } = string.Empty;
+
+        [JsonProperty("content")]
+        public IEnumerable<JiraDocContentElement> Content { get; set; } = new JiraDocContentElement[0];
+    }
+
+    class JiraDocContentElement
+    {
+        [JsonProperty("type")]
+        public string Type { get; set; } = string.Empty;
+        [JsonProperty("text")]
+        public string Text { get; set; } = string.Empty;
     }
 
     class PermissionSettingsContainer
