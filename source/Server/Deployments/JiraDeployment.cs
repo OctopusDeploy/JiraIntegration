@@ -157,7 +157,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             },
                             Environment = new JiraDeploymentEnvironment
                             {
-                                Id = $"{deployment.EnvironmentId}{(string.IsNullOrWhiteSpace(deployment.TenantId) ? "" : $"-{deployment.TenantId}")}",
+                                Id = $"{deployment.EnvironmentId}{(deployment.TenantId is null ? "" : $"-{deployment.TenantId}")}",
                                 DisplayName = deploymentEnvironment?.Name ?? string.Empty,
                                 Type = environmentSettings?.JiraEnvironmentType.ToString() ?? string.Empty
                             },
