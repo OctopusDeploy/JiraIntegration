@@ -1,14 +1,5 @@
 mode: ContinuousDeployment
+
 branches:
-  lts:
-    mode: ContinuousDeployment
-    tag: ''
-    increment: Patch
-    prevent-increment-of-merged-branch-version: false
-    track-merge-target: false
-    regex: lts?[_]
-    source-branches:
-    - master
-    tracks-release-branches: false
-    is-release-branch: false
-    is-mainline: true
+  master:
+    regex: ^(main)$
