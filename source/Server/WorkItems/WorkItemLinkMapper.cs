@@ -46,26 +46,38 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 return ResultFromExtension<WorkItemLink[]>.Failed("No BaseUrl configured");
 
             var releaseNotePrefix = store.GetReleaseNotePrefix();
-            var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct();
+            var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
+            if (workItemIds.Length == 0)
+                return ResultFromExtension<WorkItemLink[]>.Success(new WorkItemLink[0]);
 
             return ResultFromExtension<WorkItemLink[]>.Success(ConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl));
         }
 
-        private WorkItemLink[] ConvertWorkItemLinks(IEnumerable<string> workItemIds, string? releaseNotePrefix, string baseUrl)
+        private WorkItemLink[] ConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
         {
-            return workItemIds.Select(workItemId =>
-                {
-                    var issue = jira.Value.GetIssue(workItemId).GetAwaiter().GetResult();
-                    if (issue is null)
-                    {
-                        log.Warn($"Parsed work item id {workItemId} from commit message but was unable to locate it in Jira");
-                        return null;
-                    }
+            var issues = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
+            if (issues == null || issues.Issues.Length == 0)
+            {
+                return new WorkItemLink[0];
+            }
 
+            var issueMap = issues.Issues.ToDictionary(x => x.Key);
+
+            var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
+            if (workItemsNotFound.Length > 0)
+            {
+                log.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
+            }
+
+            return workItemIds
+                .Where(workItemId => issueMap.ContainsKey(workItemId))
+                .Select(workItemId =>
+                {
+                    var issue = issueMap[workItemId];
                     return new WorkItemLink
                     {
                         Id = workItemId,
-                        Description = GetReleaseNote(issue, releaseNotePrefix),
+                        Description = GetReleaseNote(issueMap[workItemId], releaseNotePrefix),
                         LinkUrl = baseUrl + "/browse/" + workItemId,
                         Source = JiraConfigurationStore.CommentParser
                     };
@@ -82,9 +94,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 return issue.Fields.Summary;
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-            var issueComments = jira.Value.GetIssueComments(issue.Key).GetAwaiter().GetResult();
 
-            var releaseNote = issueComments?.Comments.LastOrDefault(c => releaseNoteRegex.IsMatch(c.Body))?.Body;
+            var releaseNote = issue.Fields.Comments.Comments.SelectMany(x => x.Body?.Content.SelectMany(b => b.Content).Select(x => x.Text)).Where(x => !(x is null)).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, "")?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
