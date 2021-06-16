@@ -70,10 +70,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             return connectivityCheckResponse;
         }
 
-        public async Task<JiraSearchResult> GetIssues(string[] workItemIds)
+        public async Task<JiraSearchResult?> GetIssues(string[] workItemIds)
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds)})";
-            var content = JsonConvert.SerializeObject(new { jql = workItemQuery, fields = new [] { "summary", "comment" } });
+            var content = JsonConvert.SerializeObject(new { jql = workItemQuery, fields = new [] { "summary", "comment" }, maxResults = 10000 });
             var response =
                 await httpClient.PostAsync($"{baseUrl}/rest/api/3/search", new StringContent(content, Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
@@ -119,7 +119,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     class JiraSearchResult
     {
         [JsonProperty("issues")]
-        public JiraIssue[] Issues { get; set; }
+        public JiraIssue[] Issues { get; set; } = new JiraIssue[0];
     }
 
     class JiraIssue
@@ -140,15 +140,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 
     class JiraIssueComments
     {
-        public JiraIssueComments()
-        {
-            Comments = new List<JiraIssueComment>();
-        }
-
         [JsonProperty("comments")]
-        public IEnumerable<JiraIssueComment> Comments { get; set; }
+        public IEnumerable<JiraIssueComment> Comments { get; set; } = new JiraIssueComment[0];
+
         [JsonProperty("total")]
-        public int Total { get; set; }
+        public int Total { get; set; } = 0;
     }
 
     class JiraIssueComment
@@ -160,24 +156,27 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     class JiraDoc
     {
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
+
         [JsonProperty("content")]
-        public IEnumerable<JiraDocContent> Content { get; set; }
+        public IEnumerable<JiraDocContent> Content { get; set; } = new JiraDocContent[0];
     }
 
     class JiraDocContent
     {
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
+
         [JsonProperty("content")]
-        public IEnumerable<JiraDocContentElement> Content { get; set; }
+        public IEnumerable<JiraDocContentElement> Content { get; set; } = new JiraDocContentElement[0];
     }
+
     class JiraDocContentElement
     {
         [JsonProperty("type")]
-        public string Type { get; set; }
+        public string Type { get; set; } = string.Empty;
         [JsonProperty("text")]
-        public string Text { get; set; }
+        public string Text { get; set; } = string.Empty;
     }
 
     class PermissionSettingsContainer
