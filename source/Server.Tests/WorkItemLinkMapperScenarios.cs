@@ -138,5 +138,38 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source);
         }
+
+        [Test]
+        public void KeyGetsUpperCased()
+        {
+            var store = Substitute.For<IJiraConfigurationStore>();
+            var jiraClient = Substitute.For<IJiraRestClient>();
+            var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
+            store.GetBaseUrl().Returns("https://github.com");
+            store.GetIsEnabled().Returns(true);
+            store.GetJiraUsername().Returns("user");
+            store.GetJiraPassword().Returns("password".ToSensitiveString());
+            var jiraIssue = new JiraIssue
+            {
+                Key = "JRE-1234",
+                Fields = new JiraIssueFields
+                {
+                    Comments = new JiraIssueComments()
+                }
+            };
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] { jiraIssue }});
+
+            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ILog>());
+
+            var workItems = mapper.Map(new OctopusBuildInformation
+            {
+                Commits = new Commit[]
+                {
+                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234"}
+                }
+            });
+
+            Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id);
+        }
     }
 }
