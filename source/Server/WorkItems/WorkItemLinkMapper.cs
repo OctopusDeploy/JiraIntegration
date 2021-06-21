@@ -61,7 +61,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 return new WorkItemLink[0];
             }
 
-            var issueMap = issues.Issues.ToDictionary(x => x.Key);
+            var issueMap = issues.Issues.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
             var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
             if (workItemsNotFound.Length > 0)
@@ -76,7 +76,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                     var issue = issueMap[workItemId];
                     return new WorkItemLink
                     {
-                        Id = workItemId,
+                        Id = issue.Key,
                         Description = GetReleaseNote(issueMap[workItemId], releaseNotePrefix),
                         LinkUrl = baseUrl + "/browse/" + workItemId,
                         Source = JiraConfigurationStore.CommentParser
