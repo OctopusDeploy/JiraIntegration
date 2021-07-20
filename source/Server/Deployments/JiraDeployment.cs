@@ -133,7 +133,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     {
                         new JiraDeploymentData
                         {
-                            DeploymentSequenceNumber = int.Parse(deployment.Id!.Split('-')[1]),
+                            DeploymentSequenceNumber = int.Parse(deployment.Id!.ToString().Split('-')[1]),
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
                             DisplayName = serverTask.Description,
                             Associations = new []
