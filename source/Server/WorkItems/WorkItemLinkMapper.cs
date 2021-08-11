@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
@@ -9,6 +11,7 @@ using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Results;
 using Octopus.Server.MessageContracts.Features.BuildInformation;
 using Octopus.Server.MessageContracts.Features.IssueTrackers;
+using Octopus.Server.MessageContracts.Features.Spaces;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
@@ -33,7 +36,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         public string CommentParser => JiraConfigurationStore.CommentParser;
         public bool IsEnabled => store.GetIsEnabled();
 
-        public IResultFromExtension<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
+        public async Task<IResultFromExtension<WorkItemLink[]>> Map(SpaceId spaceId, OctopusBuildInformation buildInformation, CancellationToken cancellationToken)
         {
             if (!IsEnabled)
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();

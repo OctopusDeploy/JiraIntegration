@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.Data;
@@ -10,6 +12,7 @@ using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
 using Octopus.Server.MessageContracts.Features.BuildInformation;
 using Octopus.Server.MessageContracts.Features.IssueTrackers;
+using Octopus.Server.MessageContracts.Features.Spaces;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
@@ -72,7 +75,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         }
 
         [Test]
-        public void DuplicatesGetIgnored()
+        public async Task DuplicatesGetIgnored()
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
@@ -93,20 +96,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = await mapper.Map( "Space-1".ToSpaceId(), new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"},
                     new Commit { Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234"}
                 }
-            });
+            }, CancellationToken.None);
 
             Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id, "Single work item should be returned");
         }
 
         [Test]
-        public void SourceGetsSet()
+        public async Task SourceGetsSet()
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
@@ -127,19 +130,19 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = await mapper.Map( "Space-1".ToSpaceId(), new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"}
                 }
-            });
+            }, CancellationToken.None);
 
             Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source, "Source should be set");
         }
 
         [Test]
-        public void KeyGetsUpperCased()
+        public async Task KeyGetsUpperCased()
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
@@ -160,13 +163,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = await mapper.Map( "Space-1".ToSpaceId(), new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234"}
                 }
-            });
+            }, CancellationToken.None);
 
             Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id);
         }

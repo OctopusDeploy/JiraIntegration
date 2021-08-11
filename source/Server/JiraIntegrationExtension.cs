@@ -5,7 +5,6 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.Extensions.Mappings;
-using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.HostServices.Web;
 using Octopus.Server.Extensibility.JiraIntegration.Actions;
@@ -47,7 +46,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>().As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
+            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>().AsImplementedInterfaces().InstancePerDependency();
 
             builder.RegisterType<JiraConfigureCommands>()
                 .As<IContributeToConfigureCommand>()

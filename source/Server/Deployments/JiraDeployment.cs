@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         private readonly IServerConfigurationStore serverConfigurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
-        private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
+        private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentResource? environmentSettings;
         private EnvironmentResource? deploymentEnvironment;
 
         public JiraDeployment(
@@ -105,8 +105,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             deploymentEnvironment = getDeploymentEnvironmentResponse.DeploymentEnvironment;
             environmentSettings =
                 deploymentEnvironmentSettingsProvider
-                    .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
-                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId.Value) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
+                    .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentResource>(
+                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId.Value) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentResource();
 
             var data = await PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment, cancellationToken);
 
