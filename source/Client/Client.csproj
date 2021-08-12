@@ -9,9 +9,10 @@
     <Product>Octopus Deploy Client Extensibility - Jira</Product>
     <Description>Octopus Deploy Client Extensibility for the Jira Integration and Service Desk</Description>
     <PackageId>Octopus.Client.Extensibility.JiraIntegration</PackageId>
-    <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
+    <PackageIconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
     <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/master/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIntegration</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/OctopusDeploy/JiraIntegration</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Octopus.Server.Client" Version="11.2.3319" />

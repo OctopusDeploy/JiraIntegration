@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" xmlns:octopus="http://octopus.org">
+  <metadata>
+    <id>Octopus.Server.Extensibility.JiraIntegration</id>
+    <title>Octopus Server Extensibility Issue Tracker - AzureDevOps</title>
+    <version>$version$</version>
+    <authors>Octopus Deploy</authors>
+    <owners>Octopus Deploy Pty. Ltd.</owners>
+    <summary>Octopus Deploy AzureDevOps issue tracker.</summary>
+    <description>
+      Implements the AzureDevOps issue tracker.
+    </description>
+    <language>en-US</language>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/OctopusDeploy/AzureDevOpsIssueTracker/blob/main/LICENSE.md</licenseUrl>
+    <projectUrl>https://github.com/OctopusDeploy/AzureDevOpsIssueTracker</projectUrl>
+    <repository type="git" url="https://github.com/OctopusDeploy/AzureDevOpsIssueTracker" />
+    <iconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
+    <tags>automation deployment</tags>
+    <developmentDependency>true</developmentDependency>
+    <dependencies>
+      <group targetFramework="net5.0">
+        <dependency id="Novell.Directory.Ldap.NETStandard" version="3.6.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="..\source\Server\bin\Release\net5.0\*.dll" target="tools" />
+  </files>
+</package>
