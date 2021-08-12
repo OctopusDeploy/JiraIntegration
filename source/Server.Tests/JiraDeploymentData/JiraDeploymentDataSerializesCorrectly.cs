@@ -37,7 +37,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
                             Url =
                                 "https://octopussample.com/app#/Spaces-1/projects/foo/releases/1.0.0/deployments/deployments-123",
                             Description = "Task Description",
-                            LastUpdated = new DateTimeOffset(new DateTime(2018, 10, 27)),
+                            LastUpdated = new DateTimeOffset(new DateTime(2018, 10, 27), TimeSpan.Zero),
                             State = "in_progress",
                             Pipeline = new JiraDeploymentPipeline
                             {
