@@ -18,7 +18,7 @@
         ],
         "url": "https://octopussample.com/app#/Spaces-1/projects/foo/releases/1.0.0/deployments/deployments-123",
         "description": "Task Description",
-        "lastUpdated": "2018-10-27T00:00:00+11:00",
+        "lastUpdated": "2018-10-27T00:00:00+10:00",
         "state": "in_progress",
         "pipeline": {
           "id": "Projects-234",
