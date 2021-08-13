@@ -75,7 +75,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
             var content = JsonConvert.SerializeObject(new { jql = workItemQuery, fields = new [] { "summary", "comment" }, maxResults = 10000 });
             var response =
-                await httpClient.PostAsync($"{baseUrl}/rest/api/3/search", new StringContent(content, Encoding.UTF8, "application/json"));
+                await httpClient.PostAsync($"{baseUrl}/{baseApiUri}/search", new StringContent(content, Encoding.UTF8, "application/json"));
             if (response.IsSuccessStatusCode)
             {
                 var result = await GetResult<JiraSearchResult>(response);
