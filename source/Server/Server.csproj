@@ -6,10 +6,9 @@
     <Description>Implements the Jira Integration and Jira Service Desk.</Description>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Octopus Deploy</Authors>
-    <PackageId>Octopus.Server.Extensibility.JiraIntegration</PackageId>
     <Company>Octopus Deploy Pty. Ltd.</Company>
     <PackageIconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIntegration</PackageProjectUrl>
     <RepositoryUrl>https://github.com/OctopusDeploy/JiraIntegration</RepositoryUrl>
     <Nullable>enable</Nullable>
