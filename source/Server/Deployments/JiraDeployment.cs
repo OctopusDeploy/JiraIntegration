@@ -159,7 +159,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             {
                                 Id = $"{deployment.EnvironmentId}{(deployment.TenantId is null ? "" : $"-{deployment.TenantId}")}",
                                 DisplayName = deploymentEnvironment?.Name ?? string.Empty,
-                                Type = environmentSettings?.JiraEnvironmentType.ToString() ?? string.Empty
+                                Type = environmentSettings?.JiraEnvironmentType.ToString() ?? JiraEnvironmentType.unmapped.ToString()
                             },
                             SchemeVersion = "1.0"
                         }
