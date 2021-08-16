@@ -6,9 +6,10 @@ using Nuke.Common.IO;
 using Nuke.Common.ProjectModel;
 using Nuke.Common.Tools.DotNet;
 using Nuke.Common.Utilities.Collections;
-using Nuke.Common.Tools.GitVersion;
 using static Nuke.Common.IO.FileSystemTasks;
 using static Nuke.Common.Tools.DotNet.DotNetTasks;
+using Nuke.OctoVersion;
+using OctoVersion.Core;
 
 [CheckBuildProjectConfigurations]
 [UnsetVisualStudioEnvironmentVariables]
@@ -18,7 +19,7 @@ class Build : NukeBuild
 
     [Solution] readonly Solution Solution;
 
-    [GitVersion(Framework="net5.0", NoFetch = true)] readonly GitVersion GitVersionInfo;
+    [NukeOctoVersion] readonly OctoVersionInfo OctoVersionInfo;
 
     static AbsolutePath SourceDirectory => RootDirectory / "source";
     static AbsolutePath ArtifactsDirectory => RootDirectory / "artifacts";
@@ -53,12 +54,12 @@ class Build : NukeBuild
         .DependsOn(Restore)
         .Executes(() =>
         {
-            Logger.Info("Building Jira Integration v{0}", GitVersionInfo.NuGetVersion);
+            Logger.Info("Building Jira Integration v{0}", OctoVersionInfo.FullSemVer);
 
             DotNetBuild(_ => _
                 .SetProjectFile(Solution)
                 .SetConfiguration(Configuration)
-                .SetVersion(GitVersionInfo.NuGetVersion)
+                .SetVersion(OctoVersionInfo.FullSemVer)
                 .EnableNoRestore());
         });
 
@@ -79,28 +80,28 @@ class Build : NukeBuild
         .Produces(ArtifactsDirectory / "*.nupkg")
         .Executes(() =>
         {
-            Logger.Info("Packing Jira Integration v{0}", GitVersionInfo.NuGetVersion);
+            Logger.Info("Packing Jira Integration v{0}", OctoVersionInfo.FullSemVer);
 
             DotNetPack(_ => _
                 .SetProject(Solution)
-                .SetVersion(GitVersionInfo.NuGetVersion)
+                .SetVersion(OctoVersionInfo.FullSemVer)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
                 .EnableNoBuild()
                 .DisableIncludeSymbols()
                 .SetVerbosity(DotNetVerbosity.Normal)
                 .SetProperty("NuspecFile", "../../build/Octopus.Server.Extensibility.JiraIntegration.nuspec")
-                .SetProperty("NuspecProperties", $"Version={GitVersionInfo.NuGetVersion}"));
+                .SetProperty("NuspecProperties", $"Version={OctoVersionInfo.FullSemVer}"));
 
             DotNetPack(_ => _
                 .SetProject(RootDirectory / "source/Client/Client.csproj")
-                .SetVersion(GitVersionInfo.NuGetVersion)
+                .SetVersion(OctoVersionInfo.FullSemVer)
                 .SetConfiguration(Configuration)
                 .SetOutputDirectory(ArtifactsDirectory)
                 .EnableNoBuild()
                 .DisableIncludeSymbols()
                 .SetVerbosity(DotNetVerbosity.Normal)
-                .SetProperty("NuspecProperties", $"Version={GitVersionInfo.NuGetVersion}"));
+                .SetProperty("NuspecProperties", $"Version={OctoVersionInfo.FullSemVer}"));
         });
 
     Target CopyToLocalPackages => _ => _

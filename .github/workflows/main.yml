@@ -30,7 +30,8 @@ jobs:
       - name: Nuke Build 🏗
         id: build
         env:
-          GitVersion_Patch: ${{ github.run_number }}
+          OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head branch
+          OCTOVERSION_Patch: ${{ github.run_number }}
         shell: bash
         run: ./build.sh --verbosity verbose
 
