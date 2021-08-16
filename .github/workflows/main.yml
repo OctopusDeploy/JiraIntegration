@@ -37,13 +37,13 @@ jobs:
 
       - name: Push package to GitHub 🐙
         id: push-github
-        if: startsWith(github.ref, 'dependabot') == false && github.event_name != 'schedule'
+        if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule'
         shell: bash
         run: dotnet nuget push artifacts/**/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "GitHub"
 
       - name: Push package to feed 🐙
         id: push-feed
-        if: startsWith(github.ref, 'dependabot') == false && github.event_name != 'schedule'
+        if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule'
         shell: bash
         env:
           FEED_API_KEY: ${{ secrets.FEED_API_KEY }}
