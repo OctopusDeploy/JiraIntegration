@@ -12,7 +12,8 @@
 
   <ItemGroup>
     <PackageReference Include="Nuke.Common" Version="5.2.1" />
-    <PackageReference Include="Nuke.OctoVersion" Version="0.2.560"/>
+    <PackageReference Include="Nuke.OctoVersion" Version="0.2.560" />
+    <PackageReference Include="OctoVersion.Core" Version="0.2.642" />
   </ItemGroup>
 
 </Project>
