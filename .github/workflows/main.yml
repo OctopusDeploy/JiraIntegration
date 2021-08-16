@@ -30,7 +30,7 @@ jobs:
       - name: Nuke Build 🏗
         id: build
         env:
-          GitVersion_Patch: ${{ env.GITHUB_RUN_NUMBER }}
+          GitVersion_Patch: ${{ github.run_number }}
         shell: bash
         run: ./build.sh --verbosity verbose
 
