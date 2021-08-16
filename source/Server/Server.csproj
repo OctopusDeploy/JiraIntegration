@@ -1,15 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Octopus.Server.Extensibility.JiraIntegration</RootNamespace>
     <AssemblyName>Octopus.Server.Extensibility.JiraIntegration</AssemblyName>
     <Description>Implements the Jira Integration and Jira Service Desk.</Description>
     <NeutralLanguage>en-US</NeutralLanguage>
     <Authors>Octopus Deploy</Authors>
-    <PackageId>Octopus.Server.Extensibility.JiraIntegration</PackageId>
-    <PackageIconUrl>http://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
-    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <Company>Octopus Deploy Pty. Ltd.</Company>
+    <PackageIconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
+    <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIntegration</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/OctopusDeploy/JiraIntegration</RepositoryUrl>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>

@@ -1,0 +1,51 @@
+name: Build, Test, Package and Push
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on pull request events and merges/pushes to main
+  push:
+  schedule:
+    - cron: '0 0 * * *'
+    # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0 # all
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.x
+
+      - name: Configure GitHub package source 🐙
+        id: package-source
+        shell: bash
+        run: dotnet nuget update source GitHub --username USERNAME --password ${{ secrets.GITHUB_TOKEN }} --store-password-in-clear-text
+
+      - name: Nuke Build 🏗
+        id: build
+        env:
+          OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head branch
+          OCTOVERSION_Patch: ${{ github.run_number }}
+        shell: bash
+        run: ./build.sh --verbosity verbose
+
+      - name: Push package to GitHub 🐙
+        id: push-github
+        if: startsWith(github.ref, 'dependabot') == false && github.event_name != 'schedule'
+        shell: bash
+        run: dotnet nuget push artifacts/**/*.nupkg --api-key ${{ secrets.GITHUB_TOKEN }} --source "GitHub"
+
+      - name: Push package to feed 🐙
+        id: push-feed
+        if: startsWith(github.ref, 'dependabot') == false && github.event_name != 'schedule'
+        shell: bash
+        env:
+          FEED_API_KEY: ${{ secrets.FEED_API_KEY }}
+          FEED_SOURCE: ${{ secrets.FEED_SOURCE }}
+        run: dotnet nuget push artifacts/**/*.nupkg --api-key "$FEED_API_KEY" --source "$FEED_SOURCE"
