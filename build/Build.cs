@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Nuke.Common;
 using Nuke.Common.CI;
@@ -81,6 +82,10 @@ class Build : NukeBuild
         {
             Logger.Info("Packing Jira Integration v{0}", OctoVersionInfo.FullSemVer);
 
+            // This is done to pass the data to github actions
+            Console.Out.WriteLine($"::set-output name=semver::{OctoVersionInfo.FullSemVer}");
+            Console.Out.WriteLine($"::set-output name=prerelease_tag::{OctoVersionInfo.PreReleaseTagWithDash}");
+            
             DotNetPack(_ => _
                 .SetProject(Solution)
                 .SetVersion(OctoVersionInfo.FullSemVer)
