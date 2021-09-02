@@ -95,7 +95,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-            var releaseNote = issue.Fields.Comments.Comments.SelectMany(x => x.Body?.Content.SelectMany(b => b.Content).Select(x => x.Text)).Where(x => !(x is null)).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
+            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, "")?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
