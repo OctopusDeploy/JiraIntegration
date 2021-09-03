@@ -9,10 +9,10 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
-    class JiraConnectAppClient
+    internal class JiraConnectAppClient
     {
-        private readonly IInstallationIdProvider installationIdProvider;
         private readonly IJiraConfigurationStore configurationStore;
+        private readonly IInstallationIdProvider installationIdProvider;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppClient(
@@ -43,20 +43,21 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 
                 if (result.IsSuccessStatusCode)
                 {
-                    var authTokenFromConnectApp = JsonConvert.DeserializeObject<JsonTokenData>(result.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+                    var authTokenFromConnectApp =
+                        JsonConvert.DeserializeObject<JsonTokenData>(result.Content.ReadAsStringAsync().GetAwaiter()
+                            .GetResult());
                     return authTokenFromConnectApp.Token;
                 }
 
-                log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}", result.StatusCode);
+                log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}",
+                    result.StatusCode);
                 return null;
             }
         }
 
-        class JsonTokenData
+        private class JsonTokenData
         {
-            [JsonProperty("token")]
-            public string Token { get; set; } = string.Empty;
+            [JsonProperty("token")] public string Token { get; set; } = string.Empty;
         }
-
     }
 }

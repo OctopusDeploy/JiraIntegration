@@ -14,20 +14,30 @@ using Octopus.Server.MessageContracts.Features.IssueTrackers;
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
     [TestFixture]
-    class WorkItemLinkMapperScenarios
+    internal class WorkItemLinkMapperScenarios
     {
-        [TestCase("JRE-1234", "Release note:", "Release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "Release note:", "release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "release note:", "Release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "release note:", "release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "Release note:", "Release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "release note:", "Release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "Release note:", "release note: This is the release note", ExpectedResult = "This is the release note")]
-        [TestCase("JRE-1234", "release note:", "release note: This is the release note", ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "Release note:", "Release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "Release note:", "release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "release note:", "Release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "release note:", "release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "Release note:", "Release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "release note:", "Release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "Release note:", "release note: This is the release note",
+            ExpectedResult = "This is the release note")]
+        [TestCase("JRE-1234", "release note:", "release note: This is the release note",
+            ExpectedResult = "This is the release note")]
         [TestCase("JRE-1234", "Release note:", "This is not a release note", ExpectedResult = "Test title")]
         [TestCase("JRE-1234", "", "Release note: This is a release note", ExpectedResult = "Test title")]
-        [TestCase("JRE-1234", "Release note:", "Release notes: This is the release note", ExpectedResult = "Test title")]
-        [TestCase("JRE-1234", "Release note:", "release notes: This is the release note", ExpectedResult = "Test title")]
+        [TestCase("JRE-1234", "Release note:", "Release notes: This is the release note",
+            ExpectedResult = "Test title")]
+        [TestCase("JRE-1234", "Release note:", "release notes: This is the release note",
+            ExpectedResult = "Test title")]
         public string GetWorkItemDescription(string linkData, string releaseNotePrefix, string releaseNote)
         {
             var store = Substitute.For<IJiraConfigurationStore>();
@@ -42,7 +52,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments
                     {
                         Total = 1,
-                        Comments = new []
+                        Comments = new[]
                         {
                             new JiraIssueComment
                             {
@@ -52,9 +62,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     }
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] { jiraIssue }});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new[] { jiraIssue } });
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>())
+                .GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
 
         [Test]
@@ -75,20 +86,25 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] {jiraIssue}});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new[] { jiraIssue } });
 
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
+            var mapper =
+                new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {
-                Commits = new Commit[]
+                Commits = new[]
                 {
-                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"},
-                    new Commit { Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234"}
+                    new() { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234" },
+                    new Commit
+                    {
+                        Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234"
+                    }
                 }
             });
 
-            Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id, "Single work item should be returned");
+            Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id,
+                "Single work item should be returned");
         }
 
         [Test]
@@ -109,19 +125,21 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] { jiraIssue }});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new[] { jiraIssue } });
 
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
+            var mapper =
+                new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {
-                Commits = new Commit[]
+                Commits = new[]
                 {
-                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"}
+                    new() { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234" }
                 }
             });
 
-            Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source, "Source should be set");
+            Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source,
+                "Source should be set");
         }
 
         [Test]
@@ -142,15 +160,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new [] { jiraIssue }});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResult { Issues = new[] { jiraIssue } });
 
-            var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
+            var mapper =
+                new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
             var workItems = mapper.Map(new OctopusBuildInformation
             {
-                Commits = new Commit[]
+                Commits = new[]
                 {
-                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234"}
+                    new() { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234" }
                 }
             });
 

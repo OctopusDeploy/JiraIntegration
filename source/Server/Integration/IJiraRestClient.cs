@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
-    interface IJiraRestClient
+    internal interface IJiraRestClient
     {
         Task<ConnectivityCheckResponse> ConnectivityCheck();
         Task<JiraSearchResult?> GetIssues(string[] workItemId);

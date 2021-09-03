@@ -2,7 +2,7 @@ using System;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraDeploymentException : Exception
+    internal class JiraDeploymentException : Exception
     {
         public JiraDeploymentException(string message)
             : base(message)
