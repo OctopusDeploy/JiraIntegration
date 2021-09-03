@@ -1,6 +1,6 @@
 name: Build, Test, Package and Push
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on pull request events and merges/pushes to main
   push:
@@ -32,6 +32,9 @@ jobs:
         env:
           OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head branch
           OCTOVERSION_Patch: ${{ github.run_number }}
+          JiraIntegration_E2E_BaseUrl: ${{ secrets.JIRA_BASE_URL }}
+          JiraIntegration_E2E_Username: ${{ secrets.JIRA_USERNAME }}
+          JiraIntegration_E2E_AuthToken: ${{ secrets.JIRA_AUTH_TOKEN }}
         shell: bash
         run: ./build.sh --verbosity verbose
 
