@@ -25,6 +25,8 @@ class Build : NukeBuild, IExtensionBuild
 {
     public string TargetPackageDescription => "JiraIntegration";
 
+    public string TestFilter => "FullyQualifiedName~.Tests";
+
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     public Enumeration Config => Configuration.Release;
     /// Support plugins are available for:
