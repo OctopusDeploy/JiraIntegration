@@ -150,33 +150,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     class JiraIssueComment
     {
         [JsonProperty("body")]
-        public JiraDoc? Body { get; set; }
-    }
-
-    class JiraDoc
-    {
-        [JsonProperty("type")]
-        public string Type { get; set; } = string.Empty;
-
-        [JsonProperty("content")]
-        public IEnumerable<JiraDocContent> Content { get; set; } = new JiraDocContent[0];
-    }
-
-    class JiraDocContent
-    {
-        [JsonProperty("type")]
-        public string Type { get; set; } = string.Empty;
-
-        [JsonProperty("content")]
-        public IEnumerable<JiraDocContentElement> Content { get; set; } = new JiraDocContentElement[0];
-    }
-
-    class JiraDocContentElement
-    {
-        [JsonProperty("type")]
-        public string Type { get; set; } = string.Empty;
-        [JsonProperty("text")]
-        public string Text { get; set; } = string.Empty;
+        public string? Body { get; set; }
     }
 
     class PermissionSettingsContainer

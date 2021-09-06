@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>Octopus.Server.Extensibility.JiraIntegration.E2E.Tests</RootNamespace>
+        <AssemblyName>Octopus.Server.Extensibility.JiraIntegration.E2E.Tests</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />
+        <PackageReference Include="NSubstitute" Version="3.1.0" />
+        <PackageReference Include="NUnit" Version="3.13.1" />
+        <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
+        <PackageReference Include="Octopus.Server.Extensibility" Version="14.0.1" />
+        <PackageReference Include="Octopus.Server.Extensibility.JiraIntegration" Version="8.3.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Server\Server.csproj" />
+    </ItemGroup>
+</Project>
