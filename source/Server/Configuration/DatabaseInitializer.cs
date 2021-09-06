@@ -4,10 +4,10 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class DatabaseInitializer : ExecuteWhenDatabaseInitializes
+    internal class DatabaseInitializer : ExecuteWhenDatabaseInitializes
     {
-        readonly ISystemLog systemLog;
-        readonly IConfigurationStore configurationStore;
+        private readonly IConfigurationStore configurationStore;
+        private readonly ISystemLog systemLog;
 
         public DatabaseInitializer(ISystemLog systemLog, IConfigurationStore configurationStore)
         {
@@ -35,7 +35,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
             configurationStore.Create(doc);
         }
 
-        class JiraConfigurationWithSettableId : JiraConfiguration
+        private class JiraConfigurationWithSettableId : JiraConfiguration
         {
             public new string Id { get; set; } = string.Empty;
         }
