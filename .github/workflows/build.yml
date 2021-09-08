@@ -4,8 +4,13 @@ name: Build, Test, Package and Push
 on:
   # Triggers the workflow on pull request events and merges/pushes to main
   push:
+    branches:
+      - '**'
+    tags-ignore:
+      - '**'
   schedule:
-    - cron: '0 0 * * *'
+    # Daily 5am australian/brisbane time
+    - cron: '19 0 * * *'
     # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -52,3 +57,17 @@ jobs:
           FEED_API_KEY: ${{ secrets.FEED_API_KEY }}
           FEED_SOURCE: ${{ secrets.FEED_SOURCE }}
         run: dotnet nuget push artifacts/**/*.nupkg --api-key "$FEED_API_KEY" --source "$FEED_SOURCE"
+
+      - name: GitHub Tag 🏷
+        id: github-tag
+        uses: actions/github-script@v3
+        if: github.actor != 'dependabot[bot]' && github.actor != 'dependabot-preview[bot]' && github.event_name != 'schedule' && steps.build.outputs.prerelease_tag == ''
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ steps.build.outputs.semver }}",
+              sha: context.sha
+            })
