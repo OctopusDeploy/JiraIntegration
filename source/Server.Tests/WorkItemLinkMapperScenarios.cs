@@ -46,21 +46,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                         {
                             new JiraIssueComment
                             {
-                                Body = new JiraDoc
-                                {
-                                    Content = new []
-                                    {
-                                        new JiraDocContent {
-                                            Content = new []
-                                            {
-                                                new JiraDocContentElement
-                                                {
-                                                    Text = releaseNote
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
+                                Body = releaseNote
                             }
                         }
                     }
