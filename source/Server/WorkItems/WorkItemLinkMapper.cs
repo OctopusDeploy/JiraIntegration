@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Octopus.Diagnostics;
@@ -12,11 +11,11 @@ using Octopus.Server.MessageContracts.Features.IssueTrackers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
-    class WorkItemLinkMapper : IWorkItemLinkMapper
+    internal class WorkItemLinkMapper : IWorkItemLinkMapper
     {
-        private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;
         private readonly Lazy<IJiraRestClient> jira;
+        private readonly IJiraConfigurationStore store;
         private readonly ISystemLog systemLog;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
@@ -50,24 +49,21 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             if (workItemIds.Length == 0)
                 return ResultFromExtension<WorkItemLink[]>.Success(new WorkItemLink[0]);
 
-            return ResultFromExtension<WorkItemLink[]>.Success(ConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl));
+            return ResultFromExtension<WorkItemLink[]>.Success(ConvertWorkItemLinks(workItemIds, releaseNotePrefix,
+                baseUrl));
         }
 
         private WorkItemLink[] ConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
         {
             var issues = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
-            if (issues == null || issues.Issues.Length == 0)
-            {
-                return new WorkItemLink[0];
-            }
+            if (issues == null || issues.Issues.Length == 0) return new WorkItemLink[0];
 
             var issueMap = issues.Issues.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
             var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
             if (workItemsNotFound.Length > 0)
-            {
-                systemLog.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
-            }
+                systemLog.Warn(
+                    $"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
 
             return workItemIds
                 .Where(workItemId => issueMap.ContainsKey(workItemId))
@@ -95,7 +91,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
+            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null)
+                .LastOrDefault(c => releaseNoteRegex.IsMatch(c));
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, "")?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
