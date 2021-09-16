@@ -8,7 +8,6 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.HostServices.Licensing;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
-using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
@@ -57,6 +56,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     return null;
                 }
                 catch (HttpRequestException e)
+                {
+                    log.ErrorFormat("Unable to get authentication token for Jira Connect App. Reason: {0}", e.Message);
+                    return null;
+                }
+                catch (TaskCanceledException e)
                 {
                     log.ErrorFormat("Unable to get authentication token for Jira Connect App. Reason: {0}", e.Message);
                     return null;

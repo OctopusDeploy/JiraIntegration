@@ -80,23 +80,47 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     $"Failed to connect to {baseUrl}. Reason: {e.Message}");
                 return connectivityCheckResponse;
             }
+            catch (TaskCanceledException e)
+            {
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                    $"Failed to connect to {baseUrl}. Reason: {e.Message}");
+                return connectivityCheckResponse;
+            }
         }
 
         public async Task<JiraSearchResult?> GetIssues(string[] workItemIds)
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
-            var content = JsonConvert.SerializeObject(new { jql = workItemQuery, fields = new [] { "summary", "comment" }, maxResults = 10000 });
-            var response =
-                await httpClient.PostAsync($"{baseUrl}/{baseApiUri}/search", new StringContent(content, Encoding.UTF8, "application/json"));
-            if (response.IsSuccessStatusCode)
+            var content = JsonConvert.SerializeObject(new
+                { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000 });
+            try
             {
-                var result = await GetResult<JiraSearchResult>(response);
-                systemLog.Info($"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
-                return result;
+                var response =
+                    await httpClient.PostAsync($"{baseUrl}/{baseApiUri}/search",
+                        new StringContent(content, Encoding.UTF8, "application/json"));
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await GetResult<JiraSearchResult>(response);
+                    systemLog.Info(
+                        $"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
+                    return result;
+                }
+
+                var msg =
+                    $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                systemLog.Warn(msg);
+            }
+            catch (HttpRequestException e)
+            {
+                var msg = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
+                systemLog.Warn(msg);
+            }
+            catch (TaskCanceledException e)
+            {
+                var msg = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
+                systemLog.Warn(msg);
             }
 
-            var msg = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
-            systemLog.Warn(msg);
             return null;
         }
 
@@ -104,7 +128,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             var content = await response.Content.ReadAsStringAsync();
             try
-
             {
                 var result = JsonConvert.DeserializeObject<TResult>(content);
                 return result;
