@@ -37,37 +37,49 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             var connectivityCheckResponse = new ConnectivityCheckResponse();
             // make sure the user can authenticate
-            var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/myself");
-            if (response.IsSuccessStatusCode)
+            try
             {
-                // make sure the user has browse projects permission
-                response = await httpClient.GetAsync(
-                    $"{baseUrl}/{baseApiUri}/mypermissions?permissions={BrowseProjectsKey}");
+                var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/myself");
                 if (response.IsSuccessStatusCode)
                 {
-                    var jsonContent = await response.Content.ReadAsStringAsync();
-                    var permissionsContainer = JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
-
-                    if (!permissionsContainer.Permissions.ContainsKey(BrowseProjectsKey))
+                    // make sure the user has browse projects permission
+                    response = await httpClient.GetAsync(
+                        $"{baseUrl}/{baseApiUri}/mypermissions?permissions={BrowseProjectsKey}");
+                    if (response.IsSuccessStatusCode)
                     {
-                        connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                        var jsonContent = await response.Content.ReadAsStringAsync();
+                        var permissionsContainer =
+                            JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
+
+                        if (!permissionsContainer.Permissions.ContainsKey(BrowseProjectsKey))
+                        {
+                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                                $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                            return connectivityCheckResponse;
+                        }
+
+                        var setting = permissionsContainer.Permissions[BrowseProjectsKey];
+                        if (!setting.HavePermission)
+                        {
+                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                                $"User does not have the '{setting.Name}' permission in Jira");
+                            return connectivityCheckResponse;
+                        }
+
                         return connectivityCheckResponse;
                     }
-
-                    var setting = permissionsContainer.Permissions[BrowseProjectsKey];
-                    if (!setting.HavePermission)
-                    {
-                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, $"User does not have the '{setting.Name}' permission in Jira");
-                            return connectivityCheckResponse;
-                    }
-
-                    return connectivityCheckResponse;
                 }
-            }
 
-            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $"Reason: {response.ReasonPhrase}" : "")}");
-            return connectivityCheckResponse;
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                    $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" Reason: {response.ReasonPhrase}" : "")}");
+                return connectivityCheckResponse;
+            }
+            catch (HttpRequestException e)
+            {
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                    $"Failed to connect to {baseUrl}. Reason: {e.Message}");
+                return connectivityCheckResponse;
+            }
         }
 
         public async Task<JiraSearchResult?> GetIssues(string[] workItemIds)

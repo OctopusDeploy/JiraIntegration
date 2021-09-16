@@ -94,7 +94,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             var taskLogBlock = taskLogFactory.CreateBlock(taskLog, $"Sending Jira state update - {eventType}");
 
             // get token from connect App
-            var token = connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock);
+            var token = await connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock);
             if (token is null)
             {
                 taskLogFactory.Finish(taskLogBlock);

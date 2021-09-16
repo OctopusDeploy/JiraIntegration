@@ -12,6 +12,7 @@
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0" />
         <PackageReference Include="Octopus.Server.Extensibility" Version="14.0.1" />
         <PackageReference Include="Octopus.Server.Extensibility.JiraIntegration" Version="8.3.4" />
+        <PackageReference Include="Shouldly" Version="4.0.3" />
     </ItemGroup>
 
     <ItemGroup>
