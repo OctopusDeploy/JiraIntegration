@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Octopus.Diagnostics;
@@ -48,20 +47,29 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             var releaseNotePrefix = store.GetReleaseNotePrefix();
             var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
             if (workItemIds.Length == 0)
-                return ResultFromExtension<WorkItemLink[]>.Success(new WorkItemLink[0]);
+                return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
 
-            return ResultFromExtension<WorkItemLink[]>.Success(ConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl));
+            var (isSuccess, errorMessage) = TryConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl, out var links);
+            return isSuccess ? ResultFromExtension<WorkItemLink[]>.Success(links) : ResultFromExtension<WorkItemLink[]>.Failed(errorMessage);
         }
 
-        private WorkItemLink[] ConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
+        private (bool isSuccess, string? errorMessage) TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl, out WorkItemLink[] links)
         {
-            var issues = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
-            if (issues == null || issues.Issues.Length == 0)
+            var response = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
+
+            if (!response.IsSuccess)
             {
-                return new WorkItemLink[0];
+                links = Array.Empty<WorkItemLink>();
+                return (false, response.ErrorMessage);
             }
 
-            var issueMap = issues.Issues.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
+            if (response.Result.Issues.Length == 0)
+            {
+                links = Array.Empty<WorkItemLink>();
+                return (true, null);
+            }
+
+            var issueMap = response.Result.Issues.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
             var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
             if (workItemsNotFound.Length > 0)
@@ -69,7 +77,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 systemLog.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
             }
 
-            return workItemIds
+            links = workItemIds
                 .Where(workItemId => issueMap.ContainsKey(workItemId))
                 .Select(workItemId =>
                 {
@@ -86,6 +94,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 // ReSharper disable once RedundantEnumerableCastCall
                 .Cast<WorkItemLink>() // cast back from `WorkItemLink?` type to keep the compiler happy
                 .ToArray();
+
+            return (true, null);
         }
 
         public string GetReleaseNote(JiraIssue issue, string? releaseNotePrefix)

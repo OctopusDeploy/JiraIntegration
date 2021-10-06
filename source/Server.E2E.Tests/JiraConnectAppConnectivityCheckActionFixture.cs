@@ -47,49 +47,47 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public async Task WhenProxyAuthenticationIsRequired()
         {
-            using (var proxyServer = new ProxyServer())
+            using var proxyServer = new ProxyServer();
+            const int port = 12312;
+
+            var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, port, false);
+            proxyServer.AddEndPoint(explicitEndPoint);
+            // Fake authentication failure for proxy
+            proxyServer.ProxySchemeAuthenticateFunc = (d, s, arg3) => Task.FromResult(new ProxyAuthenticationContext { Result = ProxyAuthenticationResult.Failure});
+            proxyServer.ProxyAuthenticationSchemes = new[] {"basic"};
+            proxyServer.Start();
+            var baseUrl = "http://notexistingdomain.dddd.ttt";
+
+            httpClientFactory.CreateClient().Returns(_ =>
             {
-                const int port = 12312;
-
-                var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, port, false);
-                proxyServer.AddEndPoint(explicitEndPoint);
-                // Fake authentication failure for proxy
-                proxyServer.ProxySchemeAuthenticateFunc = (d, s, arg3) => Task.FromResult(new ProxyAuthenticationContext { Result = ProxyAuthenticationResult.Failure});
-                proxyServer.ProxyAuthenticationSchemes = new[] {"basic"};
-                proxyServer.Start();
-                var baseUrl = "http://notexistingdomain.dddd.ttt";
-
-                httpClientFactory.CreateClient().Returns(_ =>
+                var httpClient = new HttpClient(new HttpClientHandler {Proxy = new WebProxy("127.0.0.1", port)})
                 {
-                    var httpClient = new HttpClient(new HttpClientHandler {Proxy = new WebProxy("127.0.0.1", port)})
-                    {
-                        BaseAddress = new Uri(baseUrl),
-                    };
+                    BaseAddress = new Uri(baseUrl),
+                };
 
-                    httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                        Convert.ToBase64String(Encoding.UTF8.GetBytes("username:authToken")));
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                    Convert.ToBase64String(Encoding.UTF8.GetBytes("username:authToken")));
 
-                    return httpClient;
-                });
+                return httpClient;
+            });
 
-                var installationIdProvider = Substitute.For<IInstallationIdProvider>();
-                installationIdProvider.GetInstallationId().Returns(Guid.NewGuid());
+            var installationIdProvider = Substitute.For<IInstallationIdProvider>();
+            installationIdProvider.GetInstallationId().Returns(Guid.NewGuid());
 
-                store.GetConnectAppUrl().Returns(baseUrl);
+            store.GetConnectAppUrl().Returns(baseUrl);
 
-                var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
-                var octoRequest = Substitute.For<IOctoRequest>();
-                octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
-                    .Returns(new JiraConnectAppConnectionCheckData
-                        { BaseUrl = baseUrl, Password = "Does not matter" });
+            var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
+            var octoRequest = Substitute.For<IOctoRequest>();
+            octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
+                .Returns(new JiraConnectAppConnectionCheckData
+                    { BaseUrl = baseUrl, Password = "Does not matter" });
 
-                var response = await action.ExecuteAsync(octoRequest);
+            var response = await action.ExecuteAsync(octoRequest);
 
-                var connectivityCheckResponse = (ConnectivityCheckResponse)((OctoDataResponse)response.Response).Model;
+            var connectivityCheckResponse = (ConnectivityCheckResponse)((OctoDataResponse)response.Response).Model;
 
-                connectivityCheckResponse.Messages.ShouldNotBeEmpty();
-                connectivityCheckResponse.Messages.First().Message.ShouldBe("Failed to get authentication token from Jira Connect App.");
-            }
+            connectivityCheckResponse.Messages.ShouldNotBeEmpty();
+            connectivityCheckResponse.Messages.First().Message.ShouldBe("Failed to get authentication token from Jira Connect App.");
         }
     }
 }
