@@ -57,7 +57,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 return Result.Response(connectivityCheckResponse);
             }
 
-            var token = connectAppClient.GetAuthTokenFromConnectApp(username, password, systemLog);
+            var token = await connectAppClient.GetAuthTokenFromConnectApp(username, password, systemLog);
             if (token is null)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Failed to get authentication token from Jira Connect App.");
@@ -94,16 +94,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
         }
 
 #nullable disable
-        class JiraConnectAppConnectionCheckData
-        {
-            public string BaseUrl { get; set; }
-            public string Password { get; set; }
-        }
-
         private class JiraConnectAppConnectivityCheckRequest
         {
             public string BaseHostUrl { get; set; } = string.Empty;
             public string OctopusInstallationId { get; set; } = string.Empty;
         }
+    }
+
+    class JiraConnectAppConnectionCheckData
+    {
+        public string BaseUrl { get; set; }
+        public string Password { get; set; }
     }
 }
