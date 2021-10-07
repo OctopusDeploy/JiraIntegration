@@ -9,6 +9,7 @@ using Newtonsoft.Json;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.Resources.Configuration;
+using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
@@ -88,7 +89,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             }
         }
 
-        public async Task<JiraSearchResponse> GetIssues(string[] workItemIds)
+        public async Task<IResultFromExtension<JiraIssue[]>> GetIssues(string[] workItemIds)
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
             var content = JsonConvert.SerializeObject(new
@@ -103,7 +104,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     var result = await GetResult<JiraSearchResult>(response);
                     systemLog.Info(
                         $"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
-                    return new JiraSearchResponse { IsSuccess = true, Result = result };
+                    return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
                 }
 
                 errorMessage =
@@ -119,7 +120,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             }
             systemLog.Warn(errorMessage);
 
-            return new JiraSearchResponse { IsSuccess = false, ErrorMessage = errorMessage };
+            return ResultFromExtension<JiraIssue[]>.Failed(errorMessage);
         }
 
         async Task<TResult> GetResult<TResult>(HttpResponseMessage response)
@@ -152,13 +153,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             httpClient.Dispose();
         }
-    }
-
-    class JiraSearchResponse
-    {
-        public bool IsSuccess { get; set; }
-        public string? ErrorMessage { get; set; }
-        public JiraSearchResult? Result { get; set; }
     }
 
     class JiraSearchResult

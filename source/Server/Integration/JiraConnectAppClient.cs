@@ -27,11 +27,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        public Task<string?> GetAuthTokenFromConnectApp(ILog log)
+        public async Task<string?> GetAuthTokenFromConnectApp(ILog log)
         {
             var username = installationIdProvider.GetInstallationId().ToString();
             var password = configurationStore.GetConnectAppPassword();
-            return GetAuthTokenFromConnectApp(username, password?.Value, log);
+            return await GetAuthTokenFromConnectApp(username, password?.Value, log);
         }
 
         public async Task<string?> GetAuthTokenFromConnectApp(string username, string? password, ILog log)

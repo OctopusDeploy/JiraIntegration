@@ -8,6 +8,7 @@ using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
+using Octopus.Server.Extensibility.Results;
 using Octopus.Server.MessageContracts.Features.BuildInformation;
 using Octopus.Server.MessageContracts.Features.IssueTrackers;
 
@@ -52,7 +53,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     }
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResponse {IsSuccess = true, Result = new JiraSearchResult { Issues = new [] { jiraIssue }}});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
 
             return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
@@ -75,7 +76,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResponse {IsSuccess = true, Result = new JiraSearchResult { Issues = new [] {jiraIssue}}});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] {jiraIssue}));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
@@ -109,7 +110,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResponse {IsSuccess = true, Result = new JiraSearchResult { Issues = new [] { jiraIssue }}});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
@@ -142,7 +143,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(new JiraSearchResponse {IsSuccess = true, Result = new JiraSearchResult { Issues = new [] { jiraIssue }}});
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
