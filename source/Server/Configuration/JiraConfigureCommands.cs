@@ -5,10 +5,10 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class JiraConfigureCommands : IContributeToConfigureCommand
+    internal class JiraConfigureCommands : IContributeToConfigureCommand
     {
-        readonly ISystemLog systemLog;
-        readonly Lazy<IJiraConfigurationStore> jiraConfiguration;
+        private readonly Lazy<IJiraConfigurationStore> jiraConfiguration;
+        private readonly ISystemLog systemLog;
 
         public JiraConfigureCommands(
             ISystemLog systemLog,
@@ -26,16 +26,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
                 jiraConfiguration.Value.SetIsEnabled(isEnabled);
                 systemLog.Info($"Jira Integration IsEnabled set to: {isEnabled}");
             });
-            yield return new ConfigureCommandOption("jiraBaseUrl=", JiraConfigurationResource.JiraBaseUrlDescription, v =>
-            {
-                jiraConfiguration.Value.SetBaseUrl(v);
-                systemLog.Info($"Jira Integration base Url set to: {v}");
-            });
+            yield return new ConfigureCommandOption("jiraBaseUrl=", JiraConfigurationResource.JiraBaseUrlDescription,
+                v =>
+                {
+                    jiraConfiguration.Value.SetBaseUrl(v);
+                    systemLog.Info($"Jira Integration base Url set to: {v}");
+                });
             yield return new ConfigureCommandOption("jiraConnectAppUrl=", "Set the URL for the Jira Connect App", v =>
             {
                 jiraConfiguration.Value.SetConnectAppUrl(v);
                 systemLog.Info($"Jira Integration ConnectAppUrl set to: {v}");
-            }, hide: true);
+            }, true);
         }
     }
 }
