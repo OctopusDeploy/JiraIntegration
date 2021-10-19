@@ -61,22 +61,22 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        bool JiraIntegrationUnavailable(DeploymentResource deployment)
+        async Task<bool> JiraIntegrationUnavailable(CancellationToken cancellationToken)
         {
-            return !store.GetIsEnabled() ||
-                   store.GetJiraInstanceType() == JiraInstanceType.Server;
+            return !await store.GetIsEnabled(cancellationToken) ||
+                   await store.GetJiraInstanceType(cancellationToken) == JiraInstanceType.Server;
         }
 
         public async Task PublishToJira(string eventType, DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment,
             ITaskLog taskLog, CancellationToken cancellationToken)
         {
-            if (JiraIntegrationUnavailable(deployment))
+            if (await JiraIntegrationUnavailable(cancellationToken))
             {
                 jiraApiDeployment.HandleJiraIntegrationIsUnavailable();
                 return;
             }
 
-            var serverUri = serverConfigurationStore.GetServerUri()?.TrimEnd('/');
+            var serverUri = (await serverConfigurationStore.GetServerUriAsync(cancellationToken))?.TrimEnd('/');
 
             if (string.IsNullOrWhiteSpace(serverUri))
             {
@@ -84,8 +84,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
-                string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
+            if (string.IsNullOrWhiteSpace(await store.GetConnectAppUrl(cancellationToken)) ||
+                string.IsNullOrWhiteSpace((await store.GetConnectAppPassword(cancellationToken))?.Value))
             {
                 taskLog.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                 return;
@@ -94,7 +94,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             var taskLogBlock = taskLogFactory.CreateBlock(taskLog, $"Sending Jira state update - {eventType}");
 
             // get token from connect App
-            var token = await connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock);
+            var token = await connectAppClient.GetAuthTokenFromConnectApp(taskLogBlock, cancellationToken);
             if (token is null)
             {
                 taskLogFactory.Finish(taskLogBlock);
@@ -111,7 +111,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             var data = await PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment, cancellationToken);
 
             // Push data to Jira
-            await SendToJira(token, data, deployment, taskLogBlock);
+            await SendToJira(token, data, deployment, taskLogBlock, cancellationToken);
 
             taskLogFactory.Finish(taskLogBlock);
         }
@@ -125,8 +125,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
             return new OctopusJiraPayloadData
             {
-                InstallationId = installationIdProvider.GetInstallationId().ToString(),
-                BaseHostUrl = store.GetBaseUrl() ?? string.Empty,
+                InstallationId = (await installationIdProvider.GetInstallationIdAsync(cancellationToken)).ToString(),
+                BaseHostUrl = await store.GetBaseUrl(cancellationToken) ?? string.Empty,
                 DeploymentsInfo = new JiraPayloadData
                 {
                     Deployments = new[]
@@ -168,7 +168,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             };
         }
 
-        async Task SendToJira(string token, OctopusJiraPayloadData data, DeploymentResource deployment, ITaskLog taskLogBlock)
+        async Task SendToJira(string token, OctopusJiraPayloadData data, DeploymentResource deployment, ITaskLog taskLogBlock, CancellationToken cancellationToken)
         {
             taskLogBlock.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment?.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
 
@@ -180,7 +180,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
                 var httpContent = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var result = await client.PostAsync($"{store.GetConnectAppUrl()}/relay/bulk", httpContent);
+                var result = await client.PostAsync($"{store.GetConnectAppUrl(cancellationToken)}/relay/bulk", httpContent);
 
                 if (!result.IsSuccessStatusCode)
                 {

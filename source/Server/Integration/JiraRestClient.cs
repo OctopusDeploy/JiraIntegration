@@ -4,50 +4,60 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Nito.AsyncEx;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
+using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.Resources.Configuration;
 using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
-    class JiraRestClient : IJiraRestClient, IDisposable
+    class JiraRestClient : IJiraRestClient, IAsyncDisposable
     {
-        const string BrowseProjectsKey = "BROWSE_PROJECTS";
+        private const string BrowseProjectsKey = "BROWSE_PROJECTS";
+        private const string BaseApiUri = "rest/api/2";
 
-        private readonly AuthenticationHeaderValue authorizationHeader;
-        private readonly HttpClient httpClient;
-
-        private readonly string baseUrl;
+        private readonly AsyncLazy<HttpClient> lazyClient;
         private readonly ISystemLog systemLog;
-        private readonly string baseApiUri = "rest/api/2";
 
-        public JiraRestClient(string baseUrl, string username, string? password, ISystemLog systemLog,
+        public JiraRestClient(IJiraConfigurationStore store, ISystemLog systemLog,
             IOctopusHttpClientFactory octopusHttpClientFactory)
         {
-            this.baseUrl = baseUrl;
             this.systemLog = systemLog;
-            authorizationHeader = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
-            httpClient = CreateHttpClient(octopusHttpClientFactory);
+
+            lazyClient = new AsyncLazy<HttpClient>(() => CreateHttpClient(octopusHttpClientFactory, store), AsyncLazyFlags.ExecuteOnCallingThread);
         }
 
-        public async Task<ConnectivityCheckResponse> ConnectivityCheck()
+        public JiraRestClient(string baseUrl, string username, string password, ISystemLog systemLog,
+            IOctopusHttpClientFactory octopusHttpClientFactory)
+        {
+            this.systemLog = systemLog;
+
+            lazyClient = new AsyncLazy<HttpClient>(() => CreateHttpClient(octopusHttpClientFactory, baseUrl, username, password), AsyncLazyFlags.ExecuteOnCallingThread);
+        }
+
+        public async Task<ConnectivityCheckResponse> ConnectivityCheck(CancellationToken cancellationToken)
         {
             var connectivityCheckResponse = new ConnectivityCheckResponse();
+
+            var httpClient = await lazyClient;
+
             // make sure the user can authenticate
             try
             {
-                using var response = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/myself");
+
+                using var response =  await httpClient.GetAsync($"{httpClient.BaseAddress}{BaseApiUri}/myself", cancellationToken);
                 if (response.IsSuccessStatusCode)
                 {
                     // make sure the user has browse projects permission
-                    using var httpResponseMessage = await httpClient.GetAsync($"{baseUrl}/{baseApiUri}/mypermissions?permissions={BrowseProjectsKey}");
+                    using var httpResponseMessage = await httpClient.GetAsync($"{httpClient.BaseAddress}{BaseApiUri}/mypermissions?permissions={BrowseProjectsKey}", cancellationToken);
                     if (response.IsSuccessStatusCode)
                     {
-                        var jsonContent = await httpResponseMessage.Content.ReadAsStringAsync();
+                        var jsonContent = await httpResponseMessage.Content.ReadAsStringAsync(cancellationToken);
                         var permissionsContainer =
                             JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
 
@@ -71,61 +81,62 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 }
 
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                    $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" Reason: {response.ReasonPhrase}" : "")}");
+                    $"Failed to connect to {httpClient.BaseAddress}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" Reason: {response.ReasonPhrase}" : "")}");
 
                 return connectivityCheckResponse;
             }
             catch (HttpRequestException e)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                    $"Failed to connect to {baseUrl}. Reason: {e.Message}");
+                    $"Failed to connect to {httpClient.BaseAddress}. Reason: {e.Message}");
                 return connectivityCheckResponse;
             }
             catch (TaskCanceledException e)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                    $"Failed to connect to {baseUrl}. Reason: {e.Message}");
+                    $"Failed to connect to {httpClient.BaseAddress}. Reason: {e.Message}");
                 return connectivityCheckResponse;
             }
         }
 
-        public async Task<IResultFromExtension<JiraIssue[]>> GetIssues(string[] workItemIds)
+        public async Task<IResultFromExtension<JiraIssue[]>> GetIssues(string[] workItemIds, CancellationToken cancellationToken)
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
             var content = JsonConvert.SerializeObject(new
                 { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000 });
+            var httpClient = await lazyClient;
 
             string errorMessage;
             try
             {
-                using var response = await httpClient.PostAsync($"{baseUrl}/{baseApiUri}/search", new StringContent(content, Encoding.UTF8, "application/json"));
+                using var response = await httpClient.PostAsync($"{httpClient.BaseAddress}{BaseApiUri}/search", new StringContent(content, Encoding.UTF8, "application/json"), cancellationToken);
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await GetResult<JiraSearchResult>(response);
+                    var result = await GetResult<JiraSearchResult>(response, cancellationToken);
                     systemLog.Info(
                         $"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
                     return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
                 }
 
                 errorMessage =
-                    $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                    $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {httpClient.BaseAddress}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
             }
             catch (HttpRequestException e)
             {
-                errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
+                errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {httpClient.BaseAddress}. (Reason: {e.Message})";
             }
             catch (TaskCanceledException e)
             {
-                errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
+                errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {httpClient.BaseAddress}. (Reason: {e.Message})";
             }
             systemLog.Warn(errorMessage);
 
             return ResultFromExtension<JiraIssue[]>.Failed(errorMessage);
         }
 
-        async Task<TResult> GetResult<TResult>(HttpResponseMessage response)
+        async Task<TResult> GetResult<TResult>(HttpResponseMessage response, CancellationToken cancellationToken)
         {
-            var content = await response.Content.ReadAsStringAsync();
+            var content = await response.Content.ReadAsStringAsync(cancellationToken);
             try
             {
                 var result = JsonConvert.DeserializeObject<TResult>(content);
@@ -141,24 +152,39 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             }
         }
 
-        HttpClient CreateHttpClient(IOctopusHttpClientFactory octopusHttpClientFactory)
+        private static Task<HttpClient> CreateHttpClient(IOctopusHttpClientFactory octopusHttpClientFactory, string baseUrl, string username, string? password)
         {
             var client = octopusHttpClientFactory.CreateClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.DefaultRequestHeaders.Authorization = authorizationHeader;
-            return client;
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+
+            return Task.FromResult(client);
         }
 
-        public void Dispose()
+        private static async Task<HttpClient> CreateHttpClient(IOctopusHttpClientFactory octopusHttpClientFactory,
+            IJiraConfigurationStore store)
         {
-            httpClient.Dispose();
+            var baseUrl = await store.GetBaseUrl(CancellationToken.None);
+            var username = await store.GetJiraUsername(CancellationToken.None);
+            var password = (await store.GetJiraPassword(CancellationToken.None))?.ToString();
+
+            return await CreateHttpClient(octopusHttpClientFactory, baseUrl, username, password);
+        }
+
+        public async ValueTask DisposeAsync()
+        {
+            if (lazyClient.IsStarted)
+            {
+                (await lazyClient).Dispose();
+            }
         }
     }
 
     class JiraSearchResult
     {
         [JsonProperty("issues")]
-        public JiraIssue[] Issues { get; set; } = new JiraIssue[0];
+        public JiraIssue[] Issues { get; set; } = Array.Empty<JiraIssue>();
     }
 
     class JiraIssue

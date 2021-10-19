@@ -14,7 +14,7 @@
     <PackageDownload Include="OctoVersion.Tool" Version="[0.2.645]" />
     <PackageReference Include="Nuke.Common" Version="5.3.0" />
     <PackageDownload Include="JetBrains.ReSharper.GlobalTools" Version="[2021.2.0]" />
-    <PackageReference Include="Octopus.NukeBuildComponents" Version="0.1.29" />
+    <PackageReference Include="Octopus.NukeBuildComponents" Version="0.1.30" />
   </ItemGroup>
 
 </Project>

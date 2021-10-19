@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.CoreUtilities.Extensions;
@@ -56,11 +57,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username, string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
         {
             var store = Substitute.For<IJiraConfigurationStore>();
-            store.GetIsEnabled().Returns(isEnabled);
-            store.GetJiraUsername().Returns(username);
-            store.GetJiraPassword().Returns(authToken.ToSensitiveString());
-            store.GetBaseUrl().Returns(baseUrl);
-            store.GetReleaseNotePrefix().Returns(releaseNotePrefix);
+            store.GetIsEnabled(CancellationToken.None).Returns(isEnabled);
+            store.GetJiraUsername(CancellationToken.None).Returns(username);
+            store.GetJiraPassword(CancellationToken.None).Returns(authToken.ToSensitiveString());
+            store.GetBaseUrl(CancellationToken.None).Returns(baseUrl);
+            store.GetReleaseNotePrefix(CancellationToken.None).Returns(releaseNotePrefix);
             return store;
         }
 

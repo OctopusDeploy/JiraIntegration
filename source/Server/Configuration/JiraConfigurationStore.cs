@@ -1,88 +1,89 @@
-﻿using Octopus.Data.Model;
-using Octopus.Data.Storage.Configuration;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Octopus.Data.Model;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class JiraConfigurationStore : ExtensionConfigurationStore<JiraConfiguration>, IJiraConfigurationStore
+    class JiraConfigurationStore : ExtensionConfigurationStoreAsync<JiraConfiguration>, IJiraConfigurationStore
     {
         public static string CommentParser = "Jira";
         public static string SingletonId = "jira-integration";
 
-        public JiraConfigurationStore(IConfigurationStore configurationStore) : base(configurationStore)
+        public JiraConfigurationStore(IConfigurationStoreAsync configurationStore) : base(configurationStore)
         {
         }
 
         public override string Id => SingletonId;
 
-        public JiraInstanceType GetJiraInstanceType()
+        public async Task<JiraInstanceType> GetJiraInstanceType(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.JiraInstanceType);
+            return await GetProperty(doc => doc.JiraInstanceType, cancellationToken);
         }
 
-        public void SetJiraInstanceType(JiraInstanceType jiraInstanceType)
+        public async Task SetJiraInstanceType(JiraInstanceType jiraInstanceType, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.JiraInstanceType = jiraInstanceType);
+            await SetProperty(doc => doc.JiraInstanceType = jiraInstanceType, cancellationToken);
         }
 
-        public string? GetBaseUrl()
+        public async Task<string?> GetBaseUrl(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.BaseUrl?.Trim('/'));
+            return await GetProperty(doc => doc.BaseUrl?.Trim('/'), cancellationToken);
         }
 
-        public void SetBaseUrl(string? baseUrl)
+        public async Task SetBaseUrl(string? baseUrl, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.BaseUrl = baseUrl?.Trim('/'));
+            await SetProperty(doc => doc.BaseUrl = baseUrl?.Trim('/'), cancellationToken);
         }
 
-        public SensitiveString? GetConnectAppPassword()
+        public async Task<SensitiveString?> GetConnectAppPassword(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.Password);
+            return await GetProperty(doc => doc.Password, cancellationToken);
         }
 
-        public void SetConnectAppPassword(SensitiveString? password)
+        public async Task SetConnectAppPassword(SensitiveString? password, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.Password = password);
+            await SetProperty(doc => doc.Password = password, cancellationToken);
         }
 
-        public string? GetConnectAppUrl()
+        public async Task<string?> GetConnectAppUrl(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.ConnectAppUrl?.Trim('/'));
+            return await GetProperty(doc => doc.ConnectAppUrl?.Trim('/'), cancellationToken);
         }
 
-        public void SetConnectAppUrl(string? url)
+        public async Task SetConnectAppUrl(string? url, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.ConnectAppUrl = url?.Trim('/'));
+            await SetProperty(doc => doc.ConnectAppUrl = url?.Trim('/'), cancellationToken);
         }
 
-        public string? GetJiraUsername()
+        public async Task<string?> GetJiraUsername(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.ReleaseNoteOptions.Username);
+            return await GetProperty(doc => doc.ReleaseNoteOptions.Username, cancellationToken);
         }
 
-        public void SetJiraUsername(string? username)
+        public async Task SetJiraUsername(string? username, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.ReleaseNoteOptions.Username = username);
+            await SetProperty(doc => doc.ReleaseNoteOptions.Username = username, cancellationToken);
         }
 
-        public SensitiveString? GetJiraPassword()
+        public async Task<SensitiveString?> GetJiraPassword(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.ReleaseNoteOptions.Password);
+            return await GetProperty(doc => doc.ReleaseNoteOptions.Password, cancellationToken);
         }
 
-        public void SetJiraPassword(SensitiveString? password)
+        public async Task SetJiraPassword(SensitiveString? password, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.ReleaseNoteOptions.Password = password);
+            await SetProperty(doc => doc.ReleaseNoteOptions.Password = password, cancellationToken);
         }
 
-        public string? GetReleaseNotePrefix()
+        public async Task<string?> GetReleaseNotePrefix(CancellationToken cancellationToken)
         {
-            return GetProperty(doc => doc.ReleaseNoteOptions.ReleaseNotePrefix);
+            return await GetProperty(doc => doc.ReleaseNoteOptions.ReleaseNotePrefix, cancellationToken);
         }
 
-        public void SetReleaseNotePrefix(string? releaseNotePrefix)
+        public async Task SetReleaseNotePrefix(string? releaseNotePrefix, CancellationToken cancellationToken)
         {
-            SetProperty(doc => doc.ReleaseNoteOptions.ReleaseNotePrefix = releaseNotePrefix);
+            await SetProperty(doc => doc.ReleaseNoteOptions.ReleaseNotePrefix = releaseNotePrefix, cancellationToken);
         }
     }
 }

@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.Metadata;
@@ -20,9 +22,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
         public string ExtensionId => JiraConfigurationStore.SingletonId;
         public string ExtensionName => JiraIntegration.Name;
 
-        public List<PropertyMetadata> Properties => store.GetIsEnabled() && store.GetJiraInstanceType() == JiraInstanceType.Cloud
-            ? new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>().Types.First().Properties
-            : new List<PropertyMetadata>();
+        public async IAsyncEnumerable<PropertyMetadata> Properties([EnumeratorCancellation] CancellationToken cancellationToken)
+        {
+            var enabled = await store.GetIsEnabled(cancellationToken) && await store.GetJiraInstanceType(cancellationToken) == JiraInstanceType.Cloud;
+            if (!enabled)
+            {
+                yield break;
+            }
+
+            foreach (var propertyMetadata in new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>()
+                .Types.First().Properties)
+            {
+                yield return propertyMetadata;
+            }
+        }
 
         internal class JiraDeploymentEnvironmentSettings
         {

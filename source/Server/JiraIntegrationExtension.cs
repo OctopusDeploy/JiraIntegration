@@ -36,8 +36,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
             builder.RegisterType<JiraConfigurationSettings>()
                 .As<IJiraConfigurationSettings>()
-                .As<IHasConfigurationSettings>()
-                .As<IHasConfigurationSettingsResource>()
+                .As<IHasConfigurationSettingsAsync>()
+                .As<IHasConfigurationSettingsResourceAsync>()
                 .As<IContributeMappings>()
                 .InstancePerLifetimeScope();
 
@@ -53,9 +53,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IContributeToConfigureCommand>()
                 .InstancePerDependency();
 
-            builder.RegisterType<JiraConnectAppConnectivityCheckAction>().AsSelf().InstancePerDependency();
-            builder.RegisterType<JiraCredentialsConnectivityCheckAction>().AsSelf().InstancePerDependency();
-
             builder.RegisterType<CommentParser>().AsSelf().InstancePerDependency();
             builder.RegisterType<WorkItemLinkMapper>().As<IWorkItemLinkMapper>().InstancePerDependency();
 
@@ -69,19 +66,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration
             builder.Register(c =>
             {
                 var store = c.Resolve<IJiraConfigurationStore>();
-                if (!store.GetIsEnabled())
-                    return null;
 
-                var baseUrl = store.GetBaseUrl();
-                var username = store.GetJiraUsername();
-                if (baseUrl == null || username == null)
-                    return null;
-
-                var password = store.GetJiraPassword();
                 return new JiraRestClient(
-                    baseUrl,
-                    username,
-                    password?.Value,
+                    store,
                     c.Resolve<ISystemLog>(),
                     c.Resolve<IOctopusHttpClientFactory>()
                 );

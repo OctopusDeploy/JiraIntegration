@@ -51,6 +51,5 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 
             return ActionHandlerResult.FromSuccess();
         }
-
     }
 }

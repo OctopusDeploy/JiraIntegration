@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using Octopus.Data.Model;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.HostServices.Configuration;
@@ -7,12 +9,12 @@ using Octopus.Server.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class JiraConfigurationSettings : ExtensionConfigurationSettings<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
+    class JiraConfigurationSettings : ExtensionConfigurationSettingsAsync<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
     {
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IServerConfigurationStore serverConfigurationStore;
 
-        public JiraConfigurationSettings(IJiraConfigurationStore configurationDocumentStore, 
+        public JiraConfigurationSettings(IJiraConfigurationStore configurationDocumentStore,
             IInstallationIdProvider installationIdProvider,
             IServerConfigurationStore serverConfigurationStore) : base(configurationDocumentStore)
         {
@@ -26,16 +28,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 
         public override string Description => "Jira Integration settings";
 
-        public override IEnumerable<IConfigurationValue> GetConfigurationValues()
+        public override async IAsyncEnumerable<IConfigurationValue> GetConfigurationValues([EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var isEnabled = ConfigurationDocumentStore.GetIsEnabled();
-
-            yield return new ConfigurationValue<bool>(  "Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled, "Is Enabled");
-            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.BaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
-            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.ConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()?.Value), "Jira Connect App Password");
-            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.Username", ConfigurationDocumentStore.GetJiraUsername(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraUsername()), "Jira Username");
-            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.Password", ConfigurationDocumentStore.GetJiraPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraPassword()?.Value), "Jira Password");
-            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.IssueTracker.JiraReleaseNotePrefix", ConfigurationDocumentStore.GetReleaseNotePrefix(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetReleaseNotePrefix()), "Jira Release Note Prefix");
+            var isEnabled = await ConfigurationDocumentStore.GetIsEnabled(cancellationToken);
+            yield return new ConfigurationValue<bool>("Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled, "Is Enabled");
+            var baseUrl = await ConfigurationDocumentStore.GetBaseUrl(cancellationToken);
+            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.BaseUrl", baseUrl, isEnabled && !string.IsNullOrWhiteSpace(baseUrl), "Jira Base Url");
+            var connectAppPassword = await ConfigurationDocumentStore.GetConnectAppPassword(cancellationToken);
+            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.ConnectAppPassword", connectAppPassword, isEnabled && !string.IsNullOrWhiteSpace(connectAppPassword?.Value), "Jira Connect App Password");
+            var jiraUsername = await ConfigurationDocumentStore.GetJiraUsername(cancellationToken);
+            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.Username", jiraUsername, isEnabled && !string.IsNullOrWhiteSpace(jiraUsername), "Jira Username");
+            var jiraPassword = await ConfigurationDocumentStore.GetJiraPassword(cancellationToken);
+            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.Password", jiraPassword, isEnabled && !string.IsNullOrWhiteSpace(jiraPassword?.Value), "Jira Password");
+            var releaseNotePrefix = await ConfigurationDocumentStore.GetReleaseNotePrefix(cancellationToken);
+            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.IssueTracker.JiraReleaseNotePrefix", releaseNotePrefix, isEnabled && !string.IsNullOrWhiteSpace(releaseNotePrefix), "Jira Release Note Prefix");
         }
 
         public override void BuildMappings(IResourceMappingsBuilder builder)

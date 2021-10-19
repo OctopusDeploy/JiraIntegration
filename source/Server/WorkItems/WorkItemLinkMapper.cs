@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using Octopus.Data;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.WorkItems;
@@ -31,33 +33,37 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         }
 
         public string CommentParser => JiraConfigurationStore.CommentParser;
-        public bool IsEnabled => store.GetIsEnabled();
 
-        public IResultFromExtension<WorkItemLink[]> Map(OctopusBuildInformation buildInformation)
+        public async Task<bool> IsEnabled(CancellationToken cancellationToken)
         {
-            if (!IsEnabled)
+            return await store.GetIsEnabled(cancellationToken);
+        }
+
+        public async Task<IResultFromExtension<WorkItemLink[]>> Map(OctopusBuildInformation buildInformation, CancellationToken cancellationToken)
+        {
+            if (!await IsEnabled(cancellationToken))
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
-            if (string.IsNullOrEmpty(store.GetJiraUsername()) ||
-                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
+            if (string.IsNullOrEmpty(await store.GetJiraUsername(cancellationToken)) ||
+                string.IsNullOrEmpty((await store.GetJiraPassword(cancellationToken))?.Value))
                 return ResultFromExtension<WorkItemLink[]>.Failed("Username/password not configured");
 
-            var baseUrl = store.GetBaseUrl();
+            var baseUrl = await store.GetBaseUrl(cancellationToken);
             if (string.IsNullOrWhiteSpace(baseUrl))
                 return ResultFromExtension<WorkItemLink[]>.Failed("No BaseUrl configured");
 
-            var releaseNotePrefix = store.GetReleaseNotePrefix();
+            var releaseNotePrefix = await store.GetReleaseNotePrefix(cancellationToken);
             var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
             if (workItemIds.Length == 0)
             {
                 return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
             }
 
-            return TryConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl);
+            return await TryConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl, cancellationToken);
         }
 
-        private IResultFromExtension<WorkItemLink[]> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
+        private async Task<IResultFromExtension<WorkItemLink[]>> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl, CancellationToken cancellationToken)
         {
-            var response = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
+            var response = await jira.Value.GetIssues(workItemIds.ToArray(), cancellationToken);
 
             if (response is IFailureResult failureResult)
             {
@@ -78,6 +84,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 systemLog.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
             }
 
+            var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
             return ResultFromExtension<WorkItemLink[]>.Success(workItemIds
                 .Where(workItemId => issueMap.ContainsKey(workItemId))
                 .Select(workItemId =>
@@ -86,27 +94,24 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                     return new WorkItemLink
                     {
                         Id = issue.Key,
-                        Description = GetReleaseNote(issueMap[workItemId], releaseNotePrefix),
+                        Description = GetReleaseNote(issueMap[workItemId], releaseNotePrefix, releaseNoteRegex),
                         LinkUrl = baseUrl + "/browse/" + workItemId,
                         Source = JiraConfigurationStore.CommentParser
                     };
                 })
-                .Where(i => i != null)
                 // ReSharper disable once RedundantEnumerableCastCall
                 .Cast<WorkItemLink>() // cast back from `WorkItemLink?` type to keep the compiler happy
                 .ToArray());
         }
 
-        public string GetReleaseNote(JiraIssue issue, string? releaseNotePrefix)
+        public string GetReleaseNote(JiraIssue issue, string? releaseNotePrefix, Regex? releaseNoteRegex)
         {
             if (issue.Fields.Comments.Total == 0 || string.IsNullOrWhiteSpace(releaseNotePrefix))
                 return issue.Fields.Summary;
 
-            var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
-            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
+            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(releaseNoteRegex.IsMatch);
             return !string.IsNullOrWhiteSpace(releaseNote)
-                ? releaseNoteRegex.Replace(releaseNote, String.Empty)?.Trim() ?? string.Empty
+                ? releaseNoteRegex.Replace(releaseNote, String.Empty).Trim()
                 : issue.Fields.Summary ?? issue.Key;
         }
     }

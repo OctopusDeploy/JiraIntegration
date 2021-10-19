@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using NSubstitute;
 using NUnit.Framework;
 using Octopus.Data;
@@ -53,21 +56,23 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     }
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
+            jiraClient.GetIssues(Arg.Any<string[]>(), CancellationToken.None).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
 
-            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
+            var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix, releaseNoteRegex);
         }
 
         [Test]
-        public void DuplicatesGetIgnored()
+        public async Task DuplicatesGetIgnored()
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
-            store.GetBaseUrl().Returns("https://github.com");
-            store.GetIsEnabled().Returns(true);
-            store.GetJiraUsername().Returns("user");
-            store.GetJiraPassword().Returns("password".ToSensitiveString());
+            store.GetBaseUrl(CancellationToken.None).Returns("https://github.com");
+            store.GetIsEnabled(CancellationToken.None).Returns(true);
+            store.GetJiraUsername(CancellationToken.None).Returns("user");
+            store.GetJiraPassword(CancellationToken.None).Returns("password".ToSensitiveString());
             var jiraIssue = new JiraIssue
             {
                 Key = "JRE-1234",
@@ -76,32 +81,32 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] {jiraIssue}));
+            jiraClient.GetIssues(Arg.Any<string[]>(), CancellationToken.None).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] {jiraIssue}));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = await mapper.Map(new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"},
                     new Commit { Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234"}
                 }
-            });
+            }, CancellationToken.None);
 
             Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id, "Single work item should be returned");
         }
 
         [Test]
-        public void SourceGetsSet()
+        public async Task SourceGetsSet()
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
-            store.GetBaseUrl().Returns("https://github.com");
-            store.GetIsEnabled().Returns(true);
-            store.GetJiraUsername().Returns("user");
-            store.GetJiraPassword().Returns("password".ToSensitiveString());
+            store.GetBaseUrl(CancellationToken.None).Returns("https://github.com");
+            store.GetIsEnabled(CancellationToken.None).Returns(true);
+            store.GetJiraUsername(CancellationToken.None).Returns("user");
+            store.GetJiraPassword(CancellationToken.None).Returns("password".ToSensitiveString());
             var jiraIssue = new JiraIssue
             {
                 Key = "JRE-1234",
@@ -110,31 +115,31 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
+            jiraClient.GetIssues(Arg.Any<string[]>(), CancellationToken.None).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = await mapper.Map(new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"}
                 }
-            });
+            }, CancellationToken.None);
 
             Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source, "Source should be set");
         }
 
         [Test]
-        public void KeyGetsUpperCased()
+        public async Task KeyGetsUpperCased()
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             var jiraClient = Substitute.For<IJiraRestClient>();
             var jiraClientLazy = new Lazy<IJiraRestClient>(() => jiraClient);
-            store.GetBaseUrl().Returns("https://github.com");
-            store.GetIsEnabled().Returns(true);
-            store.GetJiraUsername().Returns("user");
-            store.GetJiraPassword().Returns("password".ToSensitiveString());
+            store.GetBaseUrl(CancellationToken.None).Returns("https://github.com");
+            store.GetIsEnabled(CancellationToken.None).Returns(true);
+            store.GetJiraUsername(CancellationToken.None).Returns("user");
+            store.GetJiraPassword(CancellationToken.None).Returns("password".ToSensitiveString());
             var jiraIssue = new JiraIssue
             {
                 Key = "JRE-1234",
@@ -143,17 +148,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
+            jiraClient.GetIssues(Arg.Any<string[]>(), CancellationToken.None).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
+            var workItems = await mapper.Map(new OctopusBuildInformation
             {
                 Commits = new Commit[]
                 {
                     new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234"}
                 }
-            });
+            }, CancellationToken.None);
 
             Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id);
         }

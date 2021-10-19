@@ -2,6 +2,7 @@ using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Octopus.Diagnostics;
@@ -27,14 +28,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
-        public async Task<string?> GetAuthTokenFromConnectApp(ILog log)
+        public async Task<string?> GetAuthTokenFromConnectApp(ILog log, CancellationToken cancellationToken)
         {
-            var username = installationIdProvider.GetInstallationId().ToString();
-            var password = configurationStore.GetConnectAppPassword();
-            return await GetAuthTokenFromConnectApp(username, password?.Value, log);
+            var username = (await installationIdProvider.GetInstallationIdAsync(cancellationToken)).ToString();
+            var password = await configurationStore.GetConnectAppPassword(cancellationToken);
+            return await GetAuthTokenFromConnectApp(username, password?.Value, log, cancellationToken);
         }
 
-        public async Task<string?> GetAuthTokenFromConnectApp(string username, string? password, ILog log)
+        public async Task<string?> GetAuthTokenFromConnectApp(string username, string? password, ILog log, CancellationToken cancellationToken)
         {
             using var client = octopusHttpClientFactory.CreateClient();
             var encodedAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
@@ -42,12 +43,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
             try
             {
-                using var result = await client.GetAsync($"{configurationStore.GetConnectAppUrl()}/token");
+                using var result = await client.GetAsync($"{configurationStore.GetConnectAppUrl(cancellationToken)}/token", cancellationToken);
                 if (result.IsSuccessStatusCode)
                 {
                     var authTokenFromConnectApp =
-                        JsonConvert.DeserializeObject<JsonTokenData>(result.Content.ReadAsStringAsync().GetAwaiter()
-                            .GetResult());
+                        JsonConvert.DeserializeObject<JsonTokenData>(await result.Content.ReadAsStringAsync(cancellationToken));
                     return authTokenFromConnectApp.Token;
                 }
                 log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}", result.StatusCode);

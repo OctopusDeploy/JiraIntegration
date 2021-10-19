@@ -1,4 +1,6 @@
-﻿using Octopus.Server.Extensibility.Extensions.WorkItems;
+﻿using System.Threading;
+using System.Threading.Tasks;
+using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
@@ -15,10 +17,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration
         }
 
         public string CommentParser => JiraConfigurationStore.CommentParser;
+
         public string IssueTrackerName => Name;
 
-        public bool IsEnabled => configurationStore.GetIsEnabled();
+        public async Task<bool> IsEnabled(CancellationToken cancellationToken)
+        {
+            return await configurationStore.GetIsEnabled(cancellationToken);
+        }
 
-        public string? BaseUrl => configurationStore.GetIsEnabled() ? configurationStore.GetBaseUrl() : null;
+        public async Task<string?> BaseUrl(CancellationToken cancellationToken)
+        {
+            return await configurationStore.GetIsEnabled(cancellationToken) ? await configurationStore.GetBaseUrl(cancellationToken) : null;
+        }
     }
 }
