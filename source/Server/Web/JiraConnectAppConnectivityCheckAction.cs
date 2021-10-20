@@ -13,10 +13,10 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Resources.Configuration;
 using Octopus.Server.Extensibility.Web.Extensions;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
-    [ApiController]
     class JiraConnectAppConnectivityCheckAction : SystemScopedApiController
     {
         private readonly ISystemLog systemLog;
@@ -39,8 +39,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             this.octopusHttpClientFactory = octopusHttpClientFactory;
         }
 
+        [SwaggerOperation(
+                Summary = "Checks the Jira ConnectApp connection.",
+                OperationId = "createJiraConnectAppConnectivityCheck"),
+        ]
         [HttpPost(JiraIntegrationApi.ApiConnectAppCredentialsTest)]
-        public async Task<ConnectivityCheckResponse> Execute(JiraConnectAppConnectionCheckData command, CancellationToken cancellationToken)
+        public async Task<ConnectivityCheckResponse> Execute([FromBody]
+            [SwaggerRequestBody("The connection check data")] JiraConnectAppConnectionCheckData command, CancellationToken cancellationToken)
         {
             var baseUrl = command.BaseUrl;
             var connectivityCheckResponse = new ConnectivityCheckResponse();

@@ -8,10 +8,10 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
 using Octopus.Server.Extensibility.Resources.Configuration;
 using Octopus.Server.Extensibility.Web.Extensions;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
-    [ApiController]
     class JiraCredentialsConnectivityCheckAction : SystemScopedApiController
     {
         private readonly IJiraConfigurationStore configurationStore;
@@ -25,8 +25,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             this.systemLog = systemLog;
         }
 
+        [SwaggerOperation(
+                Summary = "Checks the Jira connection.",
+                OperationId = "createJiraCredentialsConnectivityCheck"),
+        ]
         [HttpPost(JiraIntegrationApi.ApiJiraCredentialsTest)]
-        public async Task<ConnectivityCheckResponse> Execute(JiraCredentialsConnectionCheckData command, CancellationToken cancellationToken)
+        public async Task<ConnectivityCheckResponse> Execute([FromBody]
+            [SwaggerRequestBody("The connection check data")] JiraCredentialsConnectionCheckData command, CancellationToken cancellationToken)
         {
             var baseUrl = command.BaseUrl;
             var username = command.Username;

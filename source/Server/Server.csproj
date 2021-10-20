@@ -20,7 +20,8 @@
     <PackageReference Include="Octopus.Server.Extensibility" Version="14.3.77-john-async-issues" />
     <PackageReference Include="Octopus.Server.Extensibility.Web" Version="0.1.63" />
     <PackageReference Include="Octopus.Server.MessageContracts" Version="2.0.120" />
-    <PackageReference Include="Octopus.Time" Version="1.1.6" />
-    <PackageReference Include="Sashimi.Server.Contracts" Version="11.0.1" />
+    <PackageReference Include="Octopus.Time" Version="1.1.388" />
+    <PackageReference Include="Sashimi.Server.Contracts" Version="14.1.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Annotations" Version="5.6.3" />
   </ItemGroup>
 </Project>
