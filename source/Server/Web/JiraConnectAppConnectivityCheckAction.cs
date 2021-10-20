@@ -17,13 +17,13 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
-    class JiraConnectAppConnectivityCheckAction : SystemScopedApiController
+    internal class JiraConnectAppConnectivityCheckAction : SystemScopedApiController
     {
-        private readonly ISystemLog systemLog;
         private readonly IJiraConfigurationStore configurationStore;
-        private readonly IInstallationIdProvider installationIdProvider;
         private readonly JiraConnectAppClient connectAppClient;
+        private readonly IInstallationIdProvider installationIdProvider;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
+        private readonly ISystemLog systemLog;
 
         public JiraConnectAppConnectivityCheckAction(
             ISystemLog systemLog,
@@ -40,12 +40,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
         }
 
         [SwaggerOperation(
-                Summary = "Checks the Jira ConnectApp connection.",
-                OperationId = "createJiraConnectAppConnectivityCheck"),
+            Summary = "Checks the Jira ConnectApp connection.",
+            OperationId = "createJiraConnectAppConnectivityCheck")
         ]
         [HttpPost(JiraIntegrationApi.ApiConnectAppCredentialsTest)]
-        public async Task<ConnectivityCheckResponse> Execute([FromBody]
-            [SwaggerRequestBody("The connection check data")] JiraConnectAppConnectionCheckData command, CancellationToken cancellationToken)
+        public async Task<ConnectivityCheckResponse> Execute(
+            [FromBody] [SwaggerRequestBody("The connection check data")] JiraConnectAppConnectionCheckData command,
+            CancellationToken cancellationToken)
         {
             var baseUrl = command.BaseUrl;
             var connectivityCheckResponse = new ConnectivityCheckResponse();
@@ -55,18 +56,26 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
             // from the database
-            var password = string.IsNullOrEmpty(command.Password) ? (await configurationStore.GetConnectAppPassword(cancellationToken))?.Value : command.Password;
+            var password = string.IsNullOrEmpty(command.Password)
+                ? (await configurationStore.GetConnectAppPassword(cancellationToken))?.Value
+                : command.Password;
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(password))
             {
-                if (string.IsNullOrEmpty(baseUrl)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
-                if (string.IsNullOrEmpty(password)) connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Connect App Password.");
+                if (string.IsNullOrEmpty(baseUrl))
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                        "Please provide a value for Jira Base Url.");
+                if (string.IsNullOrEmpty(password))
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                        "Please provide a value for Jira Connect App Password.");
                 return connectivityCheckResponse;
             }
 
-            var token = await connectAppClient.GetAuthTokenFromConnectApp(username, password, systemLog, cancellationToken);
+            var token = await connectAppClient.GetAuthTokenFromConnectApp(username, password, systemLog,
+                cancellationToken);
             if (token is null)
             {
-                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, "Failed to get authentication token from Jira Connect App.");
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                    "Failed to get authentication token from Jira Connect App.");
                 return connectivityCheckResponse;
             }
 
@@ -75,30 +84,31 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 var connectivityCheckPayload =
-                    JsonConvert.SerializeObject(new JiraConnectAppConnectivityCheckRequest {BaseHostUrl = baseUrl, OctopusInstallationId = username});
+                    JsonConvert.SerializeObject(new JiraConnectAppConnectivityCheckRequest
+                        { BaseHostUrl = baseUrl, OctopusInstallationId = username });
                 var result = await client.PostAsync(
-                        $"{configurationStore.GetConnectAppUrl(cancellationToken)}/relay/connectivitycheck",
-                        new StringContent(connectivityCheckPayload, Encoding.UTF8, "application/json"), cancellationToken);
+                    $"{configurationStore.GetConnectAppUrl(cancellationToken)}/relay/connectivitycheck",
+                    new StringContent(connectivityCheckPayload, Encoding.UTF8, "application/json"), cancellationToken);
 
                 if (!result.IsSuccessStatusCode)
                 {
-                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, result.StatusCode == HttpStatusCode.NotFound
-                        ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl(cancellationToken)}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIntegration)."
-                        : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {await result.Content.ReadAsStringAsync(cancellationToken)}");
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                        result.StatusCode == HttpStatusCode.NotFound
+                            ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl(cancellationToken)}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIntegration)."
+                            : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {await result.Content.ReadAsStringAsync(cancellationToken)}");
                     return connectivityCheckResponse;
                 }
             }
 
-            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
+            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info,
+                "The Jira Connect App connection was tested successfully");
 
             if (!await configurationStore.GetIsEnabled(cancellationToken))
-            {
-                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
-            }
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning,
+                    "The Jira Integration is not enabled, so its functionality will not currently be available");
 
             return connectivityCheckResponse;
         }
-
 #nullable disable
         private class JiraConnectAppConnectivityCheckRequest
         {
@@ -107,7 +117,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
         }
     }
 
-    class JiraConnectAppConnectionCheckData
+    internal class JiraConnectAppConnectionCheckData
     {
         public string BaseUrl { get; set; }
         public string Password { get; set; }

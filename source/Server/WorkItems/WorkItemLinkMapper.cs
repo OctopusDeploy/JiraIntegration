@@ -14,11 +14,11 @@ using Octopus.Server.MessageContracts.Features.IssueTrackers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
-    class WorkItemLinkMapper : IWorkItemLinkMapper
+    internal class WorkItemLinkMapper : IWorkItemLinkMapper
     {
-        private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;
         private readonly Lazy<IJiraRestClient> jira;
+        private readonly IJiraConfigurationStore store;
         private readonly ISystemLog systemLog;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
@@ -39,7 +39,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             return await store.GetIsEnabled(cancellationToken);
         }
 
-        public async Task<IResultFromExtension<WorkItemLink[]>> Map(OctopusBuildInformation buildInformation, CancellationToken cancellationToken)
+        public async Task<IResultFromExtension<WorkItemLink[]>> Map(OctopusBuildInformation buildInformation,
+            CancellationToken cancellationToken)
         {
             if (!await IsEnabled(cancellationToken))
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
@@ -54,35 +55,28 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             var releaseNotePrefix = await store.GetReleaseNotePrefix(cancellationToken);
             var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
             if (workItemIds.Length == 0)
-            {
                 return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
-            }
 
             return await TryConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl, cancellationToken);
         }
 
-        private async Task<IResultFromExtension<WorkItemLink[]>> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl, CancellationToken cancellationToken)
+        private async Task<IResultFromExtension<WorkItemLink[]>> TryConvertWorkItemLinks(string[] workItemIds,
+            string? releaseNotePrefix, string baseUrl, CancellationToken cancellationToken)
         {
             var response = await jira.Value.GetIssues(workItemIds.ToArray(), cancellationToken);
 
             if (response is IFailureResult failureResult)
-            {
                 return ResultFromExtension<WorkItemLink[]>.Failed(failureResult.Errors);
-            }
 
             var issues = ((ISuccessResult<JiraIssue[]>)response).Value;
-            if (issues.Length == 0)
-            {
-                return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
-            }
+            if (issues.Length == 0) return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
 
             var issueMap = issues.ToDictionary(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
             var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
             if (workItemsNotFound.Length > 0)
-            {
-                systemLog.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
-            }
+                systemLog.Warn(
+                    $"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
@@ -109,9 +103,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             if (issue.Fields.Comments.Total == 0 || string.IsNullOrWhiteSpace(releaseNotePrefix))
                 return issue.Fields.Summary;
 
-            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(releaseNoteRegex.IsMatch);
+            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null)
+                .LastOrDefault(releaseNoteRegex.IsMatch);
             return !string.IsNullOrWhiteSpace(releaseNote)
-                ? releaseNoteRegex.Replace(releaseNote, String.Empty).Trim()
+                ? releaseNoteRegex.Replace(releaseNote, string.Empty).Trim()
                 : issue.Fields.Summary ?? issue.Key;
         }
     }

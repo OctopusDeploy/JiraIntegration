@@ -9,14 +9,17 @@ using Shouldly;
 namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 {
     [TestFixture]
-    class JiraCredentialsConnectivityCheckActionFixture: ConnectivityCheckActionsBaseFixture
+    internal class JiraCredentialsConnectivityCheckActionFixture : ConnectivityCheckActionsBaseFixture
     {
         [Test]
         public async Task WhenDnsCannotBeResolved()
         {
             var action = new JiraCredentialsConnectivityCheckAction(store, httpClientFactory, log);
             var baseUrl = "http://notexistingdomain.dddd.ttt/";
-            var connectivityCheckResponse = await action.Execute(new JiraCredentialsConnectionCheckData {BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter"}, CancellationToken.None);
+            var connectivityCheckResponse = await action.Execute(
+                new JiraCredentialsConnectionCheckData
+                    { BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter" },
+                CancellationToken.None);
 
             connectivityCheckResponse.Messages.ShouldNotBeEmpty();
             connectivityCheckResponse.Messages.First().Message.ShouldStartWith($"Failed to connect to {baseUrl}.");
@@ -27,10 +30,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         {
             var action = new JiraCredentialsConnectivityCheckAction(store, httpClientFactory, log);
             var baseUrl = new Uri(await store.GetBaseUrl(CancellationToken.None)).ToString();
-            var connectivityCheckResponse = await action.Execute(new JiraCredentialsConnectionCheckData {BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter"}, CancellationToken.None);
+            var connectivityCheckResponse = await action.Execute(
+                new JiraCredentialsConnectionCheckData
+                    { BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter" },
+                CancellationToken.None);
 
             connectivityCheckResponse.Messages.ShouldNotBeEmpty();
-            connectivityCheckResponse.Messages.First().Message.ShouldStartWith($"Failed to connect to {baseUrl}. Response code: Unauthorized");
+            connectivityCheckResponse.Messages.First().Message
+                .ShouldStartWith($"Failed to connect to {baseUrl}. Response code: Unauthorized");
         }
     }
 }

@@ -13,14 +13,14 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 {
-    abstract class ConnectivityCheckActionsBaseFixture
+    internal abstract class ConnectivityCheckActionsBaseFixture
     {
-        protected IJiraConfigurationStore store;
-        protected ISystemLog log;
-        protected IOctopusHttpClientFactory httpClientFactory;
         private const string JiraBaseUrlEnvironmentVariable = "JiraIntegration_E2E_BaseUrl";
         private const string JiraUsernameEnvironmentVariable = "JiraIntegration_E2E_Username";
         private const string JiraAuthTokenEnvironmentVariable = "JiraIntegration_E2E_AuthToken";
+        protected IOctopusHttpClientFactory httpClientFactory;
+        protected ISystemLog log;
+        protected IJiraConfigurationStore store;
 
         [OneTimeSetUp]
         public void Setup()
@@ -35,7 +35,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             httpClientFactory = BuildOctopusHttpClientFactory(baseUrl, username, authToken);
         }
 
-        static IOctopusHttpClientFactory BuildOctopusHttpClientFactory(string baseUrl, string username, string authToken)
+        private static IOctopusHttpClientFactory BuildOctopusHttpClientFactory(string baseUrl, string username,
+            string authToken)
         {
             var httpClientFactory = Substitute.For<IOctopusHttpClientFactory>();
 
@@ -54,7 +55,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             return httpClientFactory;
         }
 
-        static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username, string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
+        private static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username,
+            string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             store.GetIsEnabled(CancellationToken.None).Returns(isEnabled);
@@ -65,7 +67,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             return store;
         }
 
-        static bool TryGetJiraSettings(out string jiraBaseUrl, out string jiraUsername, out string jiraAuthToken)
+        private static bool TryGetJiraSettings(out string jiraBaseUrl, out string jiraUsername,
+            out string jiraAuthToken)
         {
             jiraBaseUrl = Environment.GetEnvironmentVariable(JiraBaseUrlEnvironmentVariable);
             jiraUsername = Environment.GetEnvironmentVariable(JiraUsernameEnvironmentVariable);

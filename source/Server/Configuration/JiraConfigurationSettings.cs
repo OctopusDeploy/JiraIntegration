@@ -9,7 +9,9 @@ using Octopus.Server.Extensibility.HostServices.Mapping;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class JiraConfigurationSettings : ExtensionConfigurationSettingsAsync<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
+    internal class JiraConfigurationSettings :
+        ExtensionConfigurationSettingsAsync<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>,
+        IJiraConfigurationSettings
     {
         private readonly IInstallationIdProvider installationIdProvider;
         private readonly IServerConfigurationStore serverConfigurationStore;
@@ -28,20 +30,29 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 
         public override string Description => "Jira Integration settings";
 
-        public override async IAsyncEnumerable<IConfigurationValue> GetConfigurationValues([EnumeratorCancellation] CancellationToken cancellationToken)
+        public override async IAsyncEnumerable<IConfigurationValue> GetConfigurationValues(
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             var isEnabled = await ConfigurationDocumentStore.GetIsEnabled(cancellationToken);
-            yield return new ConfigurationValue<bool>("Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled, "Is Enabled");
+            yield return new ConfigurationValue<bool>("Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled,
+                "Is Enabled");
             var baseUrl = await ConfigurationDocumentStore.GetBaseUrl(cancellationToken);
-            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.BaseUrl", baseUrl, isEnabled && !string.IsNullOrWhiteSpace(baseUrl), "Jira Base Url");
+            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.BaseUrl", baseUrl,
+                isEnabled && !string.IsNullOrWhiteSpace(baseUrl), "Jira Base Url");
             var connectAppPassword = await ConfigurationDocumentStore.GetConnectAppPassword(cancellationToken);
-            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.ConnectAppPassword", connectAppPassword, isEnabled && !string.IsNullOrWhiteSpace(connectAppPassword?.Value), "Jira Connect App Password");
+            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.ConnectAppPassword",
+                connectAppPassword, isEnabled && !string.IsNullOrWhiteSpace(connectAppPassword?.Value),
+                "Jira Connect App Password");
             var jiraUsername = await ConfigurationDocumentStore.GetJiraUsername(cancellationToken);
-            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.Username", jiraUsername, isEnabled && !string.IsNullOrWhiteSpace(jiraUsername), "Jira Username");
+            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.Username", jiraUsername,
+                isEnabled && !string.IsNullOrWhiteSpace(jiraUsername), "Jira Username");
             var jiraPassword = await ConfigurationDocumentStore.GetJiraPassword(cancellationToken);
-            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.Password", jiraPassword, isEnabled && !string.IsNullOrWhiteSpace(jiraPassword?.Value), "Jira Password");
+            yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.Password", jiraPassword,
+                isEnabled && !string.IsNullOrWhiteSpace(jiraPassword?.Value), "Jira Password");
             var releaseNotePrefix = await ConfigurationDocumentStore.GetReleaseNotePrefix(cancellationToken);
-            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.IssueTracker.JiraReleaseNotePrefix", releaseNotePrefix, isEnabled && !string.IsNullOrWhiteSpace(releaseNotePrefix), "Jira Release Note Prefix");
+            yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.IssueTracker.JiraReleaseNotePrefix",
+                releaseNotePrefix, isEnabled && !string.IsNullOrWhiteSpace(releaseNotePrefix),
+                "Jira Release Note Prefix");
         }
 
         public override void BuildMappings(IResourceMappingsBuilder builder)

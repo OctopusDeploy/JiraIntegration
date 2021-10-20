@@ -4,7 +4,7 @@ using Octopus.Server.Extensibility.Results;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
-    interface IJiraRestClient
+    internal interface IJiraRestClient
     {
         Task<IResultFromExtension<JiraIssue[]>> GetIssues(string[] workItemId, CancellationToken cancellationToken);
     }

@@ -9,19 +9,11 @@ using Sashimi.Server.Contracts.ActionHandlers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 {
-    class JiraServiceDeskActionHandler : IActionHandler
+    internal class JiraServiceDeskActionHandler : IActionHandler
     {
-        public string Id => "Octopus.JiraIntegration.ServiceDeskAction";
-        public string Name => "Jira Service Desk Change Request";
-        public string Description => "Initiate a Change Request in Jira Service Desk";
-        public string? Keywords => null;
-        public bool ShowInStepTemplatePickerUI => true;
-        public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
-        public bool CanRunOnDeploymentTarget => false;
-        public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
+        private readonly JiraDeployment jiraDeployment;
 
         private readonly IMediator mediator;
-        readonly JiraDeployment jiraDeployment;
 
         public JiraServiceDeskActionHandler(
             IMediator mediator,
@@ -31,18 +23,35 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
             this.jiraDeployment = jiraDeployment;
         }
 
+        public string Id => "Octopus.JiraIntegration.ServiceDeskAction";
+        public string Name => "Jira Service Desk Change Request";
+        public string Description => "Initiate a Change Request in Jira Service Desk";
+        public string? Keywords => null;
+        public bool ShowInStepTemplatePickerUI => true;
+        public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
+        public bool CanRunOnDeploymentTarget => false;
+
+        public ActionHandlerCategory[] Categories => new[]
+            { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
+
         public IActionHandlerResult Execute(IActionHandlerContext context, ITaskLog taskLog)
         {
             var deploymentId = context.Variables.Get(KnownVariables.Deployment.Id, "");
-            var deployment = mediator.Request(new GetDeploymentRequest(deploymentId.ToDeploymentId()), CancellationToken.None).GetAwaiter().GetResult().Deployment;
+            var deployment = mediator
+                .Request(new GetDeploymentRequest(deploymentId.ToDeploymentId()), CancellationToken.None).GetAwaiter()
+                .GetResult().Deployment;
 
-            var jiraServiceDeskChangeRequestId = context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
+            var jiraServiceDeskChangeRequestId =
+                context.Variables.Get("Octopus.Action.JiraIntegration.ServiceDesk.ServiceId");
             if (string.IsNullOrWhiteSpace(jiraServiceDeskChangeRequestId))
                 throw new ControlledActionFailedException("ServiceId is not set");
 
             try
             {
-                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), taskLog, CancellationToken.None).GetAwaiter().GetResult();
+                jiraDeployment.PublishToJira("in_progress", deployment,
+                        new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), taskLog,
+                        CancellationToken.None)
+                    .GetAwaiter().GetResult();
             }
             catch (JiraDeploymentException exception)
             {

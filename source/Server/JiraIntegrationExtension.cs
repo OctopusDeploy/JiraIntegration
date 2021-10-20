@@ -13,7 +13,6 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
 using Octopus.Server.Extensibility.JiraIntegration.Environments;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
-using Octopus.Server.Extensibility.JiraIntegration.Web;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
 using Sashimi.Server.Contracts.ActionHandlers;
 
@@ -28,7 +27,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IConfigurationDocumentMapper>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerLifetimeScope();
+            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>()
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConfigurationStore>()
                 .As<IJiraConfigurationStore>()
@@ -47,7 +47,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>().As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
+            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>()
+                .As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
 
             builder.RegisterType<JiraConfigureCommands>()
                 .As<IContributeToConfigureCommand>()
@@ -64,16 +65,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .InstancePerDependency();
 
             builder.Register(c =>
-            {
-                var store = c.Resolve<IJiraConfigurationStore>();
+                {
+                    var store = c.Resolve<IJiraConfigurationStore>();
 
-                return new JiraRestClient(
-                    store,
-                    c.Resolve<ISystemLog>(),
-                    c.Resolve<IOctopusHttpClientFactory>()
-                );
-            }).As<IJiraRestClient>()
-            .InstancePerDependency();
+                    return new JiraRestClient(
+                        store,
+                        c.Resolve<ISystemLog>(),
+                        c.Resolve<IOctopusHttpClientFactory>()
+                    );
+                }).As<IJiraRestClient>()
+                .InstancePerDependency();
 
             builder.RegisterType<JiraIntegrationHomeLinksContributor>().As<IHomeLinksContributor>()
                 .InstancePerDependency();

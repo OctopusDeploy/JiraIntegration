@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.HostServices.Web;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraIntegrationHomeLinksContributor : IHomeLinksContributor
+    internal class JiraIntegrationHomeLinksContributor : IHomeLinksContributor
     {
         public const string ApiConnectAppCredentialsTestLinkName = "JiraConnectAppCredentialsTest";
         public const string ApiJiraCredentialsTestLinkName = "JiraCredentialsTest";
@@ -12,8 +12,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
         {
             var linksToContribute = new Dictionary<string, string>
             {
-                {ApiConnectAppCredentialsTestLinkName, $"~{JiraIntegrationApi.ApiConnectAppCredentialsTest}"},
-                {ApiJiraCredentialsTestLinkName, $"~{JiraIntegrationApi.ApiJiraCredentialsTest}"}
+                { ApiConnectAppCredentialsTestLinkName, $"~{JiraIntegrationApi.ApiConnectAppCredentialsTest}" },
+                { ApiJiraCredentialsTestLinkName, $"~{JiraIntegrationApi.ApiJiraCredentialsTest}" }
             };
 
             return linksToContribute;

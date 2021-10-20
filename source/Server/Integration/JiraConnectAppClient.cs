@@ -12,10 +12,10 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
-    class JiraConnectAppClient
+    internal class JiraConnectAppClient
     {
-        private readonly IInstallationIdProvider installationIdProvider;
         private readonly IJiraConfigurationStore configurationStore;
+        private readonly IInstallationIdProvider installationIdProvider;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppClient(
@@ -35,7 +35,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             return await GetAuthTokenFromConnectApp(username, password?.Value, log, cancellationToken);
         }
 
-        public async Task<string?> GetAuthTokenFromConnectApp(string username, string? password, ILog log, CancellationToken cancellationToken)
+        public async Task<string?> GetAuthTokenFromConnectApp(string username, string? password, ILog log,
+            CancellationToken cancellationToken)
         {
             using var client = octopusHttpClientFactory.CreateClient();
             var encodedAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}"));
@@ -43,14 +44,19 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", encodedAuth);
             try
             {
-                using var result = await client.GetAsync($"{configurationStore.GetConnectAppUrl(cancellationToken)}/token", cancellationToken);
+                using var result =
+                    await client.GetAsync($"{configurationStore.GetConnectAppUrl(cancellationToken)}/token",
+                        cancellationToken);
                 if (result.IsSuccessStatusCode)
                 {
                     var authTokenFromConnectApp =
-                        JsonConvert.DeserializeObject<JsonTokenData>(await result.Content.ReadAsStringAsync(cancellationToken));
+                        JsonConvert.DeserializeObject<JsonTokenData>(
+                            await result.Content.ReadAsStringAsync(cancellationToken));
                     return authTokenFromConnectApp.Token;
                 }
-                log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}", result.StatusCode);
+
+                log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}",
+                    result.StatusCode);
 
                 return null;
             }
@@ -66,11 +72,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             }
         }
 
-        class JsonTokenData
+        private class JsonTokenData
         {
-            [JsonProperty("token")]
-            public string Token { get; set; } = string.Empty;
+            [JsonProperty("token")] public string Token { get; set; } = string.Empty;
         }
-
     }
 }

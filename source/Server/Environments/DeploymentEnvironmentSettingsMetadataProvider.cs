@@ -10,7 +10,7 @@ using Octopus.Server.MessageContracts.Attributes;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Environments
 {
-    class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
+    internal class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
     {
         private readonly IJiraConfigurationStore store;
 
@@ -22,19 +22,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
         public string ExtensionId => JiraConfigurationStore.SingletonId;
         public string ExtensionName => JiraIntegration.Name;
 
-        public async IAsyncEnumerable<PropertyMetadata> Properties([EnumeratorCancellation] CancellationToken cancellationToken)
+        public async IAsyncEnumerable<PropertyMetadata> Properties(
+            [EnumeratorCancellation] CancellationToken cancellationToken)
         {
-            var enabled = await store.GetIsEnabled(cancellationToken) && await store.GetJiraInstanceType(cancellationToken) == JiraInstanceType.Cloud;
-            if (!enabled)
-            {
-                yield break;
-            }
+            var enabled = await store.GetIsEnabled(cancellationToken) &&
+                          await store.GetJiraInstanceType(cancellationToken) == JiraInstanceType.Cloud;
+            if (!enabled) yield break;
 
             foreach (var propertyMetadata in new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>()
                 .Types.First().Properties)
-            {
                 yield return propertyMetadata;
-            }
         }
 
         internal class JiraDeploymentEnvironmentSettings
@@ -47,7 +44,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
         }
     }
 
-    enum JiraEnvironmentType
+    internal enum JiraEnvironmentType
     {
         unmapped,
         development,

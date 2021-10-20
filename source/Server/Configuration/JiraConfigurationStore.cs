@@ -5,7 +5,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class JiraConfigurationStore : ExtensionConfigurationStoreAsync<JiraConfiguration>, IJiraConfigurationStore
+    internal class JiraConfigurationStore : ExtensionConfigurationStoreAsync<JiraConfiguration>, IJiraConfigurationStore
     {
         public static string CommentParser = "Jira";
         public static string SingletonId = "jira-integration";

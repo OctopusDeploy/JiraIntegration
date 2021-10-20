@@ -5,7 +5,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    interface IJiraConfigurationStore : IExtensionConfigurationStoreAsync<JiraConfiguration>
+    internal interface IJiraConfigurationStore : IExtensionConfigurationStoreAsync<JiraConfiguration>
     {
         Task<JiraInstanceType> GetJiraInstanceType(CancellationToken cancellationToken);
         Task SetJiraInstanceType(JiraInstanceType jiraInstanceType, CancellationToken cancellationToken);
