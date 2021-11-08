@@ -39,11 +39,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
             if (string.IsNullOrEmpty(store.GetJiraUsername()) ||
                 string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
-                return ResultFromExtension<WorkItemLink[]>.Failed("Username/password not configured");
+                return FailureWithLog("Username/password not configured");
 
             var baseUrl = store.GetBaseUrl();
             if (string.IsNullOrWhiteSpace(baseUrl))
-                return ResultFromExtension<WorkItemLink[]>.Failed("No BaseUrl configured");
+                return FailureWithLog("No BaseUrl configured");
 
             var releaseNotePrefix = store.GetReleaseNotePrefix();
             var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
@@ -57,16 +57,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
         private IResultFromExtension<WorkItemLink[]> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
         {
+            systemLog.InfoFormat("Getting work items {0} from Jira", string.Join(", ", workItemIds));
             var response = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
 
             if (response is IFailureResult failureResult)
             {
-                return ResultFromExtension<WorkItemLink[]>.Failed(failureResult.Errors);
+                return FailureWithLog(failureResult.Errors);
             }
 
             var issues = ((ISuccessResult<JiraIssue[]>)response).Value;
             if (issues.Length == 0)
             {
+                systemLog.InfoFormat("No work items returned from Jira");
                 return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
             }
 
@@ -108,6 +110,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, String.Empty)?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
+        }
+
+        IResultFromExtension<WorkItemLink[]> FailureWithLog(params string[] errors)
+        {
+            systemLog.Warn(string.Join(Environment.NewLine, errors));
+            return ResultFromExtension<WorkItemLink[]>.Failed(errors);
         }
     }
 }
