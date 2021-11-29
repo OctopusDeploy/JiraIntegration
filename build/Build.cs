@@ -29,12 +29,13 @@ class Build : NukeBuild, IExtensionBuild
 
     [Parameter("Configuration to build - Default is 'Debug' (local) or 'Release' (server)")]
     public Enumeration Config => Configuration.Release;
+
+    public string NuspecFilePath => "../../build/Octopus.Server.Extensibility.JiraIntegration.nuspec";
+
     /// Support plugins are available for:
     /// - JetBrains ReSharper        https://nuke.build/resharper
     /// - JetBrains Rider            https://nuke.build/rider
     /// - Microsoft VisualStudio     https://nuke.build/visualstudio
     /// - Microsoft VSCode           https://nuke.build/vscode
     public static int Main() => Execute<Build>(x => ((IExtensionBuild)x).Default);
-
-    public string NuspecFilePath => "../../build/Octopus.Server.Extensibility.JiraIntegration.nuspec";
 }

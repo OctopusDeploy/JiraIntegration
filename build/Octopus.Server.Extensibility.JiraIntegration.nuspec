@@ -1,25 +1,26 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd" xmlns:octopus="http://octopus.org">
-  <metadata>
-    <id>Octopus.Server.Extensibility.JiraIntegration</id>
-    <title>Octopus Server Extensibility Issue Tracker - Jira Integration</title>
-    <version>$version$</version>
-    <authors>Octopus Deploy</authors>
-    <owners>Octopus Deploy Pty. Ltd.</owners>
-    <summary>Octopus Deploy Jira Integration issue tracker.</summary>
-    <description>
-      Implements the Jira Integration issue tracker.
-    </description>
-    <language>en-US</language>
-    <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <licenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</licenseUrl>
-    <projectUrl>https://github.com/OctopusDeploy/JiraIntegration</projectUrl>
-    <repository type="git" url="https://github.com/OctopusDeploy/JiraIntegration" />
-    <iconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
-    <tags>automation deployment</tags>
-    <developmentDependency>true</developmentDependency>
-  </metadata>
-  <files>
-    <file src="..\source\Server\bin\Release\net5.0\*.dll" target="tools" />
-  </files>
+    <metadata>
+        <id>Octopus.Server.Extensibility.JiraIntegration</id>
+        <title>Octopus Server Extensibility Issue Tracker - Jira Integration</title>
+        <version>$version$</version>
+        <authors>Octopus Deploy</authors>
+        <owners>Octopus Deploy Pty. Ltd.</owners>
+        <summary>Octopus Deploy Jira Integration issue tracker.</summary>
+        <description>
+            Implements the Jira Integration issue tracker.
+        </description>
+        <language>en-US</language>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <licenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</licenseUrl>
+        <projectUrl>https://github.com/OctopusDeploy/JiraIntegration</projectUrl>
+        <repository type="git" url="https://github.com/OctopusDeploy/JiraIntegration" />
+        <iconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
+        <tags>automation deployment</tags>
+        <developmentDependency>true</developmentDependency>
+    </metadata>
+    <files>
+        <file src="..\source\Server\bin\Release\net5.0\*.dll" target="tools" />
+    </files>
 </package>
