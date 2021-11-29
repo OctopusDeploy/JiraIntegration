@@ -2,6 +2,7 @@
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    interface IJiraConfigurationSettings : IHasConfigurationSettings
-    { }
+    internal interface IJiraConfigurationSettings : IHasConfigurationSettings
+    {
+    }
 }
