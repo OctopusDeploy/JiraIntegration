@@ -50,27 +50,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public void WeCanDeserializeJiraIssuesWithComments()
         {
-            var buildInformation = new OctopusBuildInformation
+            var buildInformation = CreateBuildInformation(new[]
             {
-                VcsType = "Git",
-                VcsRoot = "https://github.com/testOrg/testRepo",
-                Branch = "main",
-                BuildEnvironment = "buildserverX",
-                Commits = new[]
+                new Commit
                 {
-                    new Commit
-                    {
-                        Id = "123",
-                        Comment = "OATP-1",
-                    },
-                    new Commit
-                    {
-                        Id = "234",
-                        Comment = "OATP-9",
-                    }
+                    Id = "123",
+                    Comment = "OATP-1",
+                },
+                new Commit
+                {
+                    Id = "234",
+                    Comment = "OATP-9",
                 }
-            };
-
+            });
+            
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 
             Assert.NotNull(result.Value);
@@ -78,6 +71,49 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 
             AssertIssueWasReturnedAndHasCorrectDetails("OATP-1", "Test issue 1", result.Value);
             AssertIssueWasReturnedAndHasCorrectDetails("OATP-9", "This is a release note for Test issue 9", result.Value);
+        }
+        
+        [Test]
+        public void WeCanDeserializeJiraIssuesWhenOnlySomeIssuesAreFound()
+        {
+            var buildInformation = CreateBuildInformation(new[]
+            {
+                new Commit
+                {
+                    Id = "123",
+                    Comment = "OATP-1",
+                },
+                new Commit
+                {
+                    Id = "234",
+                    Comment = "OATP-9999", // non-existent
+                }
+            });
+            
+            var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
+
+            Assert.NotNull(result.Value);
+            Assert.AreEqual(1, result.Value.Length);
+
+            AssertIssueWasReturnedAndHasCorrectDetails("OATP-1", "Test issue 1", result.Value);
+        }
+        
+        [Test]
+        public void WeCanDeserializeJiraIssuesAsEmptyCollectionWhenNoIssuesAreFound()
+        {
+            var buildInformation = CreateBuildInformation(new[]
+            {
+                new Commit
+                {
+                    Id = "234",
+                    Comment = "OATP-9999", // non-existent
+                }
+            });
+            
+            var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
+
+            Assert.NotNull(result.Value);
+            Assert.AreEqual(0, result.Value.Length);
         }
 
         private static JiraRestClient BuildJiraRestClient(string baseUrl, string username, string authToken, ISystemLog log)
@@ -135,6 +171,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 issues.FirstOrDefault(v => v.Id.Equals(issueId, StringComparison.OrdinalIgnoreCase));
             Assert.NotNull(issue);
             Assert.AreEqual(expectedDescription, issue.Description);
+        }
+        
+        private static OctopusBuildInformation CreateBuildInformation(Commit[] commits)
+        {
+            return new OctopusBuildInformation
+            {
+                VcsType = "Git",
+                VcsRoot = "https://github.com/testOrg/testRepo",
+                Branch = "main",
+                BuildEnvironment = "buildserverX",
+                Commits = commits
+            };
         }
 
     }

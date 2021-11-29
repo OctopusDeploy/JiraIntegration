@@ -93,7 +93,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
             var content = JsonConvert.SerializeObject(new
-                { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000 });
+                { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000, validateQuery = "none" });
 
             string errorMessage;
             try
