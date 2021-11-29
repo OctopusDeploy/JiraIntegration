@@ -3,11 +3,11 @@ using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration
 {
-    class JiraIntegration : IIssueTracker
+    internal class JiraIntegration : IIssueTracker
     {
         internal static string Name = "Jira";
 
-        readonly IJiraConfigurationStore configurationStore;
+        private readonly IJiraConfigurationStore configurationStore;
 
         public JiraIntegration(IJiraConfigurationStore configurationStore)
         {
