@@ -23,17 +23,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
     [TestFixture]
     public class WorkItemLinkMapperTestScript
     {
-        private const string JiraBaseUrlEnvironmentVariable = "JiraIntegration_E2E_BaseUrl";
-        private const string JiraUsernameEnvironmentVariable = "JiraIntegration_E2E_Username";
-        private const string JiraAuthTokenEnvironmentVariable = "JiraIntegration_E2E_AuthToken";
-
-        IWorkItemLinkMapper workItemLinkMapper;
-
         [OneTimeSetUp]
         public void Setup()
         {
-            if(!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
-                Assert.Ignore($"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
+            if (!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
+                Assert.Ignore(
+                    $"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
 
             var log = Substitute.For<ISystemLog>();
 
@@ -47,6 +42,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 log);
         }
 
+        private const string JiraBaseUrlEnvironmentVariable = "JiraIntegration_E2E_BaseUrl";
+        private const string JiraUsernameEnvironmentVariable = "JiraIntegration_E2E_Username";
+        private const string JiraAuthTokenEnvironmentVariable = "JiraIntegration_E2E_AuthToken";
+
+        private IWorkItemLinkMapper workItemLinkMapper;
+
         [Test]
         public void WeCanDeserializeJiraIssuesWithComments()
         {
@@ -55,24 +56,25 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 new Commit
                 {
                     Id = "123",
-                    Comment = "OATP-1",
+                    Comment = "OATP-1"
                 },
                 new Commit
                 {
                     Id = "234",
-                    Comment = "OATP-9",
+                    Comment = "OATP-9"
                 }
             });
-            
+
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 
             Assert.NotNull(result.Value);
             Assert.AreEqual(2, result.Value.Length);
 
             AssertIssueWasReturnedAndHasCorrectDetails("OATP-1", "Test issue 1", result.Value);
-            AssertIssueWasReturnedAndHasCorrectDetails("OATP-9", "This is a release note for Test issue 9", result.Value);
+            AssertIssueWasReturnedAndHasCorrectDetails("OATP-9", "This is a release note for Test issue 9",
+                result.Value);
         }
-        
+
         [Test]
         public void WeCanDeserializeJiraIssuesWhenOnlySomeIssuesAreFound()
         {
@@ -81,15 +83,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 new Commit
                 {
                     Id = "123",
-                    Comment = "OATP-1",
+                    Comment = "OATP-1"
                 },
                 new Commit
                 {
                     Id = "234",
-                    Comment = "OATP-9999", // non-existent
+                    Comment = "OATP-9999" // non-existent
                 }
             });
-            
+
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 
             Assert.NotNull(result.Value);
@@ -97,7 +99,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 
             AssertIssueWasReturnedAndHasCorrectDetails("OATP-1", "Test issue 1", result.Value);
         }
-        
+
         [Test]
         public void WeCanDeserializeJiraIssuesAsEmptyCollectionWhenNoIssuesAreFound()
         {
@@ -106,17 +108,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 new Commit
                 {
                     Id = "234",
-                    Comment = "OATP-9999", // non-existent
+                    Comment = "OATP-9999" // non-existent
                 }
             });
-            
+
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 
             Assert.NotNull(result.Value);
             Assert.AreEqual(0, result.Value.Length);
         }
 
-        private static JiraRestClient BuildJiraRestClient(string baseUrl, string username, string authToken, ISystemLog log)
+        private static JiraRestClient BuildJiraRestClient(string baseUrl, string username, string authToken,
+            ISystemLog log)
         {
             var httpClientFactory = BuildOctopusHttpClientFactory(baseUrl, username, authToken);
 
@@ -128,7 +131,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 httpClientFactory);
         }
 
-        private static IOctopusHttpClientFactory BuildOctopusHttpClientFactory(string baseUrl, string username, string authToken)
+        private static IOctopusHttpClientFactory BuildOctopusHttpClientFactory(string baseUrl, string username,
+            string authToken)
         {
             var httpClient = new HttpClient
             {
@@ -143,7 +147,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             return httpClientFactory;
         }
 
-        private static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username, string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
+        private static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username,
+            string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             store.GetIsEnabled().Returns(isEnabled);
@@ -154,7 +159,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             return store;
         }
 
-        static bool TryGetJiraSettings(out string jiraBaseUrl, out string jiraUsername, out string jiraAuthToken)
+        private static bool TryGetJiraSettings(out string jiraBaseUrl, out string jiraUsername,
+            out string jiraAuthToken)
         {
             jiraBaseUrl = Environment.GetEnvironmentVariable(JiraBaseUrlEnvironmentVariable);
             jiraUsername = Environment.GetEnvironmentVariable(JiraUsernameEnvironmentVariable);
@@ -165,14 +171,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                    !jiraAuthToken.IsNullOrEmpty();
         }
 
-        static void AssertIssueWasReturnedAndHasCorrectDetails(string issueId, string expectedDescription, IEnumerable<WorkItemLink> issues)
+        private static void AssertIssueWasReturnedAndHasCorrectDetails(string issueId, string expectedDescription,
+            IEnumerable<WorkItemLink> issues)
         {
             var issue =
                 issues.FirstOrDefault(v => v.Id.Equals(issueId, StringComparison.OrdinalIgnoreCase));
             Assert.NotNull(issue);
             Assert.AreEqual(expectedDescription, issue.Description);
         }
-        
+
         private static OctopusBuildInformation CreateBuildInformation(Commit[] commits)
         {
             return new OctopusBuildInformation
@@ -184,6 +191,5 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 Commits = commits
             };
         }
-
     }
 }
