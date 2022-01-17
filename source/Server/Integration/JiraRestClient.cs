@@ -17,20 +17,23 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     {
         const string BrowseProjectsKey = "BROWSE_PROJECTS";
 
-        private readonly AuthenticationHeaderValue authorizationHeader;
-        private readonly HttpClient httpClient;
+        readonly AuthenticationHeaderValue authorizationHeader;
+        readonly HttpClient httpClient;
 
-        private readonly string baseUrl;
-        private readonly ISystemLog systemLog;
-        private readonly string baseApiUri = "rest/api/2";
+        readonly string baseUrl;
+        readonly ISystemLog systemLog;
+        readonly string baseApiUri = "rest/api/2";
 
-        public JiraRestClient(string baseUrl, string username, string? password, ISystemLog systemLog,
-            IOctopusHttpClientFactory octopusHttpClientFactory)
+        public JiraRestClient(string baseUrl,
+                              string username,
+                              string? password,
+                              ISystemLog systemLog,
+                              IOctopusHttpClientFactory octopusHttpClientFactory)
         {
             this.baseUrl = baseUrl;
             this.systemLog = systemLog;
             authorizationHeader = new AuthenticationHeaderValue("Basic",
-                Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
+                                                                Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{password}")));
             httpClient = CreateHttpClient(octopusHttpClientFactory);
         }
 
@@ -54,7 +57,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                         if (!permissionsContainer.Permissions.ContainsKey(BrowseProjectsKey))
                         {
                             connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                                $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
+                                                                 $"Permissions returned from Jira does not contain the {BrowseProjectsKey} permission details.");
                             return connectivityCheckResponse;
                         }
 
@@ -62,7 +65,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                         if (!setting.HavePermission)
                         {
                             connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                                $"User does not have the '{setting.Name}' permission in Jira");
+                                                                 $"User does not have the '{setting.Name}' permission in Jira");
                             return connectivityCheckResponse;
                         }
 
@@ -71,20 +74,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 }
 
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                    $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" Reason: {response.ReasonPhrase}" : "")}");
+                                                     $"Failed to connect to {baseUrl}. Response code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" Reason: {response.ReasonPhrase}" : "")}");
 
                 return connectivityCheckResponse;
             }
             catch (HttpRequestException e)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                    $"Failed to connect to {baseUrl}. Reason: {e.Message}");
+                                                     $"Failed to connect to {baseUrl}. Reason: {e.Message}");
                 return connectivityCheckResponse;
             }
             catch (TaskCanceledException e)
             {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
-                    $"Failed to connect to {baseUrl}. Reason: {e.Message}");
+                                                     $"Failed to connect to {baseUrl}. Reason: {e.Message}");
                 return connectivityCheckResponse;
             }
         }
@@ -93,7 +96,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
             var content = JsonConvert.SerializeObject(new
-                { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000, validateQuery = "none" });
+                                                          { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000, validateQuery = "none" });
 
             string errorMessage;
             try
@@ -103,7 +106,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 {
                     var result = await GetResult<JiraSearchResult>(response);
                     systemLog.Info(
-                        $"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
+                                   $"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
                     return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
                 }
 
@@ -118,6 +121,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             {
                 errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
             }
+
             systemLog.Warn(errorMessage);
 
             return ResultFromExtension<JiraIssue[]>.Failed(errorMessage);
@@ -165,16 +169,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     {
         [JsonProperty("key")]
         public string Key { get; set; } = string.Empty;
+
         [JsonProperty("fields")]
-        public JiraIssueFields Fields { get; set; } = new JiraIssueFields();
+        public JiraIssueFields Fields { get; set; } = new();
     }
 
     class JiraIssueFields
     {
         [JsonProperty("summary")]
         public string Summary { get; set; } = string.Empty;
+
         [JsonProperty("comment")]
-        public JiraIssueComments Comments { get; set; } = new JiraIssueComments();
+        public JiraIssueComments Comments { get; set; } = new();
     }
 
     class JiraIssueComments
@@ -183,7 +189,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         public IEnumerable<JiraIssueComment> Comments { get; set; } = new JiraIssueComment[0];
 
         [JsonProperty("total")]
-        public int Total { get; set; } = 0;
+        public int Total { get; set; }
     }
 
     class JiraIssueComment
@@ -195,12 +201,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     class PermissionSettingsContainer
     {
         [JsonProperty("permissions")]
-        public Dictionary<string, PermissionSettings> Permissions { get; set; } = new Dictionary<string, PermissionSettings>();
+        public Dictionary<string, PermissionSettings> Permissions { get; set; } = new();
     }
 
     class PermissionSettings
     {
         public string Name { get; set; } = string.Empty;
+
         [JsonProperty("havePermission")]
         public bool HavePermission { get; set; }
     }

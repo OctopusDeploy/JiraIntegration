@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -15,14 +16,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraConnectAppConnectivityCheckAction : IAsyncApiAction
     {
-        static readonly RequestBodyRegistration<JiraConnectAppConnectionCheckData> Data = new RequestBodyRegistration<JiraConnectAppConnectionCheckData>();
-        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
+        static readonly RequestBodyRegistration<JiraConnectAppConnectionCheckData> Data = new();
+        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new();
 
-        private readonly ISystemLog systemLog;
-        private readonly IJiraConfigurationStore configurationStore;
-        private readonly IInstallationIdProvider installationIdProvider;
-        private readonly JiraConnectAppClient connectAppClient;
-        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
+        readonly ISystemLog systemLog;
+        readonly IJiraConfigurationStore configurationStore;
+        readonly IInstallationIdProvider installationIdProvider;
+        readonly JiraConnectAppClient connectAppClient;
+        readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppConnectivityCheckAction(
             ISystemLog systemLog,
@@ -69,16 +70,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
                 var connectivityCheckPayload =
-                    JsonConvert.SerializeObject(new JiraConnectAppConnectivityCheckRequest {BaseHostUrl = baseUrl, OctopusInstallationId = username});
+                    JsonConvert.SerializeObject(new JiraConnectAppConnectivityCheckRequest { BaseHostUrl = baseUrl, OctopusInstallationId = username });
                 var result = await client.PostAsync(
-                        $"{configurationStore.GetConnectAppUrl()}/relay/connectivitycheck",
-                        new StringContent(connectivityCheckPayload, Encoding.UTF8, "application/json"));
+                                                    $"{configurationStore.GetConnectAppUrl()}/relay/connectivitycheck",
+                                                    new StringContent(connectivityCheckPayload, Encoding.UTF8, "application/json"));
 
                 if (!result.IsSuccessStatusCode)
                 {
-                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error, result.StatusCode == HttpStatusCode.NotFound
-                        ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIntegration)."
-                        : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}");
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,
+                                                         result.StatusCode == HttpStatusCode.NotFound
+                                                             ? $"Failed to find an installation for Jira host {configurationStore.GetBaseUrl()}. Please ensure you have installed the Octopus Deploy for Jira plugin from the [Atlassian Marketplace](https://marketplace.atlassian.com/apps/1220376/octopus-deploy-for-jira). [Learn more](https://g.octopushq.com/JiraIntegration)."
+                                                             : $"Failed to check connectivity to Jira. Response code: {result.StatusCode}, Message: {result.Content.ReadAsStringAsync().GetAwaiter().GetResult()}");
                     return Result.Response(connectivityCheckResponse);
                 }
             }
@@ -86,15 +88,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
 
             if (!configurationStore.GetIsEnabled())
-            {
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
-            }
 
             return Result.Response(connectivityCheckResponse);
         }
-
 #nullable disable
-        private class JiraConnectAppConnectivityCheckRequest
+        class JiraConnectAppConnectivityCheckRequest
         {
             public string BaseHostUrl { get; set; } = string.Empty;
             public string OctopusInstallationId { get; set; } = string.Empty;

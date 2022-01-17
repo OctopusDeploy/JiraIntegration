@@ -14,15 +14,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
     class WorkItemLinkMapper : IWorkItemLinkMapper
     {
-        private readonly IJiraConfigurationStore store;
-        private readonly CommentParser commentParser;
-        private readonly Lazy<IJiraRestClient> jira;
-        private readonly ISystemLog systemLog;
+        readonly IJiraConfigurationStore store;
+        readonly CommentParser commentParser;
+        readonly Lazy<IJiraRestClient> jira;
+        readonly ISystemLog systemLog;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
-            CommentParser commentParser,
-            Lazy<IJiraRestClient> jira,
-            ISystemLog systemLog)
+                                  CommentParser commentParser,
+                                  Lazy<IJiraRestClient> jira,
+                                  ISystemLog systemLog)
         {
             this.store = store;
             this.commentParser = commentParser;
@@ -37,8 +37,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
         {
             if (!IsEnabled)
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
-            if (string.IsNullOrEmpty(store.GetJiraUsername()) ||
-                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
+            if (string.IsNullOrEmpty(store.GetJiraUsername()) || string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
                 return FailureWithLog("Username/password not configured");
 
             var baseUrl = store.GetBaseUrl();
@@ -48,22 +47,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             var releaseNotePrefix = store.GetReleaseNotePrefix();
             var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
             if (workItemIds.Length == 0)
-            {
                 return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
-            }
 
             return TryConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl);
         }
 
-        private IResultFromExtension<WorkItemLink[]> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
+        IResultFromExtension<WorkItemLink[]> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
         {
             systemLog.InfoFormat("Getting work items {0} from Jira", string.Join(", ", workItemIds));
             var response = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
 
             if (response is IFailureResult failureResult)
-            {
                 return FailureWithLog(failureResult.Errors);
-            }
 
             var issues = ((ISuccessResult<JiraIssue[]>)response).Value;
             if (issues.Length == 0)
@@ -76,27 +71,25 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
             if (workItemsNotFound.Length > 0)
-            {
                 systemLog.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
-            }
 
             return ResultFromExtension<WorkItemLink[]>.Success(workItemIds
-                .Where(workItemId => issueMap.ContainsKey(workItemId))
-                .Select(workItemId =>
-                {
-                    var issue = issueMap[workItemId];
-                    return new WorkItemLink
-                    {
-                        Id = issue.Key,
-                        Description = GetReleaseNote(issueMap[workItemId], releaseNotePrefix),
-                        LinkUrl = baseUrl + "/browse/" + workItemId,
-                        Source = JiraConfigurationStore.CommentParser
-                    };
-                })
-                .Where(i => i != null)
-                // ReSharper disable once RedundantEnumerableCastCall
-                .Cast<WorkItemLink>() // cast back from `WorkItemLink?` type to keep the compiler happy
-                .ToArray());
+                                                               .Where(workItemId => issueMap.ContainsKey(workItemId))
+                                                               .Select(workItemId =>
+                                                                       {
+                                                                           var issue = issueMap[workItemId];
+                                                                           return new WorkItemLink
+                                                                           {
+                                                                               Id = issue.Key,
+                                                                               Description = GetReleaseNote(issueMap[workItemId], releaseNotePrefix),
+                                                                               LinkUrl = baseUrl + "/browse/" + workItemId,
+                                                                               Source = JiraConfigurationStore.CommentParser
+                                                                           };
+                                                                       })
+                                                               .Where(i => i != null)
+                                                               // ReSharper disable once RedundantEnumerableCastCall
+                                                               .Cast<WorkItemLink>() // cast back from `WorkItemLink?` type to keep the compiler happy
+                                                               .ToArray());
         }
 
         public string GetReleaseNote(JiraIssue issue, string? releaseNotePrefix)
@@ -108,7 +101,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
             return !string.IsNullOrWhiteSpace(releaseNote)
-                ? releaseNoteRegex.Replace(releaseNote, String.Empty)?.Trim() ?? string.Empty
+                ? releaseNoteRegex.Replace(releaseNote, string.Empty)?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
         }
 

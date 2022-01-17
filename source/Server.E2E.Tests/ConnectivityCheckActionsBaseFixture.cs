@@ -14,19 +14,19 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 {
     abstract class ConnectivityCheckActionsBaseFixture
     {
+        const string JiraBaseUrlEnvironmentVariable = "JiraIntegration_E2E_BaseUrl";
+        const string JiraUsernameEnvironmentVariable = "JiraIntegration_E2E_Username";
+        const string JiraAuthTokenEnvironmentVariable = "JiraIntegration_E2E_AuthToken";
         protected IJiraConfigurationStore store;
         protected ISystemLog log;
         protected IOctopusHttpClientFactory httpClientFactory;
-        private const string JiraBaseUrlEnvironmentVariable = "JiraIntegration_E2E_BaseUrl";
-        private const string JiraUsernameEnvironmentVariable = "JiraIntegration_E2E_Username";
-        private const string JiraAuthTokenEnvironmentVariable = "JiraIntegration_E2E_AuthToken";
 
         [OneTimeSetUp]
         public void Setup()
         {
             if (!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
                 Assert.Ignore(
-                    $"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
+                              $"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
 
             log = Substitute.For<ISystemLog>();
 
@@ -38,22 +38,27 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         {
             var httpClientFactory = Substitute.For<IOctopusHttpClientFactory>();
 
-            httpClientFactory.CreateClient().Returns(_ =>
-            {
-                var httpClient = new HttpClient
-                {
-                    BaseAddress = new Uri(baseUrl)
-                };
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{authToken}")));
+            httpClientFactory.CreateClient()
+                             .Returns(_ =>
+                                      {
+                                          var httpClient = new HttpClient
+                                          {
+                                              BaseAddress = new Uri(baseUrl)
+                                          };
+                                          httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+                                                                                                                         Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{authToken}")));
 
-                return httpClient;
-            });
+                                          return httpClient;
+                                      });
 
             return httpClientFactory;
         }
 
-        static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username, string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
+        static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl,
+                                                                   string username,
+                                                                   string authToken,
+                                                                   bool isEnabled = true,
+                                                                   string releaseNotePrefix = "Release note:")
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             store.GetIsEnabled().Returns(isEnabled);
@@ -70,9 +75,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             jiraUsername = Environment.GetEnvironmentVariable(JiraUsernameEnvironmentVariable);
             jiraAuthToken = Environment.GetEnvironmentVariable(JiraAuthTokenEnvironmentVariable);
 
-            return !jiraBaseUrl.IsNullOrEmpty() &&
-                   !jiraUsername.IsNullOrEmpty() &&
-                   !jiraAuthToken.IsNullOrEmpty();
+            return !jiraBaseUrl.IsNullOrEmpty() && !jiraUsername.IsNullOrEmpty() && !jiraAuthToken.IsNullOrEmpty();
         }
     }
 }

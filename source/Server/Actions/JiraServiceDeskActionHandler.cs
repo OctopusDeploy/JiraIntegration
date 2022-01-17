@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Threading;
 using Octopus.Server.Extensibility.HostServices.Diagnostics;
 using Octopus.Server.Extensibility.JiraIntegration.Deployments;
@@ -11,16 +12,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 {
     class JiraServiceDeskActionHandler : IActionHandler
     {
-        public string Id => "Octopus.JiraIntegration.ServiceDeskAction";
-        public string Name => "Jira Service Desk Change Request";
-        public string Description => "Initiate a Change Request in Jira Service Desk";
-        public string? Keywords => null;
-        public bool ShowInStepTemplatePickerUI => true;
-        public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
-        public bool CanRunOnDeploymentTarget => false;
-        public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
-
-        private readonly IMediator mediator;
+        readonly IMediator mediator;
         readonly JiraDeployment jiraDeployment;
 
         public JiraServiceDeskActionHandler(
@@ -30,6 +22,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
             this.mediator = mediator;
             this.jiraDeployment = jiraDeployment;
         }
+
+        public string Id => "Octopus.JiraIntegration.ServiceDeskAction";
+        public string Name => "Jira Service Desk Change Request";
+        public string Description => "Initiate a Change Request in Jira Service Desk";
+        public string? Keywords => null;
+        public bool ShowInStepTemplatePickerUI => true;
+        public bool WhenInAChildStepRunInTheContextOfTheTargetMachine => false;
+        public bool CanRunOnDeploymentTarget => false;
+        public ActionHandlerCategory[] Categories => new[] { ActionHandlerCategory.BuiltInStep, ActionHandlerCategory.Atlassian };
 
         public IActionHandlerResult Execute(IActionHandlerContext context, ITaskLog taskLog)
         {
@@ -42,7 +43,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 
             try
             {
-                jiraDeployment.PublishToJira("in_progress", deployment, new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId), taskLog, CancellationToken.None).GetAwaiter().GetResult();
+                jiraDeployment.PublishToJira("in_progress",
+                                             deployment,
+                                             new JiraServiceDeskApiDeployment(jiraServiceDeskChangeRequestId),
+                                             taskLog,
+                                             CancellationToken.None)
+                              .GetAwaiter()
+                              .GetResult();
             }
             catch (JiraDeploymentException exception)
             {
@@ -51,6 +58,5 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Actions
 
             return ActionHandlerResult.FromSuccess();
         }
-
     }
 }

@@ -25,18 +25,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class JiraDeployment
     {
-        private readonly IMediator mediator;
-        private readonly ITaskLogFactory taskLogFactory;
-        private readonly IJiraConfigurationStore store;
-        private readonly JiraConnectAppClient connectAppClient;
-        private readonly IInstallationIdProvider installationIdProvider;
-        private readonly IClock clock;
-        private readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
-        private readonly IServerConfigurationStore serverConfigurationStore;
-        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
+        readonly IMediator mediator;
+        readonly ITaskLogFactory taskLogFactory;
+        readonly IJiraConfigurationStore store;
+        readonly JiraConnectAppClient connectAppClient;
+        readonly IInstallationIdProvider installationIdProvider;
+        readonly IClock clock;
+        readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
+        readonly IServerConfigurationStore serverConfigurationStore;
+        readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
-        private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
-        private EnvironmentResource? deploymentEnvironment;
+        DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
+        EnvironmentResource? deploymentEnvironment;
 
         public JiraDeployment(
             IMediator mediator,
@@ -63,12 +63,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         bool JiraIntegrationUnavailable(DeploymentResource deployment)
         {
-            return !store.GetIsEnabled() ||
-                   store.GetJiraInstanceType() == JiraInstanceType.Server;
+            return !store.GetIsEnabled() || store.GetJiraInstanceType() == JiraInstanceType.Server;
         }
 
-        public async Task PublishToJira(string eventType, DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment,
-            ITaskLog taskLog, CancellationToken cancellationToken)
+        public async Task PublishToJira(string eventType,
+                                        DeploymentResource deployment,
+                                        IJiraApiDeployment jiraApiDeployment,
+                                        ITaskLog taskLog,
+                                        CancellationToken cancellationToken)
         {
             if (JiraIntegrationUnavailable(deployment))
             {
@@ -84,8 +86,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
-                string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
+            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) || string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
             {
                 taskLog.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                 return;
@@ -106,9 +107,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             environmentSettings =
                 deploymentEnvironmentSettingsProvider
                     .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
-                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId.Value) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
+                                                                                                                  JiraConfigurationStore.SingletonId,
+                                                                                                                  deployment.EnvironmentId.Value)
+                ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
 
-            var data = await PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment, cancellationToken);
+            var data = await PrepareOctopusJiraPayload(eventType,
+                                                       serverUri,
+                                                       deployment,
+                                                       jiraApiDeployment,
+                                                       cancellationToken);
 
             // Push data to Jira
             await SendToJira(token, data, deployment, taskLogBlock);
@@ -116,7 +123,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             taskLogFactory.Finish(taskLogBlock);
         }
 
-        async Task<OctopusJiraPayloadData> PrepareOctopusJiraPayload(string eventType, string serverUri, DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment, CancellationToken cancellationToken)
+        async Task<OctopusJiraPayloadData> PrepareOctopusJiraPayload(string eventType,
+                                                                     string serverUri,
+                                                                     DeploymentResource deployment,
+                                                                     IJiraApiDeployment jiraApiDeployment,
+                                                                     CancellationToken cancellationToken)
         {
             var project = (await mediator.Request(new GetProjectRequest(deployment.ProjectId), cancellationToken)).Project;
 
@@ -136,9 +147,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             DeploymentSequenceNumber = int.Parse(deployment.Id!.ToString().Split('-')[1]),
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
                             DisplayName = serverTask.Description,
-                            Associations = new []
+                            Associations = new[]
                             {
-                                new JiraAssociation()
+                                new JiraAssociation
                                 {
                                     AssociationType = jiraApiDeployment.DeploymentType,
                                     Values = jiraApiDeployment.DeploymentValues(deployment)

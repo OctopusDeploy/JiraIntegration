@@ -1,3 +1,4 @@
+using System;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
 using Octopus.Server.Extensibility.JiraIntegration.Web;
 
@@ -10,8 +11,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration
 
         public JiraIntegrationApi()
         {
-            Add<JiraCredentialsConnectivityCheckAction>("POST", ApiJiraCredentialsTest, RouteCategory.Raw, new SecuredEndpointInvocation(), null, "JiraIntegration");
-            Add<JiraConnectAppConnectivityCheckAction>("POST", ApiConnectAppCredentialsTest, RouteCategory.Raw, new SecuredEndpointInvocation(), null, "JiraIntegration");
+            Add<JiraCredentialsConnectivityCheckAction>("POST",
+                                                        ApiJiraCredentialsTest,
+                                                        RouteCategory.Raw,
+                                                        new SecuredEndpointInvocation(),
+                                                        null,
+                                                        "JiraIntegration");
+            Add<JiraConnectAppConnectivityCheckAction>("POST",
+                                                       ApiConnectAppCredentialsTest,
+                                                       RouteCategory.Raw,
+                                                       new SecuredEndpointInvocation(),
+                                                       null,
+                                                       "JiraIntegration");
         }
     }
 }

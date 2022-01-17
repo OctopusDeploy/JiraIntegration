@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using Octopus.Server.Extensibility.JiraIntegration.WorkItems;
@@ -26,7 +27,6 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             var reference = workItemReferences.First();
             Assert.AreEqual(expectedReference, reference);
-
         }
 
         [TestCase("Fixes [JRE-1234]", "JRE-1234")]
@@ -76,8 +76,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             Assert.AreEqual("JRE-2345", reference);
         }
 
-        [TestCase("Fixes [JRE-1234],[JRE-2345]", "JRE-1234","JRE-2345")]
-        [TestCase("Fixes (JRE-1234),(JRE-2345)", "JRE-1234","JRE-2345")]
+        [TestCase("Fixes [JRE-1234],[JRE-2345]", "JRE-1234", "JRE-2345")]
+        [TestCase("Fixes (JRE-1234),(JRE-2345)", "JRE-1234", "JRE-2345")]
         public void MultipleIssueNumberReferencesEnclosedInBracketsGetsParsedCorrectly(string comment, params string[] expectedReferences)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
@@ -152,11 +152,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             Assert.IsEmpty(workItemReferences);
         }
 
-        private OctopusBuildInformation Create(string comment)
+        OctopusBuildInformation Create(string comment)
         {
             return new OctopusBuildInformation
             {
-                Commits = new[] { new Commit{ Id = "a", Comment = comment }}
+                Commits = new[] { new Commit { Id = "a", Comment = comment } }
             };
         }
     }
