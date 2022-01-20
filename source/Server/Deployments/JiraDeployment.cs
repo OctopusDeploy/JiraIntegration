@@ -19,6 +19,7 @@ using Octopus.Server.MessageContracts.Features.Projects;
 using Octopus.Server.MessageContracts.Features.Projects.Releases;
 using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 using Octopus.Server.MessageContracts.Features.ServerTasks;
+using Octopus.Server.MessageContracts.Features.Tenants;
 using Octopus.Time;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
@@ -34,9 +35,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         private readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
         private readonly IServerConfigurationStore serverConfigurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
-
-        private DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings? environmentSettings;
-        private EnvironmentResource? deploymentEnvironment;
+        
 
         public JiraDeployment(
             IMediator mediator,
@@ -102,27 +101,37 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             }
 
             var getDeploymentEnvironmentResponse = await mediator.Request(new GetDeploymentEnvironmentRequest(deployment.EnvironmentId), cancellationToken);
-            deploymentEnvironment = getDeploymentEnvironmentResponse.DeploymentEnvironment;
-            environmentSettings =
+            var deploymentEnvironment = getDeploymentEnvironmentResponse.DeploymentEnvironment;
+            var environmentSettings =
                 deploymentEnvironmentSettingsProvider
-                    .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings>(
+                    .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings?>(
                         JiraConfigurationStore.SingletonId, deployment.EnvironmentId.Value) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
 
-            var data = await PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment, cancellationToken);
+            var data = await PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment, cancellationToken, deploymentEnvironment, environmentSettings);
 
             // Push data to Jira
-            await SendToJira(token, data, deployment, taskLogBlock);
+            await SendToJira(token, data, deployment, taskLogBlock, deploymentEnvironment, environmentSettings);
 
             taskLogFactory.Finish(taskLogBlock);
         }
 
-        async Task<OctopusJiraPayloadData> PrepareOctopusJiraPayload(string eventType, string serverUri, DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment, CancellationToken cancellationToken)
+        async Task<OctopusJiraPayloadData> PrepareOctopusJiraPayload(string eventType, string serverUri,
+            DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment, CancellationToken cancellationToken,
+            EnvironmentResource deploymentEnvironment,
+            DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings
+                environmentSettings)
         {
             var project = (await mediator.Request(new GetProjectRequest(deployment.ProjectId), cancellationToken)).Project;
 
             var release = (await mediator.Request(new GetReleaseRequest(deployment.ReleaseId), cancellationToken)).Release;
             var serverTask = (await mediator.Request(new GetServerTaskRequest(deployment.TaskId), cancellationToken)).Task;
-
+            
+            TenantResource? tenant = null;
+            if (deployment.TenantId?.Value is not null)
+            {
+                tenant = (await mediator.Request(new GetTenantByIdOrNameRequest(deployment.TenantId.Value.ToTenantIdOrName()), cancellationToken)).Resource;
+            }
+            
             return new OctopusJiraPayloadData
             {
                 InstallationId = installationIdProvider.GetInstallationId().ToString(),
@@ -158,7 +167,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             Environment = new JiraDeploymentEnvironment
                             {
                                 Id = $"{deployment.EnvironmentId}{(deployment.TenantId is null ? "" : $"-{deployment.TenantId}")}",
-                                DisplayName = deploymentEnvironment?.Name ?? string.Empty,
+                                DisplayName =  $"{deploymentEnvironment.Name}{(tenant?.Name is null ? "" : $" ({tenant.Name})")}",
                                 Type = environmentSettings?.JiraEnvironmentType.ToString() ?? JiraEnvironmentType.unmapped.ToString()
                             },
                             SchemeVersion = "1.0"
@@ -168,9 +177,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             };
         }
 
-        async Task SendToJira(string token, OctopusJiraPayloadData data, DeploymentResource deployment, ITaskLog taskLogBlock)
+        async Task SendToJira(string token, OctopusJiraPayloadData data, DeploymentResource deployment,
+            ITaskLog taskLogBlock, EnvironmentResource deploymentEnvironment,
+            DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings
+                environmentSettings)
         {
-            taskLogBlock.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment?.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
+            taskLogBlock.Info($"Sending deployment data to Jira for deployment {deployment.Id}, to {deploymentEnvironment.Name}({environmentSettings?.JiraEnvironmentType.ToString()}) with state {data.DeploymentsInfo.Deployments[0].State} for issue keys {string.Join(",", data.DeploymentsInfo.Deployments[0].Associations[0].Values)}");
 
             var json = JsonConvert.SerializeObject(data);
 
