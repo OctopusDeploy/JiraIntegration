@@ -4,7 +4,7 @@ using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
-    class JiraIssueTrackerApiDeployment : IJiraApiDeployment
+    internal class JiraIssueTrackerApiDeployment : IJiraApiDeployment
     {
         public string DeploymentType => JiraAssociationConstants.JiraAssociationTypeIssueKeys;
 
@@ -17,6 +17,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 .Distinct()).ToArray();
         }
 
-        public void HandleJiraIntegrationIsUnavailable() { }
+        public void HandleJiraIntegrationIsUnavailable()
+        {
+        }
     }
 }
