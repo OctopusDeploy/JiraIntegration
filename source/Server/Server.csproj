@@ -17,7 +17,7 @@
     <PackageReference Include="Octopus.Data" Version="6.0.0" />
     <PackageReference Include="Octopus.Diagnostics" Version="2.1.1" />
     <PackageReference Include="Octopus.Server.Extensibility" Version="14.0.1" />
-    <PackageReference Include="Octopus.Server.MessageContracts" Version="0.1.389" />
+    <PackageReference Include="Octopus.Server.MessageContracts" Version="2.0.188" />
     <PackageReference Include="Octopus.Time" Version="1.1.6" />
     <PackageReference Include="Sashimi.Server.Contracts" Version="11.0.1" />
   </ItemGroup>
