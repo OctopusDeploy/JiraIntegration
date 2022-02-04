@@ -6,9 +6,10 @@ using Octopus.Server.MessageContracts.Attributes;
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     [Description("Configure the Jira Integration. [Learn more](https://g.octopushq.com/JiraIntegration).")]
-    class JiraConfigurationResource : ExtensionConfigurationResource
+    internal class JiraConfigurationResource : ExtensionConfigurationResource
     {
-        public const string JiraBaseUrlDescription = "Enter the base url of your Jira instance. Once set, work item references will render as links.";
+        public const string JiraBaseUrlDescription =
+            "Enter the base url of your Jira instance. Once set, work item references will render as links.";
 
         [DisplayName("Jira Instance Type")]
         [Description("Set whether you are using a cloud or server instance of Jira")]
@@ -22,10 +23,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         public string? BaseUrl { get; set; }
 
         [DisplayName("Jira Connect App Password")]
-        [Description("Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIntegration#connecting-jira-cloud-and-octopus).")]
+        [Description(
+            "Set the password for authenticating with Jira Connect App to allow deployment data to be sent to Jira. [Learn more](https://g.octopushq.com/JiraIntegration#connecting-jira-cloud-and-octopus).")]
         [Writeable]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
-        [AllowConnectivityCheck("Jira Connect App configuration", JiraIntegrationApi.ApiConnectAppCredentialsTest, nameof(BaseUrl), nameof(Password))]
+        [AllowConnectivityCheck("Jira Connect App configuration", JiraIntegrationApi.ApiConnectAppCredentialsTest,
+            nameof(BaseUrl), nameof(Password))]
         public SensitiveValue? Password { get; set; }
 
         [DisplayName("Octopus Installation Id")]
@@ -36,20 +39,23 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         public string OctopusInstallationId { get; set; } = string.Empty;
 
         [DisplayName("Octopus Server Url")]
-        [Description("This Url is required in order to push deployment data to Jira. If it is blank please set it in [Configuration/Nodes](/configuration/nodes)")]
+        [Description(
+            "This Url is required in order to push deployment data to Jira. If it is blank please set it in [Configuration/Nodes](/configuration/nodes)")]
         [ReadOnly(true)]
         [ApplicableWhenSpecificValue(nameof(JiraInstanceType), "Cloud")]
         public string? OctopusServerUrl { get; set; }
 
         [DisplayName("Release Note Options")]
-        public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
+        public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new();
     }
 
-    class ReleaseNoteOptionsResource
+    internal class ReleaseNoteOptionsResource
     {
         public const string UsernameDescription = "Set the username to authenticate with against your Jira instance.";
         public const string PasswordDescription = "Set the password to authenticate with against your Jira instance.";
-        public const string ReleaseNotePrefixDescription = "Set the prefix to look for when finding release notes for Jira issues. For example `Release note:`.";
+
+        public const string ReleaseNotePrefixDescription =
+            "Set the prefix to look for when finding release notes for Jira issues. For example `Release note:`.";
 
         [DisplayName("Jira Username")]
         [Description(UsernameDescription)]
@@ -59,7 +65,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         [DisplayName("Jira Password")]
         [Description(PasswordDescription)]
         [Writeable]
-        [AllowConnectivityCheck("Jira credentials", JiraIntegrationApi.ApiJiraCredentialsTest, nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
+        [AllowConnectivityCheck("Jira credentials", JiraIntegrationApi.ApiJiraCredentialsTest,
+            nameof(JiraConfigurationResource.BaseUrl), nameof(Username), nameof(Password))]
         public SensitiveValue? Password { get; set; }
 
         [DisplayName("Release Note Prefix")]
