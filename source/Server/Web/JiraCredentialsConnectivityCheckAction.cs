@@ -8,16 +8,17 @@ using Octopus.Server.Extensibility.Resources.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
-    class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
+    internal class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
-        static readonly RequestBodyRegistration<JiraCredentialsConnectionCheckData> Data = new RequestBodyRegistration<JiraCredentialsConnectionCheckData>();
-        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
+        private static readonly RequestBodyRegistration<JiraCredentialsConnectionCheckData> Data = new();
+        private static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new();
 
         private readonly IJiraConfigurationStore configurationStore;
         private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
         private readonly ISystemLog systemLog;
 
-        public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore, IOctopusHttpClientFactory octopusHttpClientFactory, ISystemLog systemLog)
+        public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore,
+            IOctopusHttpClientFactory octopusHttpClientFactory, ISystemLog systemLog)
         {
             this.configurationStore = configurationStore;
             this.octopusHttpClientFactory = octopusHttpClientFactory;
@@ -39,9 +40,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             if (string.IsNullOrEmpty(baseUrl) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
                 var response = new ConnectivityCheckResponse();
-                if (string.IsNullOrEmpty(baseUrl)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Base Url.");
-                if (string.IsNullOrEmpty(username)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Username.");
-                if (string.IsNullOrEmpty(password)) response.AddMessage(ConnectivityCheckMessageCategory.Error, "Please provide a value for Jira Password.");
+                if (string.IsNullOrEmpty(baseUrl))
+                    response.AddMessage(ConnectivityCheckMessageCategory.Error,
+                        "Please provide a value for Jira Base Url.");
+                if (string.IsNullOrEmpty(username))
+                    response.AddMessage(ConnectivityCheckMessageCategory.Error,
+                        "Please provide a value for Jira Username.");
+                if (string.IsNullOrEmpty(password))
+                    response.AddMessage(ConnectivityCheckMessageCategory.Error,
+                        "Please provide a value for Jira Password.");
                 return Result.Response(response);
             }
 
@@ -49,12 +56,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             var connectivityCheckResponse = await jiraRestClient.ConnectivityCheck();
             if (connectivityCheckResponse.Messages.All(m => m.Category != ConnectivityCheckMessageCategory.Error))
             {
-                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
+                connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info,
+                    "The Jira Connect App connection was tested successfully");
 
                 if (!configurationStore.GetIsEnabled())
-                {
-                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
-                }
+                    connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning,
+                        "The Jira Integration is not enabled, so its functionality will not currently be available");
             }
 
             return Result.Response(connectivityCheckResponse);
@@ -62,11 +69,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
     }
 
 #nullable disable
-    class JiraCredentialsConnectionCheckData
+    internal class JiraCredentialsConnectionCheckData
     {
         public string BaseUrl { get; set; }
         public string Username { get; set; }
         public string Password { get; set; }
     }
-
 }
