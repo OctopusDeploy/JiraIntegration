@@ -19,7 +19,7 @@ using Titanium.Web.Proxy.Models;
 namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 {
     [TestFixture]
-    class JiraConnectAppConnectivityCheckActionFixture : ConnectivityCheckActionsBaseFixture
+    internal class JiraConnectAppConnectivityCheckActionFixture : ConnectivityCheckActionsBaseFixture
     {
         [Test]
         public async Task WhenDnsCannotBeResolved()
@@ -30,7 +30,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var baseUrl = "http://notexistingdomain.dddd.ttt";
             store.GetConnectAppUrl().Returns(baseUrl);
 
-            var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
+            var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider,
+                new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
             var octoRequest = Substitute.For<IOctoRequest>();
             octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
                 .Returns(new JiraConnectAppConnectionCheckData
@@ -41,7 +42,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var connectivityCheckResponse = (ConnectivityCheckResponse)((OctoDataResponse)response.Response).Model;
 
             connectivityCheckResponse.Messages.ShouldNotBeEmpty();
-            connectivityCheckResponse.Messages.First().Message.ShouldBe("Failed to get authentication token from Jira Connect App.");
+            connectivityCheckResponse.Messages.First().Message
+                .ShouldBe("Failed to get authentication token from Jira Connect App.");
         }
 
         [Test]
@@ -53,16 +55,17 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, port, false);
             proxyServer.AddEndPoint(explicitEndPoint);
             // Fake authentication failure for proxy
-            proxyServer.ProxySchemeAuthenticateFunc = (d, s, arg3) => Task.FromResult(new ProxyAuthenticationContext { Result = ProxyAuthenticationResult.Failure});
-            proxyServer.ProxyAuthenticationSchemes = new[] {"basic"};
+            proxyServer.ProxySchemeAuthenticateFunc = (d, s, arg3) => Task.FromResult(new ProxyAuthenticationContext
+                { Result = ProxyAuthenticationResult.Failure });
+            proxyServer.ProxyAuthenticationSchemes = new[] { "basic" };
             proxyServer.Start();
             var baseUrl = "http://notexistingdomain.dddd.ttt";
 
             httpClientFactory.CreateClient().Returns(_ =>
             {
-                var httpClient = new HttpClient(new HttpClientHandler {Proxy = new WebProxy("127.0.0.1", port)})
+                var httpClient = new HttpClient(new HttpClientHandler { Proxy = new WebProxy("127.0.0.1", port) })
                 {
-                    BaseAddress = new Uri(baseUrl),
+                    BaseAddress = new Uri(baseUrl)
                 };
 
                 httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
@@ -76,7 +79,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 
             store.GetConnectAppUrl().Returns(baseUrl);
 
-            var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
+            var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider,
+                new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
             var octoRequest = Substitute.For<IOctoRequest>();
             octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
                 .Returns(new JiraConnectAppConnectionCheckData
@@ -87,7 +91,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var connectivityCheckResponse = (ConnectivityCheckResponse)((OctoDataResponse)response.Response).Model;
 
             connectivityCheckResponse.Messages.ShouldNotBeEmpty();
-            connectivityCheckResponse.Messages.First().Message.ShouldBe("Failed to get authentication token from Jira Connect App.");
+            connectivityCheckResponse.Messages.First().Message
+                .ShouldBe("Failed to get authentication token from Jira Connect App.");
         }
     }
 }

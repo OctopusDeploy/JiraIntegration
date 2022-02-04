@@ -12,11 +12,11 @@ using Octopus.Server.MessageContracts.Features.IssueTrackers;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 {
-    class WorkItemLinkMapper : IWorkItemLinkMapper
+    internal class WorkItemLinkMapper : IWorkItemLinkMapper
     {
-        private readonly IJiraConfigurationStore store;
         private readonly CommentParser commentParser;
         private readonly Lazy<IJiraRestClient> jira;
+        private readonly IJiraConfigurationStore store;
         private readonly ISystemLog systemLog;
 
         public WorkItemLinkMapper(IJiraConfigurationStore store,
@@ -48,22 +48,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             var releaseNotePrefix = store.GetReleaseNotePrefix();
             var workItemIds = commentParser.ParseWorkItemIds(buildInformation).Distinct().ToArray();
             if (workItemIds.Length == 0)
-            {
                 return ResultFromExtension<WorkItemLink[]>.Success(Array.Empty<WorkItemLink>());
-            }
 
             return TryConvertWorkItemLinks(workItemIds, releaseNotePrefix, baseUrl);
         }
 
-        private IResultFromExtension<WorkItemLink[]> TryConvertWorkItemLinks(string[] workItemIds, string? releaseNotePrefix, string baseUrl)
+        private IResultFromExtension<WorkItemLink[]> TryConvertWorkItemLinks(string[] workItemIds,
+            string? releaseNotePrefix, string baseUrl)
         {
             systemLog.InfoFormat("Getting work items {0} from Jira", string.Join(", ", workItemIds));
             var response = jira.Value.GetIssues(workItemIds.ToArray()).GetAwaiter().GetResult();
 
-            if (response is IFailureResult failureResult)
-            {
-                return FailureWithLog(failureResult.Errors);
-            }
+            if (response is IFailureResult failureResult) return FailureWithLog(failureResult.Errors);
 
             var issues = ((ISuccessResult<JiraIssue[]>)response).Value;
             if (issues.Length == 0)
@@ -76,9 +72,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var workItemsNotFound = workItemIds.Where(x => !issueMap.ContainsKey(x)).ToArray();
             if (workItemsNotFound.Length > 0)
-            {
-                systemLog.Warn($"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
-            }
+                systemLog.Warn(
+                    $"Parsed work item ids {string.Join(", ", workItemsNotFound)} from commit messages but could not locate them in Jira");
 
             return ResultFromExtension<WorkItemLink[]>.Success(workItemIds
                 .Where(workItemId => issueMap.ContainsKey(workItemId))
@@ -106,13 +101,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
+            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null)
+                .LastOrDefault(c => releaseNoteRegex.IsMatch(c));
             return !string.IsNullOrWhiteSpace(releaseNote)
-                ? releaseNoteRegex.Replace(releaseNote, String.Empty)?.Trim() ?? string.Empty
+                ? releaseNoteRegex.Replace(releaseNote, string.Empty)?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
         }
 
-        IResultFromExtension<WorkItemLink[]> FailureWithLog(params string[] errors)
+        private IResultFromExtension<WorkItemLink[]> FailureWithLog(params string[] errors)
         {
             systemLog.Warn(string.Join(Environment.NewLine, errors));
             return ResultFromExtension<WorkItemLink[]>.Failed(errors);
