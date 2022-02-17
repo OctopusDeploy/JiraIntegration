@@ -114,7 +114,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     if (result == null)
                     {
                         systemLog.Info("Jira Work Item data not found in response body");
-                        return ResultFromExtension<JiraIssue[]>.Failed("");
+                        return ResultFromExtension<JiraIssue[]>.Failed("Jira Work Item data not found in response body");
                     }
                     systemLog.Info($"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
                     return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
