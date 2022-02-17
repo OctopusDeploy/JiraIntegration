@@ -6,7 +6,7 @@ using Octopus.Server.MessageContracts.Features.BuildInformation;
 namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 {
     [TestFixture]
-    class CommentParserScenarios
+    internal class CommentParserScenarios
     {
         [Test]
         public void StandardIssueNumberReferenceGetsParsedCorrectly()
@@ -26,14 +26,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             var reference = workItemReferences.First();
             Assert.AreEqual(expectedReference, reference);
-
         }
 
         [TestCase("Fixes [JRE-1234]", "JRE-1234")]
         [TestCase("Fixes (JRE-1234)", "JRE-1234")]
         [TestCase("Fixes (JRE-1234]", "JRE-1234")]
         [TestCase("Fixes [JRE-1234)", "JRE-1234")]
-        public void StandardIssueNumberReferenceEnclosedInBracketsGetsParsedCorrectly(string comment, string expectedReference)
+        public void StandardIssueNumberReferenceEnclosedInBracketsGetsParsedCorrectly(string comment,
+            string expectedReference)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsNotEmpty(workItemReferences);
@@ -54,7 +54,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
         [TestCase("Fixes [BT2-1234]", "BT2-1234")]
         [TestCase("Fixes (BT2-1234)", "BT2-1234")]
-        public void StandardIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferenceGetsParsedCorrectly(string comment, string expectedReference)
+        public void StandardIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferenceGetsParsedCorrectly(
+            string comment, string expectedReference)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsNotEmpty(workItemReferences);
@@ -76,9 +77,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
             Assert.AreEqual("JRE-2345", reference);
         }
 
-        [TestCase("Fixes [JRE-1234],[JRE-2345]", "JRE-1234","JRE-2345")]
-        [TestCase("Fixes (JRE-1234),(JRE-2345)", "JRE-1234","JRE-2345")]
-        public void MultipleIssueNumberReferencesEnclosedInBracketsGetsParsedCorrectly(string comment, params string[] expectedReferences)
+        [TestCase("Fixes [JRE-1234],[JRE-2345]", "JRE-1234", "JRE-2345")]
+        [TestCase("Fixes (JRE-1234),(JRE-2345)", "JRE-1234", "JRE-2345")]
+        public void MultipleIssueNumberReferencesEnclosedInBracketsGetsParsedCorrectly(string comment,
+            params string[] expectedReferences)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create(comment));
             Assert.IsNotEmpty(workItemReferences);
@@ -104,7 +106,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         }
 
         [TestCase("Fixes Bt2-1234,Bt2-2345", "Bt2-1234", "Bt2-2345")]
-        public void MultipleIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferencesGetsParsedCorrectly(string comment, params string[] expectedReferences)
+        public void MultipleIssueNumberWithAlphaNumericProjectIdentifierEnclosedInBracketsReferencesGetsParsedCorrectly(
+            string comment, params string[] expectedReferences)
         {
             var workItemReferences = new CommentParser().ParseWorkItemIds(Create("Fixes Bt2-1234,Bt2-2345"));
             Assert.IsNotEmpty(workItemReferences);
@@ -156,7 +159,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         {
             return new OctopusBuildInformation
             {
-                Commits = new[] { new Commit{ Id = "a", Comment = comment }}
+                Commits = new[] { new Commit { Id = "a", Comment = comment } }
             };
         }
     }

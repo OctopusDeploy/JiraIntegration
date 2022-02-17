@@ -2,7 +2,7 @@ using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
-    interface IJiraApiDeployment
+    internal interface IJiraApiDeployment
     {
         public string DeploymentType { get; }
         public string[] DeploymentValues(DeploymentResource deployment);
