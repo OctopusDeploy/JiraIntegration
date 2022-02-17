@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,8 +49,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonContent = await httpResponseMessage.Content.ReadAsStringAsync();
-                        var permissionsContainer =
-                            JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
+                        var permissionsContainer = JsonConvert.DeserializeObject<PermissionSettingsContainer>(jsonContent);
+
+                        if (permissionsContainer == null)
+                        {
+                            connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Error,$"Unable to read permissions from response body");
+                            return connectivityCheckResponse;
+                        }
 
                         if (!permissionsContainer.Permissions.ContainsKey(BrowseProjectsKey))
                         {
@@ -105,15 +111,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 if (response.IsSuccessStatusCode)
                 {
                     var result = await GetResult<JiraSearchResult>(response);
-                    systemLog.Info(
-                        $"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
+                    if (result == null)
+                    {
+                        systemLog.Info("Jira Work Item data not found in response body");
+                        return ResultFromExtension<JiraIssue[]>.Failed("");
+                    }
+                    systemLog.Info($"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
                     return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
                 }
 
                 var errorResult = await GetResult<JiraErrorResult>(response);
 
-                errorMessage =
-                    $"Failed to retrieve Jira issues from {baseUrl}. Response Code: {response.StatusCode}{(errorResult.ErrorMessages.Any() ? $" (Errors: {string.Join(", ", errorResult.ErrorMessages)})" : "")}";
+                errorMessage = $"Failed to retrieve Jira issues from {baseUrl}. Response Code: {response.StatusCode}{(errorResult?.ErrorMessages.Any() == true ? $" (Errors: {string.Join(", ", errorResult.ErrorMessages)})" : "")}";
             }
             catch (HttpRequestException e)
             {
@@ -128,7 +137,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             return ResultFromExtension<JiraIssue[]>.Failed(errorMessage);
         }
 
-        async Task<TResult> GetResult<TResult>(HttpResponseMessage response)
+        async Task<TResult?> GetResult<TResult>(HttpResponseMessage response)
         {
             var content = await response.Content.ReadAsStringAsync();
             try
@@ -177,7 +186,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         [JsonProperty("key")]
         public string Key { get; set; } = string.Empty;
         [JsonProperty("fields")]
-        public JiraIssueFields Fields { get; set; } = new JiraIssueFields();
+        public JiraIssueFields Fields { get; set; } = new();
     }
 
     class JiraIssueFields
@@ -185,16 +194,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         [JsonProperty("summary")]
         public string Summary { get; set; } = string.Empty;
         [JsonProperty("comment")]
-        public JiraIssueComments Comments { get; set; } = new JiraIssueComments();
+        public JiraIssueComments Comments { get; set; } = new();
     }
 
     class JiraIssueComments
     {
         [JsonProperty("comments")]
-        public IEnumerable<JiraIssueComment> Comments { get; set; } = new JiraIssueComment[0];
+        public IEnumerable<JiraIssueComment> Comments { get; set; } = Array.Empty<JiraIssueComment>();
 
         [JsonProperty("total")]
-        public int Total { get; set; } = 0;
+        public int Total { get; set; }
     }
 
     class JiraIssueComment
@@ -206,7 +215,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
     class PermissionSettingsContainer
     {
         [JsonProperty("permissions")]
-        public Dictionary<string, PermissionSettings> Permissions { get; set; } = new Dictionary<string, PermissionSettings>();
+        public Dictionary<string, PermissionSettings> Permissions { get; set; } = new();
     }
 
     class PermissionSettings
