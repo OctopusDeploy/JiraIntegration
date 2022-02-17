@@ -92,8 +92,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         public async Task<IResultFromExtension<JiraIssue[]>> GetIssues(string[] workItemIds)
         {
             var workItemQuery = $"id in ({string.Join(", ", workItemIds.Select(x => x.ToUpper()))})";
+
+            // WARNING: while the Jira API documentation says that validateQuery values of true/false are deprecated,
+            // that is only valid for Jira Cloud. Jira Server only supports true/false
             var content = JsonConvert.SerializeObject(new
-                { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000, validateQuery = "none" });
+                { jql = workItemQuery, fields = new[] { "summary", "comment" }, maxResults = 10000, validateQuery = "false" });
 
             string errorMessage;
             try
@@ -107,8 +110,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
                 }
 
+                var errorResult = await GetResult<JiraErrorResult>(response);
+
                 errorMessage =
-                    $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. Response Code: {response.StatusCode}{(!string.IsNullOrEmpty(response.ReasonPhrase) ? $" (Reason: {response.ReasonPhrase})" : "")}";
+                    $"Failed to retrieve Jira issues from {baseUrl}. Response Code: {response.StatusCode}{(errorResult.ErrorMessages.Any() ? $" (Errors: {string.Join(", ", errorResult.ErrorMessages)})" : "")}";
             }
             catch (HttpRequestException e)
             {
@@ -155,10 +160,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
         }
     }
 
+    class JiraErrorResult
+    {
+        [JsonProperty("errorMessages")]
+        public string[] ErrorMessages { get; set; } = Array.Empty<string>();
+    }
+
     class JiraSearchResult
     {
         [JsonProperty("issues")]
-        public JiraIssue[] Issues { get; set; } = new JiraIssue[0];
+        public JiraIssue[] Issues { get; set; } = Array.Empty<JiraIssue>();
     }
 
     class JiraIssue
