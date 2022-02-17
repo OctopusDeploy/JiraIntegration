@@ -15,7 +15,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
 
             var publicThings = assembly.GetExportedTypes()
                 .Select(t => t.FullName);
-            
+
             this.Assent(string.Join(Environment.NewLine, publicThings));
         }
     }

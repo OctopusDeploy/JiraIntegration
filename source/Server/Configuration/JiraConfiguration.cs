@@ -3,7 +3,7 @@ using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
-    class JiraConfiguration : ExtensionConfigurationDocument
+    internal class JiraConfiguration : ExtensionConfigurationDocument
     {
         public JiraConfiguration() : base(JiraConfigurationStore.SingletonId, "Jira", "Octopus Deploy", "1.1")
         {
@@ -14,21 +14,21 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         public JiraInstanceType JiraInstanceType { get; set; }
 
         public string? BaseUrl { get; set; }
-        
+
         public SensitiveString? Password { get; set; }
 
         public string? ConnectAppUrl { get; set; }
-        
-        public ReleaseNoteOptions ReleaseNoteOptions { get; set; } = new ReleaseNoteOptions();
+
+        public ReleaseNoteOptions ReleaseNoteOptions { get; set; } = new();
     }
 
-    enum JiraInstanceType
+    internal enum JiraInstanceType
     {
         Cloud,
         Server
     }
 
-    class ReleaseNoteOptions
+    internal class ReleaseNoteOptions
     {
         public string? Username { get; set; }
         public SensitiveString? Password { get; set; }
