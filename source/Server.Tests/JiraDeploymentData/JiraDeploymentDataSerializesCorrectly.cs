@@ -21,18 +21,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
                 {
                     Deployments = new[]
                     {
-                        new Extensibility.JiraIntegration.Deployments.JiraDeploymentData
+                        new Deployments.JiraDeploymentData
                         {
                             DeploymentSequenceNumber = 11,
                             UpdateSequenceNumber = 3,
                             DisplayName = "Task Name",
-                            Associations = new []
+                            Associations = new[]
                             {
-                                new JiraAssociation()
+                                new JiraAssociation
                                 {
                                     AssociationType = JiraAssociationConstants.JiraAssociationTypeIssueKeys,
-                                    Values = new [] { "JIR-1", "JIR-2"}
-                                },
+                                    Values = new[] { "JIR-1", "JIR-2" }
+                                }
                             },
                             Url =
                                 "https://octopussample.com/app#/Spaces-1/projects/foo/releases/1.0.0/deployments/deployments-123",
