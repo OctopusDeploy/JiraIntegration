@@ -31,7 +31,8 @@ jobs:
         id: set-branch-standard
         if: github.event_name != 'schedule'
         env:
-          OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head 
+          OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head
+        run: echo Set branch to $OCTOVERSION_CurrentBranch
 
       - name: OctoVersion setup - nightly
         id: set-branch-nightly
@@ -39,6 +40,7 @@ jobs:
         env:
           OCTOVERSION_CurrentBranch: 'nightly' # For nightly we override the branch and use the build number as the patch
           OCTOVERSION_Patch: ${{ github.run_number }}
+        run: echo Set branch to $OCTOVERSION_CurrentBranch, with patch $OCTOVERSION_Patch
           
       - name: Nuke Build 🏗
         id: build
