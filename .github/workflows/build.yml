@@ -15,8 +15,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  determine-branch:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: OctoVersion setup - standard
+        id: set-branch-standard
+        if: github.event_name != 'schedule'
+        run: echo "::set-output name=branch::${{ github.head_ref || github.ref }}"
+
+      - name: OctoVersion setup - nightly
+        id: set-branch-nightly
+        if: github.event_name == 'schedule'
+        run: echo "::set-output name=branch::nightly"
+          echo "::set-output name=patch::${{ github.run_number }}"
+
+    outputs:
+        branch: ${{ steps.set-branch-standard.outputs.branch || steps.set-branch-nightly.outputs.branch }}
+        patch: ${{ steps.set-branch-standard.outputs.patch || steps.set-branch-nightly.outputs.patch }}
+
   build:
     runs-on: ubuntu-20.04
+    needs: determine-branch
     steps:
       - uses: actions/checkout@v2
         with:
@@ -27,24 +46,11 @@ jobs:
         with:
           dotnet-version: 5.0.x
 
-      - name: OctoVersion setup - standard
-        id: set-branch-standard
-        if: github.event_name != 'schedule'
-        env:
-          OCTOVERSION_CurrentBranch: ${{ github.head_ref || github.ref }} # For pull_request events we override the /refs/pull/xx/merge branch to the PR's head
-        run: echo Set branch to $OCTOVERSION_CurrentBranch
-
-      - name: OctoVersion setup - nightly
-        id: set-branch-nightly
-        if: github.event_name == 'schedule'
-        env:
-          OCTOVERSION_CurrentBranch: 'nightly' # For nightly we override the branch and use the build number as the patch
-          OCTOVERSION_Patch: ${{ github.run_number }}
-        run: echo Set branch to $OCTOVERSION_CurrentBranch, with patch $OCTOVERSION_Patch
-          
       - name: Nuke Build 🏗
         id: build
         env:
+          OCTOVERSION_CurrentBranch: ${{ needs.determine-branch.outputs.branch }}
+          OCTOVERSION_Patch: ${{ needs.determine-branch.outputs.patch }}
           JiraIntegration_E2E_BaseUrl: ${{ secrets.JIRA_BASE_URL }}
           JiraIntegration_E2E_Username: ${{ secrets.JIRA_USERNAME }}
           JiraIntegration_E2E_AuthToken: ${{ secrets.JIRA_AUTH_TOKEN }}
