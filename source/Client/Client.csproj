@@ -15,6 +15,6 @@
     <RepositoryUrl>https://github.com/OctopusDeploy/JiraIntegration</RepositoryUrl>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Octopus.Server.Client" Version="11.2.3319" />
+    <PackageReference Include="Octopus.Server.Client" Version="11.6.3673" />
   </ItemGroup>
 </Project>
