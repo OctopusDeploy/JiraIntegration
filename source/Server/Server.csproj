@@ -1,24 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>Octopus.Server.Extensibility.JiraIntegration</RootNamespace>
-    <AssemblyName>Octopus.Server.Extensibility.JiraIntegration</AssemblyName>
-    <Description>Implements the Jira Integration and Jira Service Desk.</Description>
-    <NeutralLanguage>en-US</NeutralLanguage>
-    <Authors>Octopus Deploy</Authors>
-    <Company>Octopus Deploy Pty. Ltd.</Company>
-    <PackageIconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
-    <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIntegration</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/OctopusDeploy/JiraIntegration</RepositoryUrl>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Octopus.Data" Version="7.1.5" />
-    <PackageReference Include="Octopus.Diagnostics" Version="2.1.2" />
-    <PackageReference Include="Octopus.Server.Extensibility" Version="14.3.126" />
-    <PackageReference Include="Octopus.Server.MessageContracts" Version="3.0.251" />
-    <PackageReference Include="Octopus.Time" Version="1.1.6" />
-    <PackageReference Include="Sashimi.Server.Contracts" Version="11.0.1" />
-  </ItemGroup>
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <RootNamespace>Octopus.Server.Extensibility.JiraIntegration</RootNamespace>
+        <AssemblyName>Octopus.Server.Extensibility.JiraIntegration</AssemblyName>
+        <Description>Implements the Jira Integration and Jira Service Desk.</Description>
+        <NeutralLanguage>en-US</NeutralLanguage>
+        <Authors>Octopus Deploy</Authors>
+        <Company>Octopus Deploy Pty. Ltd.</Company>
+        <PackageIconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</PackageIconUrl>
+        <PackageLicenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</PackageLicenseUrl>
+        <PackageProjectUrl>https://github.com/OctopusDeploy/JiraIntegration</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/OctopusDeploy/JiraIntegration</RepositoryUrl>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Octopus.Data" Version="7.1.5"/>
+        <PackageReference Include="Octopus.Diagnostics" Version="2.1.2"/>
+        <PackageReference Include="Octopus.Server.Extensibility" Version="14.3.126"/>
+        <PackageReference Include="Octopus.Server.MessageContracts" Version="3.0.251"/>
+        <PackageReference Include="Octopus.Time" Version="1.1.6"/>
+        <PackageReference Include="Sashimi.Server.Contracts" Version="11.0.1"/>
+    </ItemGroup>
 </Project>

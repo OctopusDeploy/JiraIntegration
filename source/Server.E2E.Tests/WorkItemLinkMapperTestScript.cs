@@ -21,7 +21,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [OneTimeSetUp]
         public void Setup()
         {
-            if(!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
+            if (!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
                 Assert.Ignore($"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
 
             var log = Substitute.For<ISystemLog>();
@@ -39,19 +39,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public void WeCanDeserializeJiraIssuesWithComments()
         {
-            var buildInformation = CreateBuildInformation(new[]
-            {
-                new Commit
+            var buildInformation = CreateBuildInformation(
+                new[]
                 {
-                    Id = "123",
-                    Comment = "OATP-1",
-                },
-                new Commit
-                {
-                    Id = "234",
-                    Comment = "OATP-9",
-                }
-            });
+                    new Commit
+                    {
+                        Id = "123",
+                        Comment = "OATP-1"
+                    },
+                    new Commit
+                    {
+                        Id = "234",
+                        Comment = "OATP-9"
+                    }
+                });
 
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 
@@ -65,19 +66,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public void WeCanDeserializeJiraIssuesWhenOnlySomeIssuesAreFound()
         {
-            var buildInformation = CreateBuildInformation(new[]
-            {
-                new Commit
+            var buildInformation = CreateBuildInformation(
+                new[]
                 {
-                    Id = "123",
-                    Comment = "OATP-1",
-                },
-                new Commit
-                {
-                    Id = "234",
-                    Comment = "OATP-9999", // non-existent
-                }
-            });
+                    new Commit
+                    {
+                        Id = "123",
+                        Comment = "OATP-1"
+                    },
+                    new Commit
+                    {
+                        Id = "234",
+                        Comment = "OATP-9999" // non-existent
+                    }
+                });
 
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 
@@ -90,14 +92,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public void WeCanDeserializeJiraIssuesAsEmptyCollectionWhenNoIssuesAreFound()
         {
-            var buildInformation = CreateBuildInformation(new[]
-            {
-                new Commit
+            var buildInformation = CreateBuildInformation(
+                new[]
                 {
-                    Id = "234",
-                    Comment = "OATP-9999", // non-existent
-                }
-            });
+                    new Commit
+                    {
+                        Id = "234",
+                        Comment = "OATP-9999" // non-existent
+                    }
+                });
 
             var result = (ResultFromExtension<WorkItemLink[]>)workItemLinkMapper.Map(buildInformation);
 

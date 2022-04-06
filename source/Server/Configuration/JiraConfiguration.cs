@@ -1,4 +1,5 @@
-﻿using Octopus.Data.Model;
+﻿using System;
+using Octopus.Data.Model;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
@@ -14,12 +15,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         public JiraInstanceType JiraInstanceType { get; set; }
 
         public string? BaseUrl { get; set; }
-        
+
         public SensitiveString? Password { get; set; }
 
         public string? ConnectAppUrl { get; set; }
-        
-        public ReleaseNoteOptions ReleaseNoteOptions { get; set; } = new ReleaseNoteOptions();
+
+        public ReleaseNoteOptions ReleaseNoteOptions { get; set; } = new();
     }
 
     enum JiraInstanceType

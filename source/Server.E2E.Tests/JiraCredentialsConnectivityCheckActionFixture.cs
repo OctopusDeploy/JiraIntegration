@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using NSubstitute;
@@ -10,7 +11,7 @@ using Shouldly;
 namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 {
     [TestFixture]
-    class JiraCredentialsConnectivityCheckActionFixture: ConnectivityCheckActionsBaseFixture
+    class JiraCredentialsConnectivityCheckActionFixture : ConnectivityCheckActionsBaseFixture
     {
         [Test]
         public async Task WhenDnsCannotBeResolved()
@@ -19,7 +20,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var octoRequest = Substitute.For<IOctoRequest>();
             var baseUrl = "http://notexistingdomain.dddd.ttt";
             octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraCredentialsConnectionCheckData>>())
-                .Returns(new JiraCredentialsConnectionCheckData {BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter"});
+                .Returns(new JiraCredentialsConnectionCheckData { BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter" });
 
             var response = await action.ExecuteAsync(octoRequest);
 
@@ -36,7 +37,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var octoRequest = Substitute.For<IOctoRequest>();
             var baseUrl = store.GetBaseUrl();
             octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraCredentialsConnectionCheckData>>())
-                .Returns(new JiraCredentialsConnectionCheckData {BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter"});
+                .Returns(new JiraCredentialsConnectionCheckData { BaseUrl = baseUrl, Username = "Does not matter", Password = "Does not matter" });
 
             var response = await action.ExecuteAsync(octoRequest);
 

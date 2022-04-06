@@ -1,4 +1,5 @@
-﻿using Octopus.Server.Extensibility.Extensions.WorkItems;
+﻿using System;
+using Octopus.Server.Extensibility.Extensions.WorkItems;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 
 namespace Octopus.Server.Extensibility.JiraIntegration

@@ -1,4 +1,4 @@
-using System.Reflection;
+using System;
 using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("Octopus.Server.Extensibility.JiraIntegration.Tests")]

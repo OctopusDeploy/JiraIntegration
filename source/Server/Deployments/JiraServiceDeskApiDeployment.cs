@@ -16,18 +16,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public string[] DeploymentValues(DeploymentResource deployment)
         {
-            if (String.IsNullOrEmpty(jiraServiceId))
-            {
+            if (string.IsNullOrEmpty(jiraServiceId))
                 throw new JiraDeploymentException("Service ID is empty. Please supply a Jira Service Desk Service ID and try again");
-            }
+
             return new[] { jiraServiceId };
         }
 
         public void HandleJiraIntegrationIsUnavailable()
         {
-            throw new JiraDeploymentException($"Trying to use Jira Service Desk Change Request step without having " +
-                                              $"Jira Integration enabled. Please enable Jira Integration or disable the Jira " +
-                                              $"Service Desk Change Request step");
+            throw new JiraDeploymentException("Trying to use Jira Service Desk Change Request step without having " + "Jira Integration enabled. Please enable Jira Integration or disable the Jira " + "Service Desk Change Request step");
         }
     }
 }

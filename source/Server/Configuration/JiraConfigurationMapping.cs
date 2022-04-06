@@ -5,6 +5,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfigurationMapping : IConfigurationDocumentMapper
     {
-        public Type GetTypeToMap() => typeof(JiraConfiguration);
+        public Type GetTypeToMap()
+        {
+            return typeof(JiraConfiguration);
+        }
     }
 }

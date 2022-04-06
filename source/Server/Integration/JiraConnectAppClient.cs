@@ -13,9 +13,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
 {
     class JiraConnectAppClient
     {
-        private readonly IInstallationIdProvider installationIdProvider;
-        private readonly IJiraConfigurationStore configurationStore;
-        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
+        readonly IInstallationIdProvider installationIdProvider;
+        readonly IJiraConfigurationStore configurationStore;
+        readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraConnectAppClient(
             IInstallationIdProvider installationIdProvider,
@@ -46,10 +46,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 if (result.IsSuccessStatusCode)
                 {
                     var authTokenFromConnectApp =
-                        JsonConvert.DeserializeObject<JsonTokenData>(result.Content.ReadAsStringAsync().GetAwaiter()
-                            .GetResult());
+                        JsonConvert.DeserializeObject<JsonTokenData>(
+                            result.Content.ReadAsStringAsync()
+                                .GetAwaiter()
+                                .GetResult());
                     return authTokenFromConnectApp.Token;
                 }
+
                 log.ErrorFormat("Unable to get authentication token for Jira Connect App. Response code: {0}", result.StatusCode);
 
                 return null;
@@ -71,6 +74,5 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
             [JsonProperty("token")]
             public string Token { get; set; } = string.Empty;
         }
-
     }
 }

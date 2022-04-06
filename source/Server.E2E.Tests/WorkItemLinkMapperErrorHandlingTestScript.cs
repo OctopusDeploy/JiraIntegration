@@ -17,22 +17,25 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public void HttpAuthExceptionShouldLogMeaningfulMessage()
         {
-            if(!TryGetJiraSettings(out var baseUrl, out var username, out var _))
+            if (!TryGetJiraSettings(out var baseUrl, out var username, out var _))
+            {
                 Assert.Ignore($"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
+            }
 
             var log = Substitute.For<ISystemLog>();
 
             var store = BuildJiraConfigurationStore(baseUrl, username, "invalidtoken");
             var jira = BuildJiraRestClient(baseUrl, username, "invalidtoken", log);
 
-            var buildInformation = CreateBuildInformation(new[]
-            {
-                new Commit
+            var buildInformation = CreateBuildInformation(
+                new[]
                 {
-                    Id = "234",
-                    Comment = "OATP-9999"
-                }
-            });
+                    new Commit
+                    {
+                        Id = "234",
+                        Comment = "OATP-9999"
+                    }
+                });
 
             var workItemLinkMapper = new WorkItemLinkMapper(
                 store,

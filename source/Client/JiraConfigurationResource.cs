@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Octopus.Client.Extensibility.Attributes;
 using Octopus.Client.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Client.Model;
@@ -43,7 +44,7 @@ namespace Octopus.Client.Extensibility.JiraIntegration
         [Description(UsernameDescription)]
         [Writeable]
         public string Username { get; set; }
-        
+
         [DisplayName("Jira Password")]
         [Description(PasswordDescription)]
         [Writeable]

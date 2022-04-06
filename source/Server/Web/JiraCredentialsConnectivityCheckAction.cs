@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Octopus.Diagnostics;
@@ -10,12 +11,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
 {
     class JiraCredentialsConnectivityCheckAction : IAsyncApiAction
     {
-        static readonly RequestBodyRegistration<JiraCredentialsConnectionCheckData> Data = new RequestBodyRegistration<JiraCredentialsConnectionCheckData>();
-        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new OctopusJsonRegistration<ConnectivityCheckResponse>();
+        static readonly RequestBodyRegistration<JiraCredentialsConnectionCheckData> Data = new();
+        static readonly OctopusJsonRegistration<ConnectivityCheckResponse> Result = new();
 
-        private readonly IJiraConfigurationStore configurationStore;
-        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
-        private readonly ISystemLog systemLog;
+        readonly IJiraConfigurationStore configurationStore;
+        readonly IOctopusHttpClientFactory octopusHttpClientFactory;
+        readonly ISystemLog systemLog;
 
         public JiraCredentialsConnectivityCheckAction(IJiraConfigurationStore configurationStore, IOctopusHttpClientFactory octopusHttpClientFactory, ISystemLog systemLog)
         {
@@ -52,9 +53,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Info, "The Jira Connect App connection was tested successfully");
 
                 if (!configurationStore.GetIsEnabled())
-                {
                     connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
-                }
             }
 
             return Result.Response(connectivityCheckResponse);
@@ -68,5 +67,4 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
         public string Username { get; set; }
         public string Password { get; set; }
     }
-
 }

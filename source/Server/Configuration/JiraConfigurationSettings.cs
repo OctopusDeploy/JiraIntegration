@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Octopus.Data.Model;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.Extensibility.HostServices.Configuration;
@@ -9,10 +10,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
 {
     class JiraConfigurationSettings : ExtensionConfigurationSettings<JiraConfiguration, JiraConfigurationResource, IJiraConfigurationStore>, IJiraConfigurationSettings
     {
-        private readonly IInstallationIdProvider installationIdProvider;
-        private readonly IServerConfigurationStore serverConfigurationStore;
+        readonly IInstallationIdProvider installationIdProvider;
+        readonly IServerConfigurationStore serverConfigurationStore;
 
-        public JiraConfigurationSettings(IJiraConfigurationStore configurationDocumentStore, 
+        public JiraConfigurationSettings(IJiraConfigurationStore configurationDocumentStore,
             IInstallationIdProvider installationIdProvider,
             IServerConfigurationStore serverConfigurationStore) : base(configurationDocumentStore)
         {
@@ -30,7 +31,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         {
             var isEnabled = ConfigurationDocumentStore.GetIsEnabled();
 
-            yield return new ConfigurationValue<bool>(  "Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled, "Is Enabled");
+            yield return new ConfigurationValue<bool>("Octopus.JiraIntegration.IsEnabled", isEnabled, isEnabled, "Is Enabled");
             yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.BaseUrl", ConfigurationDocumentStore.GetBaseUrl(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetBaseUrl()), "Jira Base Url");
             yield return new ConfigurationValue<SensitiveString?>("Octopus.JiraIntegration.ConnectAppPassword", ConfigurationDocumentStore.GetConnectAppPassword(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetConnectAppPassword()?.Value), "Jira Connect App Password");
             yield return new ConfigurationValue<string?>("Octopus.JiraIntegration.Username", ConfigurationDocumentStore.GetJiraUsername(), isEnabled && !string.IsNullOrWhiteSpace(ConfigurationDocumentStore.GetJiraUsername()), "Jira Username");
@@ -41,11 +42,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         public override void BuildMappings(IResourceMappingsBuilder builder)
         {
             builder.Map<JiraConfigurationResource, JiraConfiguration>()
-                .EnrichResource((model, resource) =>
-                {
-                    resource.OctopusInstallationId = installationIdProvider.GetInstallationId().ToString();
-                    resource.OctopusServerUrl = serverConfigurationStore.GetServerUri();
-                });
+                .EnrichResource(
+                    (model, resource) =>
+                    {
+                        resource.OctopusInstallationId = installationIdProvider.GetInstallationId().ToString();
+                        resource.OctopusServerUrl = serverConfigurationStore.GetServerUri();
+                    });
             builder.Map<ReleaseNoteOptionsResource, ReleaseNoteOptions>();
         }
     }

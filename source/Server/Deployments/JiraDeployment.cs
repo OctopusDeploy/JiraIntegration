@@ -26,16 +26,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class JiraDeployment
     {
-        private readonly IMediator mediator;
-        private readonly ITaskLogFactory taskLogFactory;
-        private readonly IJiraConfigurationStore store;
-        private readonly JiraConnectAppClient connectAppClient;
-        private readonly IInstallationIdProvider installationIdProvider;
-        private readonly IClock clock;
-        private readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
-        private readonly IServerConfigurationStore serverConfigurationStore;
-        private readonly IOctopusHttpClientFactory octopusHttpClientFactory;
-        
+        readonly IMediator mediator;
+        readonly ITaskLogFactory taskLogFactory;
+        readonly IJiraConfigurationStore store;
+        readonly JiraConnectAppClient connectAppClient;
+        readonly IInstallationIdProvider installationIdProvider;
+        readonly IClock clock;
+        readonly IProvideDeploymentEnvironmentSettingsValues deploymentEnvironmentSettingsProvider;
+        readonly IServerConfigurationStore serverConfigurationStore;
+        readonly IOctopusHttpClientFactory octopusHttpClientFactory;
 
         public JiraDeployment(
             IMediator mediator,
@@ -62,12 +61,14 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         bool JiraIntegrationUnavailable(DeploymentResource deployment)
         {
-            return !store.GetIsEnabled() ||
-                   store.GetJiraInstanceType() == JiraInstanceType.Server;
+            return !store.GetIsEnabled() || store.GetJiraInstanceType() == JiraInstanceType.Server;
         }
 
-        public async Task PublishToJira(string eventType, DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment,
-            ITaskLog taskLog, CancellationToken cancellationToken)
+        public async Task PublishToJira(string eventType,
+            DeploymentResource deployment,
+            IJiraApiDeployment jiraApiDeployment,
+            ITaskLog taskLog,
+            CancellationToken cancellationToken)
         {
             if (JiraIntegrationUnavailable(deployment))
             {
@@ -83,8 +84,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) ||
-                string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
+            if (string.IsNullOrWhiteSpace(store.GetConnectAppUrl()) || string.IsNullOrWhiteSpace(store.GetConnectAppPassword()?.Value))
             {
                 taskLog.Warn("Jira integration is enabled but settings are incomplete, ignoring deployment events");
                 return;
@@ -105,18 +105,36 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             var environmentSettings =
                 deploymentEnvironmentSettingsProvider
                     .GetSettings<DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings?>(
-                        JiraConfigurationStore.SingletonId, deployment.EnvironmentId.Value) ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
+                        JiraConfigurationStore.SingletonId,
+                        deployment.EnvironmentId.Value)
+                ?? new DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings();
 
-            var data = await PrepareOctopusJiraPayload(eventType, serverUri, deployment, jiraApiDeployment, cancellationToken, deploymentEnvironment, environmentSettings);
+            var data = await PrepareOctopusJiraPayload(
+                eventType,
+                serverUri,
+                deployment,
+                jiraApiDeployment,
+                cancellationToken,
+                deploymentEnvironment,
+                environmentSettings);
 
             // Push data to Jira
-            await SendToJira(token, data, deployment, taskLogBlock, deploymentEnvironment, environmentSettings);
+            await SendToJira(
+                token,
+                data,
+                deployment,
+                taskLogBlock,
+                deploymentEnvironment,
+                environmentSettings);
 
             taskLogFactory.Finish(taskLogBlock);
         }
 
-        async Task<OctopusJiraPayloadData> PrepareOctopusJiraPayload(string eventType, string serverUri,
-            DeploymentResource deployment, IJiraApiDeployment jiraApiDeployment, CancellationToken cancellationToken,
+        async Task<OctopusJiraPayloadData> PrepareOctopusJiraPayload(string eventType,
+            string serverUri,
+            DeploymentResource deployment,
+            IJiraApiDeployment jiraApiDeployment,
+            CancellationToken cancellationToken,
             EnvironmentResource deploymentEnvironment,
             DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings
                 environmentSettings)
@@ -125,13 +143,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
             var release = (await mediator.Request(new GetReleaseRequest(deployment.ReleaseId), cancellationToken)).Release;
             var serverTask = (await mediator.Request(new GetServerTaskRequest(deployment.TaskId), cancellationToken)).Task;
-            
+
             TenantResource? tenant = null;
             if (deployment.TenantId?.Value is not null)
-            {
                 tenant = (await mediator.Request(new GetTenantByIdOrNameRequest(deployment.TenantId.Value.ToTenantIdOrName()), cancellationToken)).Resource;
-            }
-            
+
             return new OctopusJiraPayloadData
             {
                 InstallationId = installationIdProvider.GetInstallationId().ToString(),
@@ -145,9 +161,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             DeploymentSequenceNumber = int.Parse(deployment.Id!.ToString().Split('-')[1]),
                             UpdateSequenceNumber = DateTime.UtcNow.Ticks,
                             DisplayName = serverTask.Description,
-                            Associations = new []
+                            Associations = new[]
                             {
-                                new JiraAssociation()
+                                new JiraAssociation
                                 {
                                     AssociationType = jiraApiDeployment.DeploymentType,
                                     Values = jiraApiDeployment.DeploymentValues(deployment)
@@ -167,7 +183,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                             Environment = new JiraDeploymentEnvironment
                             {
                                 Id = $"{deployment.EnvironmentId}{(deployment.TenantId is null ? "" : $"-{deployment.TenantId}")}",
-                                DisplayName =  $"{deploymentEnvironment.Name}{(tenant?.Name is null ? "" : $" ({tenant.Name})")}",
+                                DisplayName = $"{deploymentEnvironment.Name}{(tenant?.Name is null ? "" : $" ({tenant.Name})")}",
                                 Type = environmentSettings?.JiraEnvironmentType.ToString() ?? JiraEnvironmentType.unmapped.ToString()
                             },
                             SchemeVersion = "1.0"
@@ -177,8 +193,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
             };
         }
 
-        async Task SendToJira(string token, OctopusJiraPayloadData data, DeploymentResource deployment,
-            ITaskLog taskLogBlock, EnvironmentResource deploymentEnvironment,
+        async Task SendToJira(string token,
+            OctopusJiraPayloadData data,
+            DeploymentResource deployment,
+            ITaskLog taskLogBlock,
+            EnvironmentResource deploymentEnvironment,
             DeploymentEnvironmentSettingsMetadataProvider.JiraDeploymentEnvironmentSettings
                 environmentSettings)
         {
