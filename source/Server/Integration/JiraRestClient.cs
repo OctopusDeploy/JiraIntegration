@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -118,6 +119,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     }
                     systemLog.Info($"Retrieved Jira Work Item data for work item ids {string.Join(", ", result.Issues.Select(wi => wi.Key))}");
                     return ResultFromExtension<JiraIssue[]>.Success(result.Issues);
+                }
+
+                if (response.StatusCode == HttpStatusCode.Unauthorized || response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    systemLog.Info("Authentication failure, check the Jira access token is valid and has permissions to read work items");
+                    return ResultFromExtension<JiraIssue[]>.Failed("Authentication failure, check the Jira access token is valid and has permissions to read work items");
                 }
 
                 var errorResult = await GetResult<JiraErrorResult>(response);
