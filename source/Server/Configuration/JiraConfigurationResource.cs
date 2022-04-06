@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 using Octopus.Server.MessageContracts;
 using Octopus.Server.MessageContracts.Attributes;
@@ -42,7 +43,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Configuration
         public string? OctopusServerUrl { get; set; }
 
         [DisplayName("Release Note Options")]
-        public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new ReleaseNoteOptionsResource();
+        public ReleaseNoteOptionsResource ReleaseNoteOptions { get; set; } = new();
     }
 
     class ReleaseNoteOptionsResource

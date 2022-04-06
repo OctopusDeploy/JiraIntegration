@@ -1,4 +1,5 @@
-﻿using Autofac;
+﻿using System;
+using Autofac;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions;
 using Octopus.Server.Extensibility.Extensions.Infrastructure;
@@ -66,29 +67,32 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .AsSelf()
                 .InstancePerDependency();
 
-            builder.Register(c =>
-            {
-                var store = c.Resolve<IJiraConfigurationStore>();
-                if (!store.GetIsEnabled())
-                    return null;
+            builder.Register(
+                    c =>
+                    {
+                        var store = c.Resolve<IJiraConfigurationStore>();
+                        if (!store.GetIsEnabled())
+                            return null;
 
-                var baseUrl = store.GetBaseUrl();
-                var username = store.GetJiraUsername();
-                if (baseUrl == null || username == null)
-                    return null;
+                        var baseUrl = store.GetBaseUrl();
+                        var username = store.GetJiraUsername();
+                        if (baseUrl == null || username == null)
+                            return null;
 
-                var password = store.GetJiraPassword();
-                return new JiraRestClient(
-                    baseUrl,
-                    username,
-                    password?.Value,
-                    c.Resolve<ISystemLog>(),
-                    c.Resolve<IOctopusHttpClientFactory>()
-                );
-            }).As<IJiraRestClient>()
-            .InstancePerDependency();
+                        var password = store.GetJiraPassword();
+                        return new JiraRestClient(
+                            baseUrl,
+                            username,
+                            password?.Value,
+                            c.Resolve<ISystemLog>(),
+                            c.Resolve<IOctopusHttpClientFactory>()
+                        );
+                    })
+                .As<IJiraRestClient>()
+                .InstancePerDependency();
 
-            builder.RegisterType<JiraIntegrationHomeLinksContributor>().As<IHomeLinksContributor>()
+            builder.RegisterType<JiraIntegrationHomeLinksContributor>()
+                .As<IHomeLinksContributor>()
                 .InstancePerDependency();
         }
     }

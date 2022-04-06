@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using Octopus.Server.Extensibility.Extensions.Model.Environments;
@@ -10,7 +11,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
 {
     class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
     {
-        private readonly IJiraConfigurationStore store;
+        readonly IJiraConfigurationStore store;
 
         public DeploymentEnvironmentSettingsMetadataProvider(IJiraConfigurationStore store)
         {

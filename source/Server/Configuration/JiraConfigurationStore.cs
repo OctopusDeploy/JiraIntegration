@@ -1,4 +1,5 @@
-﻿using Octopus.Data.Model;
+﻿using System;
+using Octopus.Data.Model;
 using Octopus.Data.Storage.Configuration;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Configuration;
 

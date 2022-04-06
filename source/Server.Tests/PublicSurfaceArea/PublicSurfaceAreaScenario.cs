@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Assent;
 using NUnit.Framework;
@@ -11,7 +12,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.PublicSurfaceArea
         public void ExtensionsShouldKeepThingsPrivate()
         {
             var types = typeof(JiraIntegrationExtension).Assembly.GetExportedTypes().Select(t => t.FullName);
-            
+
             this.Assent(string.Join('\n', types));
         }
     }

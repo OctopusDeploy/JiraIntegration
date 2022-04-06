@@ -33,8 +33,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
             var octoRequest = Substitute.For<IOctoRequest>();
             octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
-                .Returns(new JiraConnectAppConnectionCheckData
-                    { BaseUrl = baseUrl, Password = "Does not matter" });
+                .Returns(
+                    new JiraConnectAppConnectionCheckData
+                        { BaseUrl = baseUrl, Password = "Does not matter" });
 
             var response = await action.ExecuteAsync(octoRequest);
 
@@ -53,23 +54,26 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var explicitEndPoint = new ExplicitProxyEndPoint(IPAddress.Any, port, false);
             proxyServer.AddEndPoint(explicitEndPoint);
             // Fake authentication failure for proxy
-            proxyServer.ProxySchemeAuthenticateFunc = (d, s, arg3) => Task.FromResult(new ProxyAuthenticationContext { Result = ProxyAuthenticationResult.Failure});
-            proxyServer.ProxyAuthenticationSchemes = new[] {"basic"};
+            proxyServer.ProxySchemeAuthenticateFunc = (d, s, arg3) => Task.FromResult(new ProxyAuthenticationContext { Result = ProxyAuthenticationResult.Failure });
+            proxyServer.ProxyAuthenticationSchemes = new[] { "basic" };
             proxyServer.Start();
             var baseUrl = "http://notexistingdomain.dddd.ttt";
 
-            httpClientFactory.CreateClient().Returns(_ =>
-            {
-                var httpClient = new HttpClient(new HttpClientHandler {Proxy = new WebProxy("127.0.0.1", port)})
-                {
-                    BaseAddress = new Uri(baseUrl),
-                };
+            httpClientFactory.CreateClient()
+                .Returns(
+                    _ =>
+                    {
+                        var httpClient = new HttpClient(new HttpClientHandler { Proxy = new WebProxy("127.0.0.1", port) })
+                        {
+                            BaseAddress = new Uri(baseUrl)
+                        };
 
-                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
-                    Convert.ToBase64String(Encoding.UTF8.GetBytes("username:authToken")));
+                        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                            "Basic",
+                            Convert.ToBase64String(Encoding.UTF8.GetBytes("username:authToken")));
 
-                return httpClient;
-            });
+                        return httpClient;
+                    });
 
             var installationIdProvider = Substitute.For<IInstallationIdProvider>();
             installationIdProvider.GetInstallationId().Returns(Guid.NewGuid());
@@ -79,8 +83,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
             var octoRequest = Substitute.For<IOctoRequest>();
             octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
-                .Returns(new JiraConnectAppConnectionCheckData
-                    { BaseUrl = baseUrl, Password = "Does not matter" });
+                .Returns(
+                    new JiraConnectAppConnectionCheckData
+                        { BaseUrl = baseUrl, Password = "Does not matter" });
 
             var response = await action.ExecuteAsync(octoRequest);
 

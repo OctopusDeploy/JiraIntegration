@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Octopus.Server.Extensibility.HostServices.Diagnostics;
@@ -10,9 +11,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
     class DeploymentObserver : IHandleEvent<DeploymentEvent>
     {
-        private JiraDeployment jiraDeployment;
-        private readonly IMediator mediator;
-        private readonly ITaskLogFactory taskLogFactory;
+        readonly IMediator mediator;
+        readonly ITaskLogFactory taskLogFactory;
+        readonly JiraDeployment jiraDeployment;
 
         public DeploymentObserver(JiraDeployment jiraDeployment,
             IMediator mediator,
@@ -26,9 +27,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         public async Task Handle(DeploymentEvent domainEvent, CancellationToken cancellationToken)
         {
             var deployment = (await mediator.Request(new GetDeploymentRequest(domainEvent.DeploymentId), cancellationToken)).Deployment;
-            if (deployment.Changes.All(drn =>
-                drn.BuildInformation.All(pm =>
-                    pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
+            if (deployment.Changes.All(
+                    drn =>
+                        drn.BuildInformation.All(
+                            pm =>
+                                pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
                 return;
 
             var taskLog = taskLogFactory.Get(domainEvent.TaskLogCorrelationId);
@@ -50,6 +53,5 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     return "unknown";
             }
         }
-
     }
 }

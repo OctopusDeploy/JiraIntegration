@@ -43,7 +43,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments
                     {
                         Total = 1,
-                        Comments = new []
+                        Comments = new[]
                         {
                             new JiraIssueComment
                             {
@@ -53,7 +53,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     }
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new[] { jiraIssue }));
 
             return new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>()).GetReleaseNote(jiraIssue, releaseNotePrefix);
         }
@@ -76,18 +76,20 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] {jiraIssue}));
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new[] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
-            {
-                Commits = new Commit[]
+            var workItems = mapper.Map(
+                new OctopusBuildInformation
                 {
-                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"},
-                    new Commit { Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234"}
-                }
-            });
+                    Commits = new[]
+                    {
+                        new()
+                            { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234" },
+                        new Commit { Id = "defg", Comment = "This is a test commit message with duplicates. Fixes JRE-1234" }
+                    }
+                });
 
             Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id, "Single work item should be returned");
         }
@@ -110,17 +112,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new[] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
-            {
-                Commits = new Commit[]
+            var workItems = mapper.Map(
+                new OctopusBuildInformation
                 {
-                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234"}
-                }
-            });
+                    Commits = new[]
+                    {
+                        new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234" }
+                    }
+                });
 
             Assert.AreEqual("Jira", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Source, "Source should be set");
         }
@@ -143,17 +146,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                     Comments = new JiraIssueComments()
                 }
             };
-            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new [] { jiraIssue }));
+            jiraClient.GetIssues(Arg.Any<string[]>()).Returns(ResultFromExtension<JiraIssue[]>.Success(new[] { jiraIssue }));
 
             var mapper = new WorkItemLinkMapper(store, new CommentParser(), jiraClientLazy, Substitute.For<ISystemLog>());
 
-            var workItems = mapper.Map(new OctopusBuildInformation
-            {
-                Commits = new Commit[]
+            var workItems = mapper.Map(
+                new OctopusBuildInformation
                 {
-                    new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234"}
-                }
-            });
+                    Commits = new[]
+                    {
+                        new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234" }
+                    }
+                });
 
             Assert.AreEqual("JRE-1234", ((ISuccessResult<WorkItemLink[]>)workItems).Value.Single().Id);
         }

@@ -37,7 +37,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             {
                 BaseAddress = new Uri(baseUrl)
             };
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic",
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+                "Basic",
                 Convert.ToBase64String(Encoding.UTF8.GetBytes($"{username}:{authToken}")));
 
             var httpClientFactory = Substitute.For<IOctopusHttpClientFactory>();
@@ -63,9 +64,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             jiraUsername = Environment.GetEnvironmentVariable(JiraUsernameEnvironmentVariable);
             jiraAuthToken = Environment.GetEnvironmentVariable(JiraAuthTokenEnvironmentVariable);
 
-            return !jiraBaseUrl.IsNullOrEmpty() &&
-                !jiraUsername.IsNullOrEmpty() &&
-                !jiraAuthToken.IsNullOrEmpty();
+            return !jiraBaseUrl.IsNullOrEmpty() && !jiraUsername.IsNullOrEmpty() && !jiraAuthToken.IsNullOrEmpty();
         }
 
         internal static OctopusBuildInformation CreateBuildInformation(Commit[] commits)
