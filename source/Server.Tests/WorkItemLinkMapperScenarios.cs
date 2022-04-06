@@ -121,8 +121,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 {
                     Commits = new[]
                     {
-                        new()
-                            { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234" }
+                        new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes JRE-1234" }
                     }
                 });
 
@@ -156,8 +155,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
                 {
                     Commits = new[]
                     {
-                        new()
-                            { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234" }
+                        new Commit { Id = "abcd", Comment = "This is a test commit message. Fixes jre-1234" }
                     }
                 });
 

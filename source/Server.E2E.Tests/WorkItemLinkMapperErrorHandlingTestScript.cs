@@ -18,9 +18,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         public void HttpAuthExceptionShouldLogMeaningfulMessage()
         {
             if (!TryGetJiraSettings(out var baseUrl, out var username, out var _))
-            {
                 Assert.Ignore($"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
-            }
 
             var log = Substitute.For<ISystemLog>();
 
