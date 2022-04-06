@@ -8,7 +8,7 @@ using Octopus.Server.MessageContracts.Attributes;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Environments
 {
-    class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
+    internal class DeploymentEnvironmentSettingsMetadataProvider : IContributeDeploymentEnvironmentSettingsMetadata
     {
         private readonly IJiraConfigurationStore store;
 
@@ -20,9 +20,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
         public string ExtensionId => JiraConfigurationStore.SingletonId;
         public string ExtensionName => JiraIntegration.Name;
 
-        public List<PropertyMetadata> Properties => store.GetIsEnabled() && store.GetJiraInstanceType() == JiraInstanceType.Cloud
-            ? new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>().Types.First().Properties
-            : new List<PropertyMetadata>();
+        public List<PropertyMetadata> Properties =>
+            store.GetIsEnabled() && store.GetJiraInstanceType() == JiraInstanceType.Cloud
+                ? new MetadataGenerator().GetMetadata<JiraDeploymentEnvironmentSettings>().Types.First().Properties
+                : new List<PropertyMetadata>();
 
         internal class JiraDeploymentEnvironmentSettings
         {
@@ -34,7 +35,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Environments
         }
     }
 
-    enum JiraEnvironmentType
+    internal enum JiraEnvironmentType
     {
         unmapped,
         development,

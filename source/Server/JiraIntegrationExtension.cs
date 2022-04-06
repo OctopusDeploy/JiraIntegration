@@ -28,7 +28,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IConfigurationDocumentMapper>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>().InstancePerLifetimeScope();
+            builder.RegisterType<DatabaseInitializer>().As<IExecuteWhenDatabaseInitializes>()
+                .InstancePerLifetimeScope();
 
             builder.RegisterType<JiraConfigurationStore>()
                 .As<IJiraConfigurationStore>()
@@ -47,7 +48,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .As<IIssueTracker>()
                 .InstancePerLifetimeScope();
 
-            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>().As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
+            builder.RegisterType<DeploymentEnvironmentSettingsMetadataProvider>()
+                .As<IContributeDeploymentEnvironmentSettingsMetadata>().InstancePerDependency();
 
             builder.RegisterType<JiraConfigureCommands>()
                 .As<IContributeToConfigureCommand>()
@@ -67,26 +69,26 @@ namespace Octopus.Server.Extensibility.JiraIntegration
                 .InstancePerDependency();
 
             builder.Register(c =>
-            {
-                var store = c.Resolve<IJiraConfigurationStore>();
-                if (!store.GetIsEnabled())
-                    return null;
+                {
+                    var store = c.Resolve<IJiraConfigurationStore>();
+                    if (!store.GetIsEnabled())
+                        return null;
 
-                var baseUrl = store.GetBaseUrl();
-                var username = store.GetJiraUsername();
-                if (baseUrl == null || username == null)
-                    return null;
+                    var baseUrl = store.GetBaseUrl();
+                    var username = store.GetJiraUsername();
+                    if (baseUrl == null || username == null)
+                        return null;
 
-                var password = store.GetJiraPassword();
-                return new JiraRestClient(
-                    baseUrl,
-                    username,
-                    password?.Value,
-                    c.Resolve<ISystemLog>(),
-                    c.Resolve<IOctopusHttpClientFactory>()
-                );
-            }).As<IJiraRestClient>()
-            .InstancePerDependency();
+                    var password = store.GetJiraPassword();
+                    return new JiraRestClient(
+                        baseUrl,
+                        username,
+                        password?.Value,
+                        c.Resolve<ISystemLog>(),
+                        c.Resolve<IOctopusHttpClientFactory>()
+                    );
+                }).As<IJiraRestClient>()
+                .InstancePerDependency();
 
             builder.RegisterType<JiraIntegrationHomeLinksContributor>().As<IHomeLinksContributor>()
                 .InstancePerDependency();

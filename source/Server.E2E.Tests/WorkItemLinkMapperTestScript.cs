@@ -16,13 +16,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
     [TestFixture]
     public class WorkItemLinkMapperTestScript : WorkItemMapperBaseFixture
     {
-        IWorkItemLinkMapper workItemLinkMapper;
-
         [OneTimeSetUp]
         public void Setup()
         {
-            if(!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
-                Assert.Ignore($"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
+            if (!TryGetJiraSettings(out var baseUrl, out var username, out var authToken))
+                Assert.Ignore(
+                    $"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
 
             var log = Substitute.For<ISystemLog>();
 
@@ -36,6 +35,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 log);
         }
 
+        private IWorkItemLinkMapper workItemLinkMapper;
+
         [Test]
         public void WeCanDeserializeJiraIssuesWithComments()
         {
@@ -44,12 +45,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 new Commit
                 {
                     Id = "123",
-                    Comment = "OATP-1",
+                    Comment = "OATP-1"
                 },
                 new Commit
                 {
                     Id = "234",
-                    Comment = "OATP-9",
+                    Comment = "OATP-9"
                 }
             });
 
@@ -59,7 +60,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             Assert.AreEqual(2, result.Value.Length);
 
             AssertIssueWasReturnedAndHasCorrectDetails("OATP-1", "Test issue 1", result.Value);
-            AssertIssueWasReturnedAndHasCorrectDetails("OATP-9", "This is a release note for Test issue 9", result.Value);
+            AssertIssueWasReturnedAndHasCorrectDetails("OATP-9", "This is a release note for Test issue 9",
+                result.Value);
         }
 
         [Test]
@@ -70,12 +72,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 new Commit
                 {
                     Id = "123",
-                    Comment = "OATP-1",
+                    Comment = "OATP-1"
                 },
                 new Commit
                 {
                     Id = "234",
-                    Comment = "OATP-9999", // non-existent
+                    Comment = "OATP-9999" // non-existent
                 }
             });
 
@@ -95,7 +97,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 new Commit
                 {
                     Id = "234",
-                    Comment = "OATP-9999", // non-existent
+                    Comment = "OATP-9999" // non-existent
                 }
             });
 
@@ -105,7 +107,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             Assert.AreEqual(0, result.Value.Length);
         }
 
-        static void AssertIssueWasReturnedAndHasCorrectDetails(string issueId, string expectedDescription, IEnumerable<WorkItemLink> issues)
+        private static void AssertIssueWasReturnedAndHasCorrectDetails(string issueId, string expectedDescription,
+            IEnumerable<WorkItemLink> issues)
         {
             var issue =
                 issues.FirstOrDefault(v => v.Id.Equals(issueId, StringComparison.OrdinalIgnoreCase));

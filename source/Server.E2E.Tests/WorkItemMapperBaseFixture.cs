@@ -19,7 +19,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         protected const string JiraUsernameEnvironmentVariable = "JiraIntegration_E2E_Username";
         protected const string JiraAuthTokenEnvironmentVariable = "JiraIntegration_E2E_AuthToken";
 
-        internal static JiraRestClient BuildJiraRestClient(string baseUrl, string username, string authToken, ISystemLog log)
+        internal static JiraRestClient BuildJiraRestClient(string baseUrl, string username, string authToken,
+            ISystemLog log)
         {
             var httpClientFactory = BuildOctopusHttpClientFactory(baseUrl, username, authToken);
 
@@ -31,7 +32,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
                 httpClientFactory);
         }
 
-        static IOctopusHttpClientFactory BuildOctopusHttpClientFactory(string baseUrl, string username, string authToken)
+        private static IOctopusHttpClientFactory BuildOctopusHttpClientFactory(string baseUrl, string username,
+            string authToken)
         {
             var httpClient = new HttpClient
             {
@@ -46,7 +48,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             return httpClientFactory;
         }
 
-        internal static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username, string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
+        internal static IJiraConfigurationStore BuildJiraConfigurationStore(string baseUrl, string username,
+            string authToken, bool isEnabled = true, string releaseNotePrefix = "Release note:")
         {
             var store = Substitute.For<IJiraConfigurationStore>();
             store.GetIsEnabled().Returns(isEnabled);
@@ -57,15 +60,16 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             return store;
         }
 
-        protected static bool TryGetJiraSettings(out string jiraBaseUrl, out string jiraUsername, out string jiraAuthToken)
+        protected static bool TryGetJiraSettings(out string jiraBaseUrl, out string jiraUsername,
+            out string jiraAuthToken)
         {
             jiraBaseUrl = Environment.GetEnvironmentVariable(JiraBaseUrlEnvironmentVariable);
             jiraUsername = Environment.GetEnvironmentVariable(JiraUsernameEnvironmentVariable);
             jiraAuthToken = Environment.GetEnvironmentVariable(JiraAuthTokenEnvironmentVariable);
 
             return !jiraBaseUrl.IsNullOrEmpty() &&
-                !jiraUsername.IsNullOrEmpty() &&
-                !jiraAuthToken.IsNullOrEmpty();
+                   !jiraUsername.IsNullOrEmpty() &&
+                   !jiraAuthToken.IsNullOrEmpty();
         }
 
         internal static OctopusBuildInformation CreateBuildInformation(Commit[] commits)

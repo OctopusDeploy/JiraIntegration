@@ -8,11 +8,11 @@ using Octopus.Server.MessageContracts.Features.Projects.Releases.Deployments;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 {
-    class DeploymentObserver : IHandleEvent<DeploymentEvent>
+    internal class DeploymentObserver : IHandleEvent<DeploymentEvent>
     {
-        private JiraDeployment jiraDeployment;
         private readonly IMediator mediator;
         private readonly ITaskLogFactory taskLogFactory;
+        private readonly JiraDeployment jiraDeployment;
 
         public DeploymentObserver(JiraDeployment jiraDeployment,
             IMediator mediator,
@@ -25,7 +25,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
         public async Task Handle(DeploymentEvent domainEvent, CancellationToken cancellationToken)
         {
-            var deployment = (await mediator.Request(new GetDeploymentRequest(domainEvent.DeploymentId), cancellationToken)).Deployment;
+            var deployment =
+                (await mediator.Request(new GetDeploymentRequest(domainEvent.DeploymentId), cancellationToken))
+                .Deployment;
             if (deployment.Changes.All(drn =>
                 drn.BuildInformation.All(pm =>
                     pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
@@ -33,10 +35,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
 
             var taskLog = taskLogFactory.Get(domainEvent.TaskLogCorrelationId);
 
-            await jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), deployment, new JiraIssueTrackerApiDeployment(), taskLog, cancellationToken);
+            await jiraDeployment.PublishToJira(StateFromEventType(domainEvent.EventType), deployment,
+                new JiraIssueTrackerApiDeployment(), taskLog, cancellationToken);
         }
 
-        string StateFromEventType(DeploymentEventType eventType)
+        private string StateFromEventType(DeploymentEventType eventType)
         {
             switch (eventType)
             {
@@ -50,6 +53,5 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     return "unknown";
             }
         }
-
     }
 }

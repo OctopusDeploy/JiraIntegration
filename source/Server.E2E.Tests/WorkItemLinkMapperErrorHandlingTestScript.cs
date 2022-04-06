@@ -17,8 +17,9 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
         [Test]
         public void HttpAuthExceptionShouldLogMeaningfulMessage()
         {
-            if(!TryGetJiraSettings(out var baseUrl, out var username, out var _))
-                Assert.Ignore($"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
+            if (!TryGetJiraSettings(out var baseUrl, out var username, out var _))
+                Assert.Ignore(
+                    $"Configure the following environment variables '{JiraBaseUrlEnvironmentVariable}', '{JiraUsernameEnvironmentVariable}', '{JiraAuthTokenEnvironmentVariable}' to run these tests.");
 
             var log = Substitute.For<ISystemLog>();
 
@@ -42,14 +43,12 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 
             IResultFromExtension<WorkItemLink[]> result = null;
             Should.NotThrow(
-                () =>
-                {
-                    result = workItemLinkMapper.Map(buildInformation);
-                });
+                () => { result = workItemLinkMapper.Map(buildInformation); });
 
             result.ShouldBeOfType<FailureResultFromExtension<WorkItemLink[]>>("A failure should be received");
             var failure = (FailureResultFromExtension<WorkItemLink[]>)result;
-            failure.ErrorString.ShouldStartWith("Authentication failure, check the Jira access token is valid and has permissions to read work items");
+            failure.ErrorString.ShouldStartWith(
+                "Authentication failure, check the Jira access token is valid and has permissions to read work items");
         }
     }
 }
