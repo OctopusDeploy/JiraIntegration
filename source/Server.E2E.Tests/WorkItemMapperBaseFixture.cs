@@ -7,9 +7,9 @@ using Octopus.CoreUtilities.Extensions;
 using Octopus.Data.Model;
 using Octopus.Diagnostics;
 using Octopus.Server.Extensibility.Extensions.Infrastructure.Web.Api;
+using Octopus.Server.Extensibility.Extensions.Model.BuildInformation;
 using Octopus.Server.Extensibility.JiraIntegration.Configuration;
 using Octopus.Server.Extensibility.JiraIntegration.Integration;
-using Octopus.Server.MessageContracts.Features.BuildInformation;
 
 namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
 {
