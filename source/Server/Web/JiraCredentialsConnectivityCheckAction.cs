@@ -30,6 +30,15 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             var requestData = request.GetBody(Data);
 
             var baseUrl = requestData.BaseUrl;
+            if (!ValidateUrl(baseUrl))
+            {
+                var response = new ConnectivityCheckResponse();
+                response.AddMessage(
+                    ConnectivityCheckMessageCategory.Error,
+                    "Invalid data received.");
+                return Result.Response(response);
+            }
+            
             var username = requestData.Username;
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
@@ -57,6 +66,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             }
 
             return Result.Response(connectivityCheckResponse);
+
+            static bool ValidateUrl(string url)
+                => Uri.TryCreate(url, UriKind.Absolute, out var uri)
+                    && new[] { "http", "https" }.Contains(uri.Scheme)
+                    && string.IsNullOrWhiteSpace(uri.Fragment);
         }
     }
 

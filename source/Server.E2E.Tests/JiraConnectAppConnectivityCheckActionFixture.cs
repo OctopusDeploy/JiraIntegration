@@ -44,7 +44,35 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             connectivityCheckResponse.Messages.ShouldNotBeEmpty();
             connectivityCheckResponse.Messages.First().Message.ShouldBe("Failed to get authentication token from Jira Connect App.");
         }
+        
+        [Test]
+        [TestCase("ftp://notexistingdomain.dddd.ttt")]
+        [TestCase("file://notexistingdomain.dddd.ttt")]
+        [TestCase("gopher://notexistingdomain.dddd.ttt")]
+        [TestCase("http://notexistingdomain.dddd.ttt/#")]
+        public async Task WhenInvalidUrlIsUsed(string baseUrl)
+        {
+            var installationIdProvider = Substitute.For<IInstallationIdProvider>();
+            installationIdProvider.GetInstallationId().Returns(Guid.NewGuid());
 
+            store.GetConnectAppUrl().Returns(baseUrl);
+
+            var action = new JiraConnectAppConnectivityCheckAction(log, store, installationIdProvider, new JiraConnectAppClient(installationIdProvider, store, httpClientFactory), httpClientFactory);
+            var octoRequest = Substitute.For<IOctoRequest>();
+            octoRequest.GetBody(Arg.Any<RequestBodyRegistration<JiraConnectAppConnectionCheckData>>())
+                .Returns(
+                    new JiraConnectAppConnectionCheckData
+                        { BaseUrl = baseUrl, Password = "Does not matter" });
+
+            var response = await action.ExecuteAsync(octoRequest);
+
+            var connectivityCheckResponse = (ConnectivityCheckResponse)((OctoDataResponse)response.Response).Model!;
+
+            connectivityCheckResponse.Messages.ShouldNotBeEmpty();
+            connectivityCheckResponse.Messages.First().Category.ShouldBe(ConnectivityCheckMessageCategory.Error);
+            connectivityCheckResponse.Messages.First().Message.ShouldBe("Invalid data received.");
+        }
+        
         [Test]
         public async Task WhenProxyAuthenticationIsRequired()
         {
