@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -45,7 +46,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
             var baseUrl = requestData.BaseUrl;
 
             var connectivityCheckResponse = new ConnectivityCheckResponse();
-
+            if (!ValidateUrl(baseUrl))
+            {
+                connectivityCheckResponse.AddMessage(
+                    ConnectivityCheckMessageCategory.Error,
+                    "Invalid data received.");
+                return Result.Response(connectivityCheckResponse);
+            }
             var username = installationIdProvider.GetInstallationId().ToString();
             // If password here is null, it could be that they're clicking the test connectivity button after saving
             // the configuration as we won't have the value of the password on client side, so we need to retrieve it
@@ -92,6 +99,11 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Web
                 connectivityCheckResponse.AddMessage(ConnectivityCheckMessageCategory.Warning, "The Jira Integration is not enabled, so its functionality will not currently be available");
 
             return Result.Response(connectivityCheckResponse);
+
+            static bool ValidateUrl(string url)
+                => Uri.TryCreate(url, UriKind.Absolute, out var uri) 
+                    && new[] { "http", "https" }.Contains(uri.Scheme) 
+                    && string.IsNullOrWhiteSpace(uri.Fragment);
         }
 #nullable disable
         class JiraConnectAppConnectivityCheckRequest

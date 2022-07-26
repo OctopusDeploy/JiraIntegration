@@ -103,6 +103,13 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                     $"Failed to connect to {baseUrl}. Reason: {e.Message}");
                 return connectivityCheckResponse;
             }
+            catch
+            {
+                connectivityCheckResponse.AddMessage(
+                    ConnectivityCheckMessageCategory.Error,
+                    $"Failed to connect to {baseUrl}.");
+                return connectivityCheckResponse;
+            }
         }
 
         public async Task<IResultFromExtension<JiraIssue[]>> GetIssues(string[] workItemIds)
