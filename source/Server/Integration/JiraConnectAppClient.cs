@@ -49,7 +49,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                         JsonConvert.DeserializeObject<JsonTokenData>(
                             result.Content.ReadAsStringAsync()
                                 .GetAwaiter()
-                                .GetResult());
+                                .GetResult())!;
                     return authTokenFromConnectApp.Token;
                 }
 

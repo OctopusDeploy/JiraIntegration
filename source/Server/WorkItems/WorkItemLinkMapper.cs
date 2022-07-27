@@ -38,8 +38,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             if (!IsEnabled)
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
 
-            if (string.IsNullOrEmpty(store.GetJiraUsername()) ||
-                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
+            if (string.IsNullOrEmpty(store.GetJiraUsername()) || string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
                 return FailureWithLog("Username/password not configured");
 
             var baseUrl = store.GetBaseUrl();
@@ -103,7 +102,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
 
             var releaseNoteRegex = new Regex($"^{releaseNotePrefix}", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => releaseNoteRegex.IsMatch(c));
+            var releaseNote = issue.Fields.Comments.Comments.Select(x => x.Body).Where(x => x is not null).LastOrDefault(c => c is not null && releaseNoteRegex.IsMatch(c));
             return !string.IsNullOrWhiteSpace(releaseNote)
                 ? releaseNoteRegex.Replace(releaseNote, string.Empty)?.Trim() ?? string.Empty
                 : issue.Fields.Summary ?? issue.Key;
