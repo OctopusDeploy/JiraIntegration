@@ -44,7 +44,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             connectivityCheckResponse.Messages.ShouldNotBeEmpty();
             connectivityCheckResponse.Messages.First().Message.ShouldBe("Failed to get authentication token from Jira Connect App.");
         }
-        
+
         [Test]
         [TestCase("ftp://notexistingdomain.dddd.ttt")]
         [TestCase("file://notexistingdomain.dddd.ttt")]
@@ -72,7 +72,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.E2E.Tests
             connectivityCheckResponse.Messages.First().Category.ShouldBe(ConnectivityCheckMessageCategory.Error);
             connectivityCheckResponse.Messages.First().Message.ShouldBe("Invalid data received.");
         }
-        
+
         [Test]
         public async Task WhenProxyAuthenticationIsRequired()
         {

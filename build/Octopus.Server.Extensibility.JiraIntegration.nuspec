@@ -1,4 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
+
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>Octopus.Server.Extensibility.JiraIntegration</id>
@@ -14,12 +15,12 @@
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
         <licenseUrl>https://github.com/OctopusDeploy/JiraIntegration/blob/main/LICENSE.txt</licenseUrl>
         <projectUrl>https://github.com/OctopusDeploy/JiraIntegration</projectUrl>
-        <repository type="git" url="https://github.com/OctopusDeploy/JiraIntegration"/>
+        <repository type="git" url="https://github.com/OctopusDeploy/JiraIntegration" />
         <iconUrl>https://i.octopusdeploy.com/resources/Avatar3_360.png</iconUrl>
         <tags>automation deployment</tags>
         <developmentDependency>true</developmentDependency>
     </metadata>
     <files>
-        <file src="..\source\Server\bin\Release\net5.0\*.dll" target="tools"/>
+        <file src="..\source\Server\bin\Release\net5.0\*.dll" target="tools" />
     </files>
 </package>
