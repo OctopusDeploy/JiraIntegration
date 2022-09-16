@@ -15,8 +15,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
                     drn => drn.BuildInformation
                         .SelectMany(pm => pm.WorkItems)
                         .Where(wi => wi.Source == JiraConfigurationStore.CommentParser)
-                        .Select(wi => wi.Id)
-                        .Distinct())
+                        .Select(wi => wi.Id))
+                .Distinct()
                 .ToArray();
         }
 
