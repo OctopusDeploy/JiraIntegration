@@ -6,15 +6,16 @@
         <AssemblyName>Octopus.Server.Extensibility.JiraIntegration.Tests</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Assent" Version="1.4.2"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1"/>
-        <PackageReference Include="NSubstitute" Version="3.1.0"/>
-        <PackageReference Include="NUnit" Version="3.13.2"/>
-        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0"/>
-        <PackageReference Include="Octokit" Version="0.32.0"/>
-        <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.15"/>
+        <PackageReference Include="Assent" Version="1.4.2" />
+        <PackageReference Include="FluentAssertions" Version="5.10.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+        <PackageReference Include="NSubstitute" Version="3.1.0" />
+        <PackageReference Include="NUnit" Version="3.13.2" />
+        <PackageReference Include="NUnit3TestAdapter" Version="4.0.0" />
+        <PackageReference Include="Octokit" Version="0.32.0" />
+        <PackageReference Include="TeamCity.VSTest.TestAdapter" Version="1.0.15" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\Server\Server.csproj"/>
+        <ProjectReference Include="..\Server\Server.csproj" />
     </ItemGroup>
 </Project>
