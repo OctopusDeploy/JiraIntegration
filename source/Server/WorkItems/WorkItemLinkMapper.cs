@@ -38,8 +38,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.WorkItems
             if (!IsEnabled)
                 return ResultFromExtension<WorkItemLink[]>.ExtensionDisabled();
 
-            if (string.IsNullOrEmpty(store.GetJiraUsername()) ||
-                string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
+            if (string.IsNullOrEmpty(store.GetJiraUsername()) || string.IsNullOrEmpty(store.GetJiraPassword()?.Value))
                 return FailureWithLog("Username/password not configured");
 
             var baseUrl = store.GetBaseUrl();

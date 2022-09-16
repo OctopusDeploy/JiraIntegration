@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
@@ -23,8 +24,8 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests.JiraDeploymentData
             {
                 Changes = new List<ReleaseChangesResource>
                 {
-                    CreateChangesForRelease("1.0.0", new Dictionary<string, string[]>{{"TestPackage1", new [] { "JIR-1", "JIR-2" }}, {"TestPackage2", new [] { "JIR-2" }}}),
-                    CreateChangesForRelease("1.0.1", new Dictionary<string, string[]>{{"TestPackage1", new [] { "JIR-2", "JIR-3" }}, {"TestPackage2", new [] { "JIR-3" }}})
+                    CreateChangesForRelease("1.0.0", new Dictionary<string, string[]> { { "TestPackage1", new[] { "JIR-1", "JIR-2" } }, { "TestPackage2", new[] { "JIR-2" } } }),
+                    CreateChangesForRelease("1.0.1", new Dictionary<string, string[]> { { "TestPackage1", new[] { "JIR-2", "JIR-3" } }, { "TestPackage2", new[] { "JIR-3" } } })
                 }
             };
 
