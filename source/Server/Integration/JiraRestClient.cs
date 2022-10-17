@@ -148,17 +148,18 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Integration
                 var errorResult = await GetResult<JiraErrorResult>(response);
 
                 errorMessage = $"Failed to retrieve Jira issues from {baseUrl}. Response Code: {response.StatusCode}{(errorResult?.ErrorMessages.Any() == true ? $" (Errors: {string.Join(", ", errorResult.ErrorMessages)})" : "")}";
+                systemLog.Warn(errorMessage);
             }
             catch (HttpRequestException e)
             {
                 errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
+                systemLog.Error($"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. ({e.PrettyPrint()})");
             }
             catch (TaskCanceledException e)
             {
                 errorMessage = $"Failed to retrieve Jira issues '{string.Join(", ", workItemIds)}' from {baseUrl}. (Reason: {e.Message})";
+                systemLog.Warn(errorMessage);
             }
-
-            systemLog.Warn(errorMessage);
 
             return ResultFromExtension<JiraIssue[]>.Failed(errorMessage);
         }
