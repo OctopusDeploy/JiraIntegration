@@ -141,6 +141,7 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Tests
         [TestCase("Some text test-foo-")]
         [TestCase("Something $foo-1")]
         [TestCase("Ignore refs followed by alpha chars Feature-0day")]
+        [TestCase("Some text with a date 2022-10-13")]
         // Due to relaxing the RegEx used to parse issues from comments this test case is no longer valid,
         // it's handled by us checking with the Jira instance if the issue exists, or if it doesnt exist
         // it doesn't get included in the list of work items returned to the UI
