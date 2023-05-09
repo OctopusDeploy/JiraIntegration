@@ -28,10 +28,10 @@ namespace Octopus.Server.Extensibility.JiraIntegration.Deployments
         {
             var deployment = (await mediator.Request(new GetDeploymentRequest(domainEvent.DeploymentId), cancellationToken)).Deployment;
             if (deployment.Changes.All(
-                    drn =>
-                        drn.BuildInformation.All(
-                            pm =>
-                                pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
+                drn =>
+                    drn.BuildInformation.All(
+                        pm =>
+                            pm.WorkItems.All(wi => wi.Source != JiraConfigurationStore.CommentParser))))
                 return;
 
             var taskLog = taskLogFactory.Get(domainEvent.TaskLogCorrelationId);
